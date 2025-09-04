@@ -20,15 +20,15 @@ class Engine {
     public:
         static Engine* getInstance() { return m_instance = m_instance != nullptr ? m_instance : new Engine(); }
 
-        bool init(int argc, char* agrv[]) { return true; }
+        bool init(int argc, char* agrv[]);
 
         void update() {}
-        void render() {}
-        void event() {}
+        void render();
+        void event();
 
-        void clean() {}
-
-        bool isRunning() { return m_running; }
+        inline void clean() { glfwTerminate(); }
+        inline bool isRunning() { return m_running; }
+        inline void quit() { m_running = false; }
 
     private:
         Engine() {}
@@ -39,3 +39,6 @@ class Engine {
         // Camera* camera;
 };
 #endif // _ENGINE_H_
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void frame_callback(GLFWwindow* window, int width, int height);
