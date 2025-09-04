@@ -25,13 +25,17 @@ class Camera {
         Camera(glm::vec3 position = {0.0f, 0.0f, 3.0f}, glm::vec3 front = {0.0f, 0.0f, -1.0f}, glm::vec3 up = {0.0, 1.0, 0.0}): m_fov(FOV), m_pitch(PITCH), m_yaw(YAW) {
             m_front = front;
             m_pos = position;
-            m_worldUP = up;
+            m_worldUp = up;
             updateCameraVectors();
         }
 
         void handleKeyInput(DIRECTION dir, float deltaTime);
         void handleScrollInput(float yoffset);
         void handleMouseInput(float xoffset, float yoffset, bool constrainPitch = true);
+
+        glm::mat4 getLookAt() { return glm::lookAt(m_pos, m_front, m_up); }
+        glm::mat4 getPerspective() { return glm::perspective(glm::radians(m_fov), 800 / 600.f, 0.1f, 100.0f); }
+        glm::vec3 getPos() { return m_pos; }
     private:
         void updateCameraVectors();
 
@@ -40,7 +44,7 @@ class Camera {
         glm::vec3 m_right;
         glm::vec3 m_up;
 
-        glm::vec3 m_worldUP;
+        glm::vec3 m_worldUp;
         float m_fov;
         float m_pitch;
         float m_yaw;
