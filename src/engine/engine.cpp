@@ -32,15 +32,16 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
+    
+    // OPENGL setup
+    
+    
+    glEnable(GL_DEPTH_TEST);
+
     // Textures setup
 
-    // OPENGL setup
-
     // Shader setup
-
     
-    // Timer setup
-
     return m_running = true;
 }
 
@@ -58,6 +59,7 @@ void Engine::render() {
     glfwSwapBuffers(m_window);
 }
 
+// Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_Q && action == GLFW_PRESS) { 
         printf("Quitting\n");

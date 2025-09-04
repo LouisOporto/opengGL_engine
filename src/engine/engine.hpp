@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../timer/timer.hpp"
 // #include "../camera/camera.hpp"
 // #include "../shader/shader.hpp"
 // #include "../image_loader/image_loader.hpp"
@@ -36,6 +37,7 @@ class Engine {
 
         GLFWwindow* m_window;
         bool m_running;
+        Timer timer;
         // Camera* camera;
 };
 #endif // _ENGINE_H_
