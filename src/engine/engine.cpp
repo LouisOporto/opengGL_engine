@@ -67,9 +67,8 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-
     // Camera setup
-    // m_camera = new Camera();
+    m_camera = new Camera();
     m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
     m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -83,9 +82,19 @@ void Engine::event() {
     float dt = m_timer.getElapsed();
     if (glfwWindowShouldClose(m_window)) quit();
     // camera handle keyboard input
+    handleKeyInput(dt);
     glfwPollEvents();
 }
 
+void Engine::handleKeyInput(float deltaTime) {
+    if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS);
+    if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS);
+    if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS);
+    if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS);
+    if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS);
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS);
+
+}
 void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.2f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
@@ -121,10 +130,7 @@ void Engine::render() {
 
 // Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS) { 
-        printf("Quitting\n");
-        glfwSetWindowShouldClose(window, GL_TRUE); 
-    }
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {

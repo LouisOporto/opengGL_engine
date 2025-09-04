@@ -11,7 +11,7 @@
 
 #include "../timer/timer.hpp"
 #include "../shader/shader.hpp"
-// #include "../camera/camera.hpp"
+#include "../camera/camera.hpp"
 // #include "../image_loader/image_loader.hpp"
 
 const int SCR_W = 800;
@@ -89,7 +89,11 @@ class Engine {
         void setFirstMouse(const bool& value) { m_firstMouse = value; }
         bool getFirstMouse() const { return m_firstMouse; }
     private:
+        void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
+
+        Camera* getCamera() const { return m_camera; }
+        
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
@@ -105,7 +109,7 @@ class Engine {
         bool m_firstMouse;
         float m_lastX, m_lastY;
 
-        // Camera* camera;
+        Camera* m_camera;
         glm::mat4 m_projection;
         glm::mat4 m_view;
         glm::mat4 m_model; 
