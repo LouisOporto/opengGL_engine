@@ -10,8 +10,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../timer/timer.hpp"
+#include "../shader/shader.hpp"
 // #include "../camera/camera.hpp"
-// #include "../shader/shader.hpp"
 // #include "../image_loader/image_loader.hpp"
 
 const int SCR_W = 800;
@@ -86,8 +86,9 @@ class Engine {
     private:
         Engine() {}
         static Engine* m_instance;
-
         GLFWwindow* m_window;
+        Shader objectShader;
+        // Shader lightShader;
         bool m_running;
         Timer timer;
 
