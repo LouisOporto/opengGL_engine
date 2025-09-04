@@ -87,7 +87,7 @@ class Engine {
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
-        Shader objectShader;
+        Shader m_objShader;
         // Shader lightShader;
         bool m_running;
         Timer timer;

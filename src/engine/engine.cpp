@@ -41,7 +41,9 @@ bool Engine::init(int argc, char* argv[]) {
     // Textures setup
 
     // Shader setup
-    
+    if (!m_objShader.initShader("src//shader/object.vert", "src/shader/object.frag")) {
+        return false;
+    }
     return m_running = true;
 }
 
