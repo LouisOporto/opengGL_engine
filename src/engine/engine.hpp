@@ -92,9 +92,13 @@ class Engine {
         bool m_running;
         Timer timer;
 
-        unsigned int VAO, objectBuffer, lightBuffer;
+        unsigned int VBO, m_objectVAO, m_lightVAO;
         // unsigned int texture0, texture1; 
         // Camera* camera;
+
+        glm::mat3 projection;
+        glm::mat3 view;
+        glm::mat3 model; 
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
