@@ -82,23 +82,28 @@ class Engine {
         inline void clean() { glfwTerminate(); }
         inline bool isRunning() { return m_running; }
         
+        void setLastX(const float& value) { m_lastX = value; }
+        float getLastX() const { return m_lastX; }
+        void setLastY(const float& value) { m_lastY = value; }
+        float getLastY() const { return m_lastY; }
+        void setFirstMouse(const bool& value) { m_firstMouse = value; }
+        bool getFirstMouse() const { return m_firstMouse; }
     private:
-
         inline void quit() { m_running = false; }
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
         Shader m_objShader;
         Shader m_lightShader;
-        Timer timer;
+        Timer m_timer;
         bool m_running;
 
-        unsigned int VBO, m_objectVAO, m_lightVAO;
+        unsigned int m_VBO, m_objectVAO, m_lightVAO;
         // unsigned int texture0, texture1; 
 
         // World perspective        
-        bool firstMouse;
-        float lastX, lastY;
+        bool m_firstMouse;
+        float m_lastX, m_lastY;
 
         // Camera* camera;
         glm::mat4 m_projection;

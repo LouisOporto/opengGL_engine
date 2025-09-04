@@ -35,9 +35,9 @@ bool Engine::init(int argc, char* argv[]) {
     // OPENGL setup
     glGenVertexArrays(1, &m_objectVAO);
     glGenVertexArrays(1, &m_lightVAO);
-    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &m_VBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
 
     glBindVertexArray(m_objectVAO);
@@ -59,17 +59,26 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
+    // if (!m_lightShader.initShader("src/shader/object.vert", "src/shader/object.frag")) {
+    //     return false;
+    // }
+
+
     // Camera setup
     // m_camera = new Camera();
     m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
     m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
+    m_firstMouse = true;
+    float temp = m_timer.getElapsed(); // Not used
+
     return m_running = true;
 }
 
 void Engine::event() {
+    float dt = m_timer.getElapsed();
     if (glfwWindowShouldClose(m_window)) quit();
-
+    // camera handle keyboard input
     glfwPollEvents();
 }
 
@@ -80,7 +89,7 @@ void Engine::render() {
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 inverseModel = glm::inverse(m_model);
-    
+
     m_objShader.use();
     m_objShader.setMat4("projection", m_projection);
     m_objShader.setMat4("view", m_view);
@@ -103,4 +112,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void frame_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow* window, float xpos, float ypos) {
+    if (Engine::getInstance()->getFirstMouse()) {
+        Engine::getInstance()->setLastX(xpos);
+        Engine::getInstance()->setLastY(ypos);
+        Engine::getInstance()->setFirstMouse(false);
+    }
+
+    float xoffset = xpos - Engine::getInstance()->getLastX();
+    float yoffset = Engine::getInstance()->getLastY() - ypos;
+
+    Engine::getInstance()->setLastX(xpos);
+    Engine::getInstance()->setLastY(ypos);
+
+    // Handle in camera
+
+}
+
+void scroll_callback(GLFWwindow* window, float xoffset, float yoffset) {
+    // Handle in camera
 }
