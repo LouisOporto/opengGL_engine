@@ -23,6 +23,8 @@ class Engine {
         void render();
         void event();
 
+        void clean();
+
         bool isRunning() { return m_running; }
 
     private:
