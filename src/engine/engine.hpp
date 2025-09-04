@@ -95,7 +95,8 @@ class Engine {
         // unsigned int texture0, texture1; 
         // Camera* camera;
 };
-#endif // _ENGINE_H_
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void frame_callback(GLFWwindow* window, int width, int height);
+
+#endif // _ENGINE_H_
