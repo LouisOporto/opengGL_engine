@@ -1,3 +1,6 @@
+#ifndef _ENGINE_H_
+#define _ENGINE_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,13 +20,13 @@ class Engine {
     public:
         static Engine* getInstance() { return m_instance = m_instance != nullptr ? m_instance : new Engine(); }
 
-        bool init(int argc, char* agrv[]);
+        bool init(int argc, char* agrv[]) { return true; }
 
-        void update();
-        void render();
-        void event();
+        void update() {}
+        void render() {}
+        void event() {}
 
-        void clean();
+        void clean() {}
 
         bool isRunning() { return m_running; }
 
@@ -35,3 +38,4 @@ class Engine {
         bool m_running;
         // Camera* camera;
 };
+#endif // _ENGINE_H_

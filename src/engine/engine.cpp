@@ -1,4 +1,4 @@
 #include "engine.hpp"
 
-Engine* m_instance = nullptr;
+Engine* Engine::m_instance = nullptr;
 
