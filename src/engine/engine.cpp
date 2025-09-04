@@ -49,6 +49,10 @@ bool Engine::init(int argc, char* argv[]) {
     
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
     glEnableVertexAttribArray(2);
+
+    glBindVertexArray(m_lightVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+    glEnableVertexAttribArray(0);
     
     glEnable(GL_DEPTH_TEST);
 
@@ -59,9 +63,9 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-    // if (!m_lightShader.initShader("src/shader/object.vert", "src/shader/object.frag")) {
-    //     return false;
-    // }
+    if (!m_lightShader.initShader("src/shader/light.vert", "src/shader/light.frag")) {
+        return false;
+    }
 
 
     // Camera setup
@@ -97,6 +101,19 @@ void Engine::render() {
     m_objShader.setMat4("inverseModel", inverseModel);
 
     glBindVertexArray(m_objectVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(0.5f, 0.5f, 0.5f));
+
+    m_lightShader.use();
+    m_lightShader.setMat4("projection", m_projection);
+    m_lightShader.setMat4("view", m_view);
+    m_lightShader.setMat4("model", m_model);
+
+    glBindVertexArray(m_lightVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glfwSwapBuffers(m_window);
