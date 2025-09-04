@@ -79,11 +79,13 @@ void Engine::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
-
+    glm::mat4 inverseModel = glm::inverse(m_model);
+    
     m_objShader.use();
     m_objShader.setMat4("projection", m_projection);
     m_objShader.setMat4("view", m_view);
     m_objShader.setMat4("model", m_model);
+    m_objShader.setMat4("inverseModel", inverseModel);
 
     glBindVertexArray(m_objectVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
