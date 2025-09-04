@@ -1,8 +1,8 @@
 CC = g++
-OBJ = src/main.cpp
+OBJ = src/main.cpp src/engine/engine.cpp
 EXE = project
-INC = C:\\msys64\\ucrt64\\include
-LIB = C:\\msys64\\ucrt64\\lib
+INC = -IC:\\msys64\\ucrt64\\include
+LIB = -LC:\\msys64\\ucrt64\\lib
 LF = -lopengl32 -lglfw3 -lglew32
 
 .PHONY = all build run
