@@ -81,21 +81,26 @@ class Engine {
 
         inline void clean() { glfwTerminate(); }
         inline bool isRunning() { return m_running; }
-        inline void quit() { m_running = false; }
-
+        
     private:
+
+        inline void quit() { m_running = false; }
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
         Shader m_objShader;
-        // Shader lightShader;
-        bool m_running;
+        Shader m_lightShader;
         Timer timer;
+        bool m_running;
 
         unsigned int VBO, m_objectVAO, m_lightVAO;
         // unsigned int texture0, texture1; 
-        // Camera* camera;
 
+        // World perspective        
+        bool firstMouse;
+        float lastX, lastY;
+
+        // Camera* camera;
         glm::mat4 m_projection;
         glm::mat4 m_view;
         glm::mat4 m_model; 
@@ -103,5 +108,7 @@ class Engine {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void frame_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, float xpos, float ypos);
+void scroll_callback(GLFWwindow* window, float xoffset, float yoffset);
 
 #endif // _ENGINE_H_
