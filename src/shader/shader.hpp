@@ -19,7 +19,7 @@ class Shader {
 
         bool initShader(const char* vertexFile, const char* fragmentFIle);
         
-        void useProgram();
+        void use();
 
         void setInt(const char* name, int value) const;
         void setBool(const char* name, bool value ) const;

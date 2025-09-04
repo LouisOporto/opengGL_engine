@@ -92,4 +92,4 @@ void Shader::setMat3(const char* name, glm::mat3 value) const {
     glUniformMatrix3fv(glGetUniformLocation(ID, name), 1, GL_FALSE, &value[0][0]);
 }
 
-void Shader::useProgram() { glUseProgram(ID); }
+void Shader::use() { glUseProgram(ID); }
