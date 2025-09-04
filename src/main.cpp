@@ -2,7 +2,7 @@
 
 int main(int argc, char* argv[]) {
     printf("Starting engine\n");
-    if (Engine::getInstance()->init(argc, argv)) {
+    if (!Engine::getInstance()->init(argc, argv)) {
         printf("Failed to init engine\n");
         return -1;
     }
