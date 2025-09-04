@@ -96,9 +96,9 @@ class Engine {
         // unsigned int texture0, texture1; 
         // Camera* camera;
 
-        glm::mat3 projection;
-        glm::mat3 view;
-        glm::mat3 model; 
+        glm::mat4 m_projection;
+        glm::mat4 m_view;
+        glm::mat4 m_model; 
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);

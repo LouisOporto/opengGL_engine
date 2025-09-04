@@ -59,6 +59,11 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
+    // Camera setup
+    // m_camera = new Camera();
+    m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
+    m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
     return m_running = true;
 }
 
@@ -72,8 +77,13 @@ void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.2f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
 
     m_objShader.use();
+    m_objShader.setMat4("projection", m_projection);
+    m_objShader.setMat4("view", m_view);
+    m_objShader.setMat4("model", m_model);
 
     glBindVertexArray(m_objectVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
