@@ -25,7 +25,7 @@ class Shader {
         void setBool(const char* name, bool value ) const;
         void setFloat(const char* name, float value) const;
         void setVec3(const char* name, glm::vec3 value) const;
-        void setMat3(const char* name, glm::mat3 value) const;
+        void setMat4(const char* name, glm::mat4 value) const;
         
     private:
         unsigned int ID;
