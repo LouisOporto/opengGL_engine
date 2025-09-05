@@ -72,24 +72,54 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
     return true;
 }
 
-void Shader::setInt(const char* name, int value) const {
-    glUniform1i(glGetUniformLocation(ID, name), value);
+void Shader::setInt(const std::string name, int value) const {
+    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Shader::setBool(const char* name, bool value) const {
-    glUniform1i(glGetUniformLocation(ID, name), (int)value);
+void Shader::setBool(const std::string name, bool value) const {
+    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
 
-void Shader::setFloat(const char* name, float value) const {
-    glUniform1f(glGetUniformLocation(ID, name), value);
+void Shader::setFloat(const std::string name, float value) const {
+    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Shader::setVec3(const char* name, glm::vec3 value) const {
-    glUniform3fv(glGetUniformLocation(ID, name), 1, &value[0]);
+void Shader::setVec3(const std::string name, glm::vec3 value) const {
+    glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }
 
-void Shader::setMat4(const char* name, glm::mat4 value) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, &value[0][0]);
+void Shader::setMat4(const std::string name, glm::mat4 value) const {
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+}
+
+void Shader::setPointLight(const std::string name, glm::vec3 pos, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant, float linear, float quadratic) {
+    setVec3(name + ".position", pos);
+    setVec3(name + ".ambient", ambient);
+    setVec3(name + ".diffuse", diffuse);
+    setVec3(name + ".specular", specular);
+    setFloat(name + ".constant", constant);
+    setFloat(name + ".linear", linear);
+    setFloat(name + ".quadratic", quadratic);
+}
+
+void Shader::setSpotLight(const std::string name, glm::vec3 pos, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float cutOff, float outerCutOff, float constant, float linear, float quadratic) {
+    setVec3(name + ".position", pos);
+    setVec3(name + ".direction", direction);
+    setVec3(name + ".ambient", ambient);
+    setVec3(name + ".diffuse", diffuse);
+    setVec3(name + ".specular", specular);
+    setFloat(name + ".constant", constant);
+    setFloat(name + ".linear", linear);
+    setFloat(name + ".quadratic", quadratic);
+    setFloat(name + ".cutOff", cutOff);
+    setFloat(name + ".outerCutOff", outerCutOff);
+}
+
+void Shader::setDirLight(const std::string name, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) {
+    setVec3(name + ".direction", direction);
+    setVec3(name + ".ambient", ambient);
+    setVec3(name + ".diffuse", diffuse);
+    setVec3(name + ".specular", specular);
 }
 
 void Shader::use() { glUseProgram(ID); }
