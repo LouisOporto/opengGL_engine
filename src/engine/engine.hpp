@@ -69,13 +69,21 @@ const glm::vec3 LIGHTPOSITIONS[] = {
     glm::vec3(0.0f, 1.0f, 0.0f),
 };
 
+const glm::vec3 AMB = {0.1f, 0.1f, 0.1f};
+const glm::vec3 DIF = {0.5f, 0.5f, 0.5f};
+const glm::vec3 SPE = {1.0f, 1.0f, 1.0f};
+
+const float CONSTANT = 1.0f;
+const float LINEAR = 0.09f;
+const float QUADRATIC = 0.032f;
+
 class Engine {
     public:
         static Engine* getInstance() { return m_instance = m_instance != nullptr ? m_instance : new Engine(); }
 
         bool init(int argc, char* agrv[]);
 
-        void update() {}
+        void update();
         void render();
         void event();
 
