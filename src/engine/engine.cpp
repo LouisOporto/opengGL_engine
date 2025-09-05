@@ -59,6 +59,9 @@ bool Engine::init(int argc, char* argv[]) {
     glEnable(GL_DEPTH_TEST);
 
     // Textures setup
+    stbi_set_flip_vertically_on_load(true);
+    m_texture0 = ImageLoader::getInstance()->loadImage("../images/box.png", 4);
+    m_texture1 = ImageLoader::getInstance()->loadImage("../images/box_specular.png", 4);
 
     // Shader setup
     if (!m_objShader.initShader("src/shader/object.vert", "src/shader/object.frag")) {

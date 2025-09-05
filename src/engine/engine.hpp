@@ -12,7 +12,7 @@
 #include "../timer/timer.hpp"
 #include "../shader/shader.hpp"
 #include "../camera/camera.hpp"
-// #include "../image_loader/image_loader.hpp"
+#include "../image_loader/image_loader.hpp"
 
 const int SCR_W = 800;
 const int SCR_H = 600;
@@ -103,7 +103,7 @@ class Engine {
         bool m_running;
 
         unsigned int m_VBO, m_objectVAO, m_lightVAO;
-        // unsigned int texture0, texture1; 
+        unsigned int m_texture0, m_texture1;
 
         // World perspective        
         bool m_firstMouse;
