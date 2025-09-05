@@ -73,8 +73,9 @@ bool Engine::init(int argc, char* argv[]) {
     }
 
     m_objShader.use();
-    m_objShader.setInt("texture0", 0);
-    m_objShader.setInt("texture1", 1);
+    m_objShader.setInt("material.diffuse", 0);
+    m_objShader.setInt("material.specular", 1);
+    m_objShader.setFloat("material.shininess", 32.0f);
 
     // Camera setup
     m_camera = new Camera();
