@@ -62,11 +62,11 @@ const float VERTICES[] = {
 };
 
 const glm::vec3 OBJECTPOSITIONS[] = {
-    glm::vec3(0.0f, 1.0f, 1.0f),
+    glm::vec3(0.0f, 0.0f, 0.0f),
 };
 
 const glm::vec3 LIGHTPOSITIONS[] = {
-    glm::vec3(0.0f, 2.0f, 0.0f),
+    glm::vec3(0.0f, 1.0f, 0.0f),
 };
 
 class Engine {

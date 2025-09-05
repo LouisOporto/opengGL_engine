@@ -117,6 +117,7 @@ void Engine::render() {
     m_objShader.use();
     m_objShader.setMat4("projection", m_projection);
     m_objShader.setMat4("view", m_view);
+    m_objShader.setVec3("viewPos", getCamera()->getPos());
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture0);
