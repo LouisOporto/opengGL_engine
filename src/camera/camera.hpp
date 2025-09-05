@@ -8,8 +8,8 @@ const float FOV = 45.0f;
 const float PITCH = 0.0f;
 const float YAW = -90.0f;
 
-const float SENSTIVITY = 0.025f;
-const float VELOCITY = 0.05f;
+const float SENSTIVITY = 0.05f;
+const float VELOCITY = 0.025f;
 
 enum DIRECTION {
     FORWARD,
@@ -30,10 +30,10 @@ class Camera {
         }
 
         void handleKeyInput(DIRECTION dir, float deltaTime);
-        void handleScrollInput(float yoffset);
         void handleMouseInput(float xoffset, float yoffset, bool constrainPitch = true);
+        void handleScrollInput(float yoffset);
 
-        glm::mat4 getLookAt() { return glm::lookAt(m_pos, m_front, m_up); }
+        glm::mat4 getLookAt() { return glm::lookAt(m_pos, m_pos + m_front, m_up); }
         glm::mat4 getPerspective() { return glm::perspective(glm::radians(m_fov), 800 / 600.f, 0.1f, 100.0f); }
         glm::vec3 getPos() { return m_pos; }
     private:
