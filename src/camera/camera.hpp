@@ -36,6 +36,7 @@ class Camera {
         glm::mat4 getLookAt() { return glm::lookAt(m_pos, m_pos + m_front, m_up); }
         glm::mat4 getPerspective() { return glm::perspective(glm::radians(m_fov), 800 / 600.f, 0.1f, 100.0f); }
         glm::vec3 getPos() { return m_pos; }
+        glm::vec3 getFront() { return m_front; }
     private:
         void updateCameraVectors();
 
