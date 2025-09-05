@@ -88,11 +88,11 @@ class Engine {
         float getLastY() const { return m_lastY; }
         void setFirstMouse(const bool& value) { m_firstMouse = value; }
         bool getFirstMouse() const { return m_firstMouse; }
+        Camera* getCamera() const { return m_camera; }
     private:
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
 
-        Camera* getCamera() const { return m_camera; }
         
         Engine() {}
         static Engine* m_instance;
@@ -117,7 +117,7 @@ class Engine {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void frame_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, float xpos, float ypos);
-void scroll_callback(GLFWwindow* window, float xoffset, float yoffset);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 #endif // _ENGINE_H_
