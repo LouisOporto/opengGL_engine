@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include "engine/engine.hpp"
 
 int main(int argc, char* argv[]) {
