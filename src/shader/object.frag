@@ -29,6 +29,9 @@ struct SpotLight {
     vec3 diffuse;
     vec3 specular;
 
+    float cutOff;
+    float outerCutOff;
+
     float constant;
     float linear;
     float quadratic;
