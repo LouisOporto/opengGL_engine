@@ -72,6 +72,10 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
+    m_objShader.use();
+    m_objShader.setInt("texture0", 0);
+    m_objShader.setInt("texture1", 1);
+
     // Camera setup
     m_camera = new Camera();
     m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
@@ -109,6 +113,9 @@ void Engine::render() {
     m_view = getCamera()->getLookAt();
 
     // Cube
+    for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
+
+    }
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 inverseModel = glm::inverse(m_model);
@@ -119,13 +126,21 @@ void Engine::render() {
     m_objShader.setMat4("model", m_model);
     m_objShader.setMat4("inverseModel", inverseModel);
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture1);
+
     glBindVertexArray(m_objectVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // Light
+    for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
+        
+    }
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 1.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(0.5f, 0.5f, 0.5f));
+    m_model = glm::scale(m_model, glm::vec3(0.1f, 0.1f, 0.1f));
 
     m_lightShader.use();
     m_lightShader.setMat4("projection", m_projection);
