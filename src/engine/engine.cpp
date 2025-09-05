@@ -105,25 +105,38 @@ void Engine::handleKeyInput(float deltaTime) {
     if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) getCamera()->handleKeyInput(DOWN, deltaTime);
 }
 
+void Engine::update() {
+    m_projection = getCamera()->getPerspective();
+    m_view = getCamera()->getLookAt();
+
+    glm::vec3 directionVector = {-0.2f, -1.0f, -0.3f};
+
+    m_objShader.use();
+    m_objShader.setMat4("projection", m_projection);
+    m_objShader.setMat4("view", m_view);
+    m_objShader.setVec3("viewPos", getCamera()->getPos());
+    
+    m_objShader.setDirLight("dirLight", directionVector, AMB, DIF, SPE);
+    m_objShader.setPointLight("pointLights[0]", LIGHTPOSITIONS[0], AMB, DIF, SPE, CONSTANT, LINEAR, QUADRATIC);
+    m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), AMB, DIF, SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
+    m_lightShader.use();
+    m_lightShader.setMat4("projection", m_projection);
+    m_lightShader.setMat4("view", m_view);
+
+}
 void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.2f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    m_projection = getCamera()->getPerspective();
-    m_view = getCamera()->getLookAt();
-
     // Cube
     m_objShader.use();
-    m_objShader.setMat4("projection", m_projection);
-    m_objShader.setMat4("view", m_view);
-    m_objShader.setVec3("viewPos", getCamera()->getPos());
-
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture0);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_texture1);
-
+    
     for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
@@ -138,8 +151,6 @@ void Engine::render() {
 
     // Light
     m_lightShader.use();
-    m_lightShader.setMat4("projection", m_projection);
-    m_lightShader.setMat4("view", m_view);
 
     for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
         m_model = glm::mat4(1.0f);
