@@ -1,5 +1,5 @@
 CC = g++
-OBJ = src/main.cpp src/engine/engine.cpp src/timer/timer.cpp src/shader/shader.cpp
+OBJ = src/main.cpp src/engine/engine.cpp src/timer/timer.cpp src/shader/shader.cpp src/camera/camera.cpp
 EXE = project
 INC = -IC:\\msys64\\ucrt64\\include
 LIB = -LC:\\msys64\\ucrt64\\lib

@@ -11,7 +11,7 @@
 
 #include "../timer/timer.hpp"
 #include "../shader/shader.hpp"
-// #include "../camera/camera.hpp"
+#include "../camera/camera.hpp"
 // #include "../image_loader/image_loader.hpp"
 
 const int SCR_W = 800;
@@ -88,8 +88,12 @@ class Engine {
         float getLastY() const { return m_lastY; }
         void setFirstMouse(const bool& value) { m_firstMouse = value; }
         bool getFirstMouse() const { return m_firstMouse; }
+        Camera* getCamera() const { return m_camera; }
     private:
+        void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
+
+        
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
@@ -105,7 +109,7 @@ class Engine {
         bool m_firstMouse;
         float m_lastX, m_lastY;
 
-        // Camera* camera;
+        Camera* m_camera;
         glm::mat4 m_projection;
         glm::mat4 m_view;
         glm::mat4 m_model; 
@@ -113,7 +117,7 @@ class Engine {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void frame_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, float xpos, float ypos);
-void scroll_callback(GLFWwindow* window, float xoffset, float yoffset);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 #endif // _ENGINE_H_

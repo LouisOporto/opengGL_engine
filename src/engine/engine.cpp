@@ -24,6 +24,8 @@ bool Engine::init(int argc, char* argv[]) {
     glfwMakeContextCurrent(m_window);
     glfwSetKeyCallback(m_window, key_callback);
     glfwSetFramebufferSizeCallback(m_window, frame_callback);
+    glfwSetScrollCallback(m_window, scroll_callback);
+    glfwSetCursorPosCallback(m_window, mouse_callback);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = true;
@@ -67,13 +69,12 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-
     // Camera setup
-    // m_camera = new Camera();
+    m_camera = new Camera();
     m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
     m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    m_firstMouse = true;
+    setFirstMouse(true);
     float temp = m_timer.getElapsed(); // Not used
 
     return m_running = true;
@@ -83,13 +84,28 @@ void Engine::event() {
     float dt = m_timer.getElapsed();
     if (glfwWindowShouldClose(m_window)) quit();
     // camera handle keyboard input
+    handleKeyInput(dt);
     glfwPollEvents();
+}
+
+void Engine::handleKeyInput(float deltaTime) {
+    if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS) getCamera()->handleKeyInput(FORWARD, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS) getCamera()->handleKeyInput(BACKWARD, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS) getCamera()->handleKeyInput(LEFT, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) getCamera()->handleKeyInput(RIGHT, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS) getCamera()->handleKeyInput(UP, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) getCamera()->handleKeyInput(DOWN, deltaTime);
 }
 
 void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.2f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_projection = getCamera()->getPerspective();
+    m_view = getCamera()->getLookAt();
+
+    // Cube
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 inverseModel = glm::inverse(m_model);
@@ -103,7 +119,7 @@ void Engine::render() {
     glBindVertexArray(m_objectVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-
+    // Light
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 1.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(0.5f, 0.5f, 0.5f));
@@ -121,33 +137,32 @@ void Engine::render() {
 
 // Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS) { 
-        printf("Quitting\n");
-        glfwSetWindowShouldClose(window, GL_TRUE); 
-    }
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void mouse_callback(GLFWwindow* window, float xpos, float ypos) {
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if (Engine::getInstance()->getFirstMouse()) {
         Engine::getInstance()->setLastX(xpos);
         Engine::getInstance()->setLastY(ypos);
         Engine::getInstance()->setFirstMouse(false);
     }
 
-    float xoffset = xpos - Engine::getInstance()->getLastX();
-    float yoffset = Engine::getInstance()->getLastY() - ypos;
+    float xoffset = (float)xpos - Engine::getInstance()->getLastX();
+    float yoffset = Engine::getInstance()->getLastY() - (float)ypos;
 
-    Engine::getInstance()->setLastX(xpos);
-    Engine::getInstance()->setLastY(ypos);
+    // printf("xoffset: %f, yoffset: %f\n", xoffset, yoffset);
+    Engine::getInstance()->setLastX((float)xpos);
+    Engine::getInstance()->setLastY((float)ypos);
 
     // Handle in camera
-
+    Engine::getInstance()->getCamera()->handleMouseInput(xoffset, yoffset);
 }
 
-void scroll_callback(GLFWwindow* window, float xoffset, float yoffset) {
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     // Handle in camera
+    Engine::getInstance()->getCamera()->handleScrollInput((float)yoffset);
 }
