@@ -52,10 +52,11 @@ uniform Material material;
 uniform SpotLight spotLight;
 uniform DirectionLight dirLight;
 
-#define NUM_OF_POINTS 3
+#define NUM_OF_POINTS 4
 uniform PointLight pointLights[NUM_OF_POINTS];
 uniform vec3 viewPos;
 uniform bool spotLightOn;
+uniform int numPointLights;
 
 in vec3 Normal;
 in vec3 FragPos;
@@ -69,7 +70,7 @@ void main() {
 
     result += calcDirLight(dirLight, normal, viewDir);
 
-    for (int iter = 0; iter < NUM_OF_POINTS; iter++) 
+    for (int iter = 0; iter < numPointLights; iter++) 
     {
         result += calcPointLight(pointLights[iter], normal, FragPos, viewDir);
     }
