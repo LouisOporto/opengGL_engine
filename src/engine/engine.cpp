@@ -112,7 +112,7 @@ void Engine::update() {
     m_projection = getCamera()->getPerspective();
     m_view = getCamera()->getLookAt();
 
-    glm::vec3 directionVector = {-0.2f, -1.0f, -0.3f};
+    glm::vec3 directionVector = {-0.2f, 5.3f, 3.3f};
 
     m_objShader.use();
     m_objShader.setMat4("projection", m_projection);
