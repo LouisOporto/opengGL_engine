@@ -15,19 +15,21 @@ bool Engine::init(int argc, char* argv[]) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     m_window = NULL;
-    m_window = glfwCreateWindow(SCR_W, SCR_H, "Window", NULL, NULL);
+    m_SCR_W = SCR_W;
+    m_SCR_H = SCR_H;
+    m_window = glfwCreateWindow(m_SCR_W, m_SCR_H, "Window", NULL, NULL);
     if (!m_window) {
         fprintf(stderr, "Failed to create window\n");
         return false;
     }
-
+    
     glfwMakeContextCurrent(m_window);
     glfwSetKeyCallback(m_window, key_callback);
     glfwSetFramebufferSizeCallback(m_window, frame_callback);
     glfwSetScrollCallback(m_window, scroll_callback);
     glfwSetCursorPosCallback(m_window, mouse_callback);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+    
     glewExperimental = true;
     if (glewInit() != GLEW_OK) {
         fprintf(stderr, "Failed to init glew\n");
@@ -38,51 +40,52 @@ bool Engine::init(int argc, char* argv[]) {
     glGenVertexArrays(1, &m_objectVAO);
     glGenVertexArrays(1, &m_lightVAO);
     glGenBuffers(1, &m_VBO);
-
+    
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
-
+    
     glBindVertexArray(m_objectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
-
+    
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
     glEnableVertexAttribArray(1);
     
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
     glEnableVertexAttribArray(2);
-
+    
     glBindVertexArray(m_lightVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
     
     glEnable(GL_DEPTH_TEST);
-
+    
     // Textures setup
     stbi_set_flip_vertically_on_load(true);
     m_texture0 = ImageLoader::getInstance()->loadImage("images/box.png", 4);
     m_texture1 = ImageLoader::getInstance()->loadImage("images/box_specular.png", 4);
-
+    
     // Shader setup
     if (!m_objShader.initShader("src/shader/object.vert", "src/shader/object.frag")) {
         return false;
     }
-
+    
     if (!m_lightShader.initShader("src/shader/light.vert", "src/shader/light.frag")) {
         return false;
     }
-
+    
     m_objShader.use();
     m_objShader.setInt("material.diffuse", 0);
     m_objShader.setInt("material.specular", 1);
     m_objShader.setFloat("material.shininess", 32.0f);
-
+    
     // Camera setup
-    m_camera = new Camera();
+    m_camera = new Camera(m_SCR_W, m_SCR_H);
     m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
     m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     setFirstMouse(true);
+    m_lightOn = false;
     float temp = m_timer.getElapsed(); // Not used
 
     return m_running = true;
@@ -117,15 +120,20 @@ void Engine::update() {
     m_objShader.setVec3("viewPos", getCamera()->getPos());
     
     m_objShader.setDirLight("dirLight", directionVector, AMB, DIF, SPE);
-    m_objShader.setPointLight("pointLights[0]", LIGHTPOSITIONS[0], AMB, DIF, SPE, CONSTANT, LINEAR, QUADRATIC);
+    m_objShader.setInt("numPointLights", sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3));
+    for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
+        m_objShader.setPointLight("pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter], AMB, DIF, SPE, CONSTANT, LINEAR, QUADRATIC);
+    }
+    m_objShader.setBool("spotLightOn", m_lightOn);
     m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), AMB, DIF, SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
+    
     m_lightShader.use();
     m_lightShader.setMat4("projection", m_projection);
     m_lightShader.setMat4("view", m_view);
 
 }
 void Engine::render() {
-    glm::vec4 background = {0.1f, 0.1f, 0.2f, 1.0f};
+    glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -169,10 +177,15 @@ void Engine::render() {
 // Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) { Engine::getInstance()->toggleLight(); }
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+
+    // Update width and height values;
+    Engine::getInstance()->getCamera()->setWidth(width);
+    Engine::getInstance()->getCamera()->setHeight(height);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
