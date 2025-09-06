@@ -64,7 +64,7 @@ void main() {
 
     vec3 result = calcDirLight(dirLight, normal, viewDir);
 
-    for (int iter = 0; iter < 1; iter++) {
+    for (int iter = 0; iter < NUM_OF_POINTS; iter++) {
         result += calcPointLight(pointLights[iter], normal, FragPos, viewDir);
     }
 
