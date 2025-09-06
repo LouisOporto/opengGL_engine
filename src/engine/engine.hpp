@@ -14,8 +14,8 @@
 #include "../camera/camera.hpp"
 #include "../image_loader/image_loader.hpp"
 
-const int SCR_W = 800;
-const int SCR_H = 600;
+const int SCR_W = 1920;
+const int SCR_H = 1080;
 
 const float VERTICES[] = {
     -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  1.0,
@@ -66,7 +66,9 @@ const glm::vec3 OBJECTPOSITIONS[] = {
 };
 
 const glm::vec3 LIGHTPOSITIONS[] = {
-    glm::vec3(0.0f, 1.0f, 0.0f),
+    glm::vec3(0.0f, 3.0f, 2.5f),
+    glm::vec3(-3.0f, 0.0f, -1.3f),
+    glm::vec3(0.0f, -1.2f, 3.0f),
 };
 
 const glm::vec3 AMB = {0.1f, 0.1f, 0.1f};
@@ -97,6 +99,7 @@ class Engine {
         void setFirstMouse(const bool& value) { m_firstMouse = value; }
         bool getFirstMouse() const { return m_firstMouse; }
         Camera* getCamera() const { return m_camera; }
+        void toggleLight() { m_lightOn = !m_lightOn; }
     private:
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
@@ -115,12 +118,16 @@ class Engine {
 
         // World perspective        
         bool m_firstMouse;
+        bool m_lightOn;
         float m_lastX, m_lastY;
 
         Camera* m_camera;
         glm::mat4 m_projection;
         glm::mat4 m_view;
         glm::mat4 m_model; 
+
+        int m_SCR_W;
+        int m_SCR_H;
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
