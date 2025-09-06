@@ -126,8 +126,7 @@ class Engine {
         glm::mat4 m_view;
         glm::mat4 m_model; 
 
-        int m_SCR_W;
-        int m_SCR_H;
+        int m_SCR_W, m_SCR_H;
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
