@@ -66,9 +66,9 @@ const glm::vec3 OBJECTPOSITIONS[] = {
 };
 
 const glm::vec3 LIGHTPOSITIONS[] = {
-    glm::vec3(0.0f, 3.0f, 2.5f),
-    glm::vec3(-3.0f, 0.0f, -1.3f),
-    glm::vec3(0.0f, -1.2f, 3.0f),
+    glm::vec3(0.0f, 2.0f, 2.5f),
+    glm::vec3(-3.0f, 3.0f, -1.3f),
+    glm::vec3(0.0f, -1.2f, 1.2f),
 };
 
 const glm::vec3 AMB = {0.1f, 0.1f, 0.1f};
