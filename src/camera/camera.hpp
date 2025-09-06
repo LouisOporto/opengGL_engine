@@ -26,8 +26,8 @@ class Camera {
             m_front = front;
             m_pos = position;
             m_worldUp = up;
-            SCR_W = scr_w;
-            SCR_H = scr_h;
+            m_SCR_W = scr_w;
+            m_SCR_H = scr_h;
             updateCameraVectors();
         }
 
@@ -40,8 +40,8 @@ class Camera {
         glm::vec3 getPos() { return m_pos; }
         glm::vec3 getFront() { return m_front; }
 
-        void setWidth(int value) { SCR_W = value; }
-        void setHeight(int value) { SCR_H = value; }
+        void setWidth(int value) { m_SCR_W = value; }
+        void setHeight(int value) { m_SCR_H = value; }
     private:
         void updateCameraVectors();
 
@@ -50,8 +50,8 @@ class Camera {
         glm::vec3 m_right;
         glm::vec3 m_up;
         
-        int SCR_W;
-        int SCR_H;
+        int m_SCR_W;
+        int m_SCR_H;
 
         glm::vec3 m_worldUp;
         float m_fov;
