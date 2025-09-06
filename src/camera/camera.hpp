@@ -36,7 +36,7 @@ class Camera {
         void handleScrollInput(float yoffset);
 
         glm::mat4 getLookAt() { return glm::lookAt(m_pos, m_pos + m_front, m_up); }
-        glm::mat4 getPerspective() { return glm::perspective(glm::radians(m_fov), SCR_W / (float)SCR_H, 0.1f, 100.0f); }
+        glm::mat4 getPerspective() { return glm::perspective(glm::radians(m_fov), m_SCR_W / (float)m_SCR_H, 0.1f, 100.0f); }
         glm::vec3 getPos() { return m_pos; }
         glm::vec3 getFront() { return m_front; }
 
