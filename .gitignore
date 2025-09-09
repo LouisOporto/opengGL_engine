@@ -1,2 +1,6 @@
 # files
 *.exe
+
+#Folders
+/build
+/required_libraries
