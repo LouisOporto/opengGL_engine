@@ -5,7 +5,7 @@ INC = -IC:\\msys64\\ucrt64\\include
 LIB = -LC:\\msys64\\ucrt64\\lib
 LF = -lopengl32 -lglfw3 -lglew32
 
-.PHONY = all build run
+.PHONY: all build run
 
 all: build run
 
