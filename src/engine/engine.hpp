@@ -64,7 +64,7 @@ const float VERTICES[] = {
 const glm::vec3 OBJECTPOSITIONS[] = {
     glm::vec3(0.0f, 0.0f, 0.0f),
     glm::vec3(3.2f, 0.3f, -5.0f),
-    glm::vec3(-3.4f, -2.f, 3.0f),
+    glm::vec3(-2.4f, -2.f, 2.0f),
     glm::vec3(0.0f, 3.0f, -3.0f),
 };
 
@@ -74,9 +74,9 @@ const glm::vec3 LIGHTPOSITIONS[] = {
     glm::vec3(0.0f, -1.2f, 1.2f),
 };
 
-const glm::vec3 AMB = {0.1f, 0.1f, 0.1f};
-const glm::vec3 DIF = {0.5f, 0.5f, 0.5f};
-const glm::vec3 SPE = {1.0f, 1.0f, 1.0f};
+const float AMB = 0.1f; 
+const float DIF = 0.7f;
+const float SPE = 1.0f;
 
 const float CONSTANT = 1.0f;
 const float LINEAR = 0.09f;

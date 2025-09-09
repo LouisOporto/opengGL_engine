@@ -114,22 +114,27 @@ void Engine::update() {
 
     glm::vec3 directionVector = {-0.2f, 5.3f, 3.3f};
 
+    m_lightShader.use();
+    m_lightShader.setMat4("projection", m_projection);
+    m_lightShader.setMat4("view", m_view);
+
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+
     m_objShader.use();
     m_objShader.setMat4("projection", m_projection);
     m_objShader.setMat4("view", m_view);
     m_objShader.setVec3("viewPos", getCamera()->getPos());
     
-    m_objShader.setDirLight("dirLight", directionVector, AMB, DIF, SPE);
+    m_objShader.setDirLight("dirLight", directionVector, lightColor * AMB, lightColor * DIF, lightColor * SPE);
     m_objShader.setInt("numPointLights", sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3));
     for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
-        m_objShader.setPointLight("pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter], AMB, DIF, SPE, CONSTANT, LINEAR, QUADRATIC);
+        glm::vec3 color = {iter == 0 ? 1.0f : 0.7f, iter == 1 ? 1.0f : 0.7f, iter == 2 ? 1.0f : 0.7f};
+        m_objShader.setPointLight("pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter], color * AMB, color * DIF, color * SPE, CONSTANT, LINEAR, QUADRATIC);
     }
+    glm::vec3 spotlightColor = {1.0f, 1.0f, 0.3f};
     m_objShader.setBool("spotLightOn", m_lightOn);
-    m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), AMB, DIF, SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
+    m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), spotlightColor * AMB, spotlightColor * DIF, spotlightColor * SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
     
-    m_lightShader.use();
-    m_lightShader.setMat4("projection", m_projection);
-    m_lightShader.setMat4("view", m_view);
 
 }
 void Engine::render() {
@@ -148,6 +153,7 @@ void Engine::render() {
     for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
+        m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
         glm::mat4 inverseModel = glm::inverse(m_model);
 
         m_objShader.setMat4("model", m_model);
@@ -166,6 +172,7 @@ void Engine::render() {
         m_model = glm::scale(m_model, glm::vec3(0.1f, 0.1f, 0.1f));
 
         m_lightShader.setMat4("model", m_model);
+        m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f : 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
 
         glBindVertexArray(m_lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
