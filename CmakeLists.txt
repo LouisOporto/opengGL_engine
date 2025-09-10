@@ -1,13 +1,25 @@
 cmake_minimum_required(VERSION 3.18)
 project(opengl_engine LANGUAGES CXX)
 
+# CMAKE Standards
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Release)
 
+# Locate needed libraries
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
+
+# Define imported DLL
+add_library(libassimp SHARED IMPORTED)
+
+# Specify location of DLL, import library and headers
+set_target_properties(libassimp PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/libs/libassimp-6.dll"
+    IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/libs/libassimp-6.dll"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
 
 add_executable(${CMAKE_PROJECT_NAME} 
     src/main.cpp 
@@ -15,7 +27,11 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/shader/shader.cpp 
     src/timer/timer.cpp 
     src/image_loader/image_loader.cpp 
-    src/camera/camera.cpp)
+    src/camera/camera.cpp
+)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OpenGL::GL GLEW::GLEW glfw)
+# Linking all required libraries
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OpenGL::GL GLEW::GLEW glfw libassimp)
+
+# Include libgcc and libstdc++ for retrieving dll libraries
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
