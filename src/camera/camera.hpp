@@ -1,15 +1,18 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
+#include <stdio.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 const float FOV = 45.0f;
 const float PITCH = 0.0f;
 const float YAW = -90.0f;
+const float ROLL = 00.0f;
 
 const float SENSTIVITY = 0.05f;
 const float VELOCITY = 0.005f;
+const float ROLLING = 0.10f;
 
 enum DIRECTION {
     FORWARD,
@@ -18,11 +21,13 @@ enum DIRECTION {
     RIGHT,
     UP,
     DOWN,
+    ROLL_LEFT,
+    ROLL_RIGHT,
 };
 
 class Camera {
     public:
-        Camera(int scr_w, int scr_h, glm::vec3 position = {0.0f, 0.0f, 10.0f}, glm::vec3 front = {0.0f, 0.0f, -1.0f}, glm::vec3 up = {0.0, 1.0, 0.0}): m_fov(FOV), m_pitch(PITCH), m_yaw(YAW) {
+        Camera(int scr_w, int scr_h, glm::vec3 position = {0.0f, 0.0f, 10.0f}, glm::vec3 front = {0.0f, 0.0f, -1.0f}, glm::vec3 up = {0.0, 1.0, 0.0}): m_fov(FOV), m_pitch(PITCH), m_yaw(YAW), m_roll(ROLL) {
             m_front = front;
             m_pos = position;
             m_worldUp = up;
@@ -57,6 +62,7 @@ class Camera {
         float m_fov;
         float m_pitch;
         float m_yaw;
+        float m_roll;
 };
 
 #endif // _CAMERA_H_
