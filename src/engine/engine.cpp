@@ -106,6 +106,8 @@ void Engine::handleKeyInput(float deltaTime) {
     if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) getCamera()->handleKeyInput(RIGHT, deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS) getCamera()->handleKeyInput(UP, deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) getCamera()->handleKeyInput(DOWN, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS) getCamera()->handleKeyInput(ROLL_LEFT, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS) getCamera()->handleKeyInput(ROLL_RIGHT, deltaTime);
 }
 
 void Engine::update() {
@@ -183,7 +185,7 @@ void Engine::render() {
 
 // Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
     if (key == GLFW_KEY_F && action == GLFW_PRESS) { Engine::getInstance()->toggleLight(); }
 }
 
