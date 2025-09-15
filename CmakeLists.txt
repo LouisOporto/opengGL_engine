@@ -28,6 +28,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/timer/timer.cpp 
     src/image_loader/image_loader.cpp 
     src/camera/camera.cpp
+    src/mesh/mesh.cpp
 )
 
 # Linking all required libraries
