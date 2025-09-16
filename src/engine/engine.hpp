@@ -71,9 +71,9 @@ const glm::vec3 OBJECTPOSITIONS[] = {
 };
 
 const glm::vec3 LIGHTPOSITIONS[] = {
-    glm::vec3(3.0f, 2.0f, 2.5f),
-    glm::vec3(-3.0f, 3.0f, -1.3f),
-    glm::vec3(0.0f, -1.2f, 1.2f),
+    glm::vec3(3.0f, 12.0f, 2.5f),
+    glm::vec3(-3.0f, 6.0f, 1.3f),
+    glm::vec3(0.0f, -1.2f, 3.2f),
 };
 
 const float AMB = 0.1f; 
@@ -113,6 +113,7 @@ class Engine {
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
+        Model* m_objModel;
         Shader m_objShader;
         Shader m_lightShader;
         Timer m_timer;
