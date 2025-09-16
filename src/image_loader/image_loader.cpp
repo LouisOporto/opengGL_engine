@@ -23,7 +23,7 @@ unsigned int ImageLoader::loadImage(const char *path, const std::string &directo
         stbi_image_free(data);
     }
     else {
-        printf("Textures failed to laod path: %s", filepath);
+        printf("Textures failed to load path: %s", filepath.c_str());
         stbi_image_free(data);
     }
 
