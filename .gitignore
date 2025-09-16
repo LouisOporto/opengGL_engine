@@ -4,3 +4,5 @@
 #Folders
 /build
 /required_libraries
+/.vscode
+/include
