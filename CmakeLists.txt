@@ -16,8 +16,8 @@ add_library(libassimp SHARED IMPORTED)
 
 # Specify location of DLL, import library and headers
 set_target_properties(libassimp PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/libs/libassimp-6.dll"
-    IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/libs/libassimp-6.dll"
+    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/libassimp-6.dll"
+    IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/libassimp-6.dll"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
@@ -29,6 +29,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/image_loader/image_loader.cpp 
     src/camera/camera.cpp
     src/mesh/mesh.cpp
+    src/model/model.cpp
 )
 
 # Linking all required libraries
