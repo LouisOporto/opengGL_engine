@@ -25,7 +25,7 @@ class Mesh {
         std::vector<unsigned int> m_indices;
         std::vector<Texture> m_textures;
 
-        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> tetures) ;
+        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
         void draw(Shader &shader);
     private:
         // render data

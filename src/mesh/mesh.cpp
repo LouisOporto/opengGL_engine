@@ -14,8 +14,8 @@ void Mesh::setupMesh() {
     glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -31,4 +31,8 @@ void Mesh::setupMesh() {
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
+}
+
+void Mesh::draw(Shader& shader) {
+    
 }

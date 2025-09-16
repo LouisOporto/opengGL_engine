@@ -88,6 +88,11 @@ bool Engine::init(int argc, char* argv[]) {
     m_lightOn = false;
     float temp = m_timer.getElapsed(); // Not used
 
+    Vertex vertex;
+    vertex.position = glm::vec3(1.0f);
+    vertex.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+    vertex.texCoords = glm::vec2(0.0f, 0.0f);
+
     return m_running = true;
 }
 
