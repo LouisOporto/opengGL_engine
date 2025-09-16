@@ -14,6 +14,7 @@
 #include "../camera/camera.hpp"
 #include "../image_loader/image_loader.hpp"
 #include "../mesh/mesh.hpp"
+#include "../model/model.hpp"
 
 const int SCR_W = 1920;
 const int SCR_H = 1080;
