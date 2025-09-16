@@ -22,7 +22,7 @@ enum DIRECTION {
 
 class Camera {
     public:
-        Camera(int scr_w, int scr_h, glm::vec3 position = {0.0f, 0.0f, 10.0f}, glm::vec3 front = {0.0f, 0.0f, -1.0f}, glm::vec3 up = {0.0, 1.0, 0.0}): m_fov(FOV), m_pitch(PITCH), m_yaw(YAW) {
+        Camera(int scr_w, int scr_h, glm::vec3 position = {0.0f, 0.0f, 20.0f}, glm::vec3 front = {0.0f, 0.0f, -1.0f}, glm::vec3 up = {0.0, 1.0, 0.0}): m_fov(FOV), m_pitch(PITCH), m_yaw(YAW) {
             m_front = front;
             m_pos = position;
             m_worldUp = up;
