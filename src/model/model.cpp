@@ -8,7 +8,7 @@ void Model::draw(Shader &shader) {
 
 void Model::loadModel(std::string path) {
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         printf("ERROR::ASSIMP::%s\n", import.GetErrorString());
@@ -33,7 +33,9 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
+    // ColorInformation colorInfo;
     std::vector<Texture> textures;
+    printf("Processing mesh: %s\n", mesh->mName.C_Str());
 
     for (int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
@@ -72,27 +74,64 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
     // process materials
     if (mesh->mMaterialIndex >= 0) {
+        // printf("Mesh size: %d\n", mesh->mMaterialIndex);
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
         std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,"texture_specular");
+        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        
+        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+        
+        // std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+        // textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+        
+        // colorInfo = {textures, {div   vffuse.r, diffuse.g, diffuse.b}, {specular.r, specular.g, specular.b}, shininess.r};
     }
-
+    
+    // printf("Number of textures: %d\n", textures.size());
+    
     return Mesh(vertices, indices, textures);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
     std::vector<Texture> textures;
-    for (int i = 0; i <  mat->GetTextureCount(type); i++) {
+    printf("Texture count for type: %s, Count: %d\n", typeName.c_str(), mat->GetTextureCount(type));
+    for (int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
-        Texture texture;
-        texture.id = ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
-        texture.type = typeName;
-        texture.path = str.C_Str();
-        textures.push_back(texture);
+        bool skip = false;
+        for (int j = 0; j < m_texturesLoaded.size(); j++) {
+            if (std::strcmp(m_texturesLoaded[j].path.data(), str.C_Str()) == 0) {
+                textures.push_back(m_texturesLoaded[j]);
+                skip = true;
+                break;
+            }
+        }
+        if (!skip) {
+            Texture texture;
+            aiColor3D ambient, diffuse, specular, shininess;
+            printf("Loading image file: %s\n", str.C_Str());
+
+            mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+            mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+            mat->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+            mat->Get(AI_MATKEY_SHININESS, shininess);
+
+            texture.id = ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
+            // printf("texture.id = %d, Typename: %s\n", texture.id, typeName.c_str());
+            texture.type = typeName;
+            texture.path = str.C_Str();
+            texture.ambient = {ambient.r, ambient.g, ambient.b};
+            texture.diffuse = {diffuse.r, diffuse.g, diffuse.b};
+            texture.specular = {specular.r, diffuse.g, diffuse.b};
+            texture.shininess = shininess.r;
+
+            textures.push_back(texture);
+            m_texturesLoaded.push_back(texture);
+        }
     }
     return textures;
 }

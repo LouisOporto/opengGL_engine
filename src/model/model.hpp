@@ -13,12 +13,13 @@
 
 class Model {
     public:
-        Model(char *path) {
+        Model(const char *path) {
             loadModel(path);
         }
         void draw(Shader &shader);
     private:
         std::vector<Mesh> m_meshes;
+        std::vector<Texture> m_texturesLoaded;
         std::string directory;
 
         void loadModel(std::string path);
