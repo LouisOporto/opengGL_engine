@@ -65,7 +65,7 @@ void Mesh::draw(Shader& shader) {
         shader.setVec3("material.ambient", m_textures[i].diffuse);
         shader.setVec3("material.diffuse", m_textures[i].diffuse);
         shader.setVec3("material.specular", m_textures[i].specular);
-        // shader.setFloat("material.shininess", m_textures[i].shininess);
+        shader.setFloat("material.shininess", m_textures[i].shininess);
     }
 
     if (!missingDiffuse) shader.setBool("material.missingDiffuse", true);

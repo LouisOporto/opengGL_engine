@@ -151,18 +151,18 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 ambient = light.ambient * material.diffuse * vec3(texture(material.texture_diffuse1, TexCoord));
 
     float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, TexCoord));
+    vec3 diffuse = light.diffuse * material.diffuse * diff * vec3(texture(material.texture_diffuse1, TexCoord));
     
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(reflectDir, viewDir), 0.0), material.shininess);
-    vec3 specular = light.specular * spec * vec3(texture(material.texture_specular1, TexCoord));
+    vec3 specular = light.specular * material.specular * spec * vec3(texture(material.texture_specular1, TexCoord));
 
     if (!material.missingDiffuse) { 
-        ambient = light.ambient * material.diffuse * vec3(1.0);
-        diffuse = light.diffuse * material.diffuse * diff * vec3(1.0);
+        ambient = light.ambient * material.diffuse * vec3(0.0);
+        diffuse = light.diffuse * material.diffuse * diff * vec3(0.0);
     }
     if (!material.missingSpecular) {
-        specular = light.specular * material.specular * spec * vec3(1.0);
+        specular = light.specular * material.specular * spec * vec3(0.0);
     }
 
     float theta = dot(lightDir, normalize(-light.direction));

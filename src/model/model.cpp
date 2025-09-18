@@ -112,7 +112,8 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
         }
         if (!skip) {
             Texture texture;
-            aiColor3D ambient, diffuse, specular, shininess;
+            aiColor3D ambient, diffuse, specular;
+            float shininess;
             printf("Loading image file: %s\n", str.C_Str());
 
             mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
@@ -127,7 +128,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
             texture.ambient = {ambient.r, ambient.g, ambient.b};
             texture.diffuse = {diffuse.r, diffuse.g, diffuse.b};
             texture.specular = {specular.r, diffuse.g, diffuse.b};
-            texture.shininess = shininess.r;
+            texture.shininess = shininess;
 
             textures.push_back(texture);
             m_texturesLoaded.push_back(texture);
