@@ -7,6 +7,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 uniform mat4 inverseModel;
+uniform sampler2D texture_normal1;
 
 out vec3 Normal;
 out vec3 FragPos;
