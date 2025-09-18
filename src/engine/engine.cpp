@@ -156,24 +156,34 @@ void Engine::render() {
 
     // Cube
     m_objShader.use();
-    
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_texture1);
-    
-    for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
-        m_model = glm::mat4(1.0f);
-        m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
-        m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
-        glm::mat4 inverseModel = glm::inverse(m_model);
 
-        m_objShader.setMat4("model", m_model);
-        m_objShader.setMat4("inverseModel", inverseModel);
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 inverseModel = glm::inverse(m_model);
 
-        glBindVertexArray(m_objectVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    m_objShader.setMat4("model", m_model);
+    m_objShader.setMat4("inverseModel", inverseModel);
+
+    m_objModel->draw(m_objShader);
+    
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, m_texture0);
+    // glActiveTexture(GL_TEXTURE1);
+    // glBindTexture(GL_TEXTURE_2D, m_texture1);
+    
+    // for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
+    //     m_model = glm::mat4(1.0f);
+    //     m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
+    //     m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
+    //     glm::mat4 inverseModel = glm::inverse(m_model);
+
+    //     m_objShader.setMat4("model", m_model);
+    //     m_objShader.setMat4("inverseModel", inverseModel);
+
+    //     glBindVertexArray(m_objectVAO);
+    //     glDrawArrays(GL_TRIANGLES, 0, 36);
+    // }
 
     // Light
     m_lightShader.use();
