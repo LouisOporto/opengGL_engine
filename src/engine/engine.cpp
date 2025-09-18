@@ -80,8 +80,8 @@ bool Engine::init(int argc, char* argv[]) {
     }
     
     m_objShader.use();
-    m_objShader.setInt("material.diffuse", 0);
-    m_objShader.setInt("material.specular", 1);
+    // m_objShader.setInt("material.diffuse", 0);
+    // m_objShader.setInt("material.specular", 1);
     m_objShader.setFloat("material.shininess", 32.0f);
     
     // Camera setup
@@ -122,13 +122,14 @@ void Engine::update() {
     m_projection = getCamera()->getPerspective();
     m_view = getCamera()->getLookAt();
 
-    glm::vec3 directionVector = {-0.2f, 5.3f, 3.3f};
+    glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
 
     m_lightShader.use();
     m_lightShader.setMat4("projection", m_projection);
     m_lightShader.setMat4("view", m_view);
 
-    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    // glm::vec3 lightColor = glm::vec3(0.5f, 0.5f, 0.5f);
+    glm::vec3 lightColor = glm::vec3(1.0f);
 
     m_objShader.use();
     m_objShader.setMat4("projection", m_projection);
@@ -139,6 +140,7 @@ void Engine::update() {
     m_objShader.setInt("numPointLights", sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3));
     for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
         glm::vec3 color = {iter == 0 ? 1.0f : 0.7f, iter == 1 ? 1.0f : 0.7f, iter == 2 ? 1.0f : 0.7f};
+        color = glm::vec3(1.0f, 1.0f, 1.0f);
         m_objShader.setPointLight("pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter], color * AMB, color * DIF, color * SPE, CONSTANT, LINEAR, QUADRATIC);
     }
     glm::vec3 spotlightColor = {1.0f, 1.0f, 0.3f};
@@ -179,10 +181,11 @@ void Engine::render() {
     for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
-        m_model = glm::scale(m_model, glm::vec3(0.1f, 0.1f, 0.1f));
+        m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
 
         m_lightShader.setMat4("model", m_model);
         m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f : 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
+        m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
 
         glBindVertexArray(m_lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
