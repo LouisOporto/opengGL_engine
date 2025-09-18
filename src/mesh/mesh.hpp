@@ -17,7 +17,19 @@ struct Texture {
     unsigned int id;
     std::string type;
     std::string path;
+
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
 };
+
+// struct ColorInformation {
+//     std::vector<Texture> textures;
+//     glm::vec3 diffuse;
+//     glm::vec3 specular;
+//     float shininess;
+// };
 
 class Mesh {
     public:
