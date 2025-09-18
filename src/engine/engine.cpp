@@ -44,15 +44,15 @@ bool Engine::init(int argc, char* argv[]) {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
     
-    glBindVertexArray(m_objectVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
-    glEnableVertexAttribArray(0);
+    // glBindVertexArray(m_objectVAO);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+    // glEnableVertexAttribArray(0);
     
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
+    // glEnableVertexAttribArray(1);
     
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
-    glEnableVertexAttribArray(2);
+    // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
+    // glEnableVertexAttribArray(2);
     
     glBindVertexArray(m_lightVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
@@ -61,10 +61,15 @@ bool Engine::init(int argc, char* argv[]) {
     glEnable(GL_DEPTH_TEST);
     
     // Textures setup
-    stbi_set_flip_vertically_on_load(true);
-    m_texture0 = ImageLoader::getInstance()->loadImage("box.png", "images");
-    m_texture1 = ImageLoader::getInstance()->loadImage("box_specular.png", "images");
+    // stbi_set_flip_vertically_on_load(true);
+    // m_texture0 = ImageLoader::getInstance()->loadImage("box.png", "images");
+    // m_texture1 = ImageLoader::getInstance()->loadImage("box_specular.png", "images");
+   
     
+    // m_objModel = new Model("./images/backpack/backpack.obj");
+    m_objModel = new Model("./images/bunny/bunnygirl.obj");
+
+
     // Shader setup
     if (!m_objShader.initShader("src/shader/object.vert", "src/shader/object.frag")) {
         return false;
