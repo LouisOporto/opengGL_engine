@@ -18,3 +18,14 @@ run:
 
 clean:
 	rm $(EXE).exe
+
+cmake_all: cmake_build cmake_construct cmake_run
+
+cmake_build:
+	cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=C:\\msys64\\ucrt64\\bin\\g++.exe
+
+cmake_construct:
+	cmake --build ./build
+
+cmake_run:
+	./build/opengl_engine
