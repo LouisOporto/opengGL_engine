@@ -21,6 +21,8 @@ set_target_properties(libassimp PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/assimp")
+
 add_executable(${CMAKE_PROJECT_NAME} 
     src/main.cpp 
     src/engine/engine.cpp 
@@ -30,6 +32,15 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/camera/camera.cpp
     src/mesh/mesh.cpp
     src/model/model.cpp
+
+    imgui/imgui.cpp
+    imgui/imgui_demo.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_tables.cpp
+    imgui/imgui_tables.cpp
+    imgui/imgui_widgets.cpp
+    imgui/backends/imgui_impl_glfw.cpp
+    imgui/backends/imgui_impl_opengl3.cpp
 )
 
 # Linking all required libraries
