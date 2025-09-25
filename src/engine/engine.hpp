@@ -9,6 +9,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../../imgui/imgui.h"
+#include "../../imgui/backends/imgui_impl_opengl3.h"
+#include "../../imgui/backends/imgui_impl_glfw.h"
+
 #include "../timer/timer.hpp"
 #include "../shader/shader.hpp"
 #include "../camera/camera.hpp"
@@ -94,7 +98,7 @@ class Engine {
         void render();
         void event();
 
-        inline void clean() { glfwTerminate(); }
+        void clean();
         inline bool isRunning() { return m_running; }
         
         void setLastX(const float& value) { m_lastX = value; }

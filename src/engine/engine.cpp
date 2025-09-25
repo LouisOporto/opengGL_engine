@@ -98,15 +98,31 @@ bool Engine::init(int argc, char* argv[]) {
     vertex.normal = glm::vec3(0.0f, 1.0f, 0.0f);
     vertex.texCoords = glm::vec2(0.0f, 0.0f);
 
+    // Initialize imGUI context
+    ImGui::GetVersion();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+    ImGui_ImplOpenGL3_Init();
+
     return m_running = true;
 }
 
 void Engine::event() {
+    glfwPollEvents();
     float dt = m_timer.getElapsed();
     if (glfwWindowShouldClose(m_window)) quit();
     // camera handle keyboard input
     handleKeyInput(dt);
-    glfwPollEvents();
+
+    // Handle imGui GUI
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow();
 }
 
 void Engine::handleKeyInput(float deltaTime) {
@@ -201,7 +217,18 @@ void Engine::render() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
+
+    // Display imGui context
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(m_window);
+}
+
+void Engine::clean() {
+    ImGui_ImplGlfw_Shutdown();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui::DestroyContext();
+    glfwTerminate();
 }
 
 // Callback functions
