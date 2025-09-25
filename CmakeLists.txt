@@ -43,8 +43,17 @@ add_executable(${CMAKE_PROJECT_NAME}
     imgui/backends/imgui_impl_opengl3.cpp
 )
 
+if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC RESOURCES="${CMAKE_CURRENT_SOURCE_DIR}/resources")
+else()
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC RESOURCES="./resources")
+endif()
+
+
 # Linking all required libraries
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OpenGL::GL GLEW::GLEW glfw libassimp)
 
 # Include libgcc and libstdc++ for retrieving dll libraries
-target_link_options(${CMAKE_PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
+if(${CMAKE_BUILD_TYPE} STREQUAL Release)
+    target_link_options(${CMAKE_PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
+endif()
