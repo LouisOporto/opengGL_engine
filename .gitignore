@@ -1,5 +1,7 @@
 # files
 *.exe
+*.txt
+*.ini
 
 #Folders
 /build
