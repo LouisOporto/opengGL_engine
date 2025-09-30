@@ -91,6 +91,7 @@ bool Engine::init(int argc, char* argv[]) {
 
     setFirstMouse(true);
     m_lightOn = false;
+    m_NormalMapOn = true;
     float temp = m_timer.getElapsed(); // Not used
 
     Vertex vertex;
@@ -108,6 +109,9 @@ bool Engine::init(int argc, char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 
+    Logger::Log("Completed initial %d", 1);
+    Logger::Warn("Completed initial %d", 1);
+    Logger::Error("Completed initial %d", 1);
     return m_running = true;
 }
 
@@ -163,7 +167,7 @@ void Engine::update() {
     m_objShader.setBool("spotLightOn", m_lightOn);
     m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), spotlightColor * AMB, spotlightColor * DIF, spotlightColor * SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
     
-
+    m_objShader.setBool("NormalOn", m_NormalMapOn);
 }
 void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
@@ -235,6 +239,7 @@ void Engine::clean() {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
     if (key == GLFW_KEY_F && action == GLFW_PRESS) { Engine::getInstance()->toggleLight(); }
+    if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {

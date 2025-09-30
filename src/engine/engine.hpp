@@ -19,6 +19,7 @@
 #include "../image_loader/image_loader.hpp"
 #include "../mesh/mesh.hpp"
 #include "../model/model.hpp"
+#include "logger.hpp"
 
 const int SCR_W = 1920;
 const int SCR_H = 1080;
@@ -109,6 +110,7 @@ class Engine {
         bool getFirstMouse() const { return m_firstMouse; }
         Camera* getCamera() const { return m_camera; }
         void toggleLight() { m_lightOn = !m_lightOn; }
+        void toggleNormalMap() { m_NormalMapOn = !m_NormalMapOn; }
     private:
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
@@ -129,6 +131,7 @@ class Engine {
         // World perspective        
         bool m_firstMouse;
         bool m_lightOn;
+        bool m_NormalMapOn;
         float m_lastX, m_lastY;
 
         Camera* m_camera;

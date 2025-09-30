@@ -8,7 +8,7 @@ void Model::draw(Shader &shader) {
 
 void Model::loadModel(std::string path) {
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         printf("ERROR::ASSIMP::%s\n", import.GetErrorString());
@@ -20,12 +20,12 @@ void Model::loadModel(std::string path) {
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene) {
-    for(int i = 0; i < node->mNumMeshes; i++) {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+    for (int i = 0; i < node->mNumMeshes; i++) {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         m_meshes.push_back(processMesh(mesh, scene));
     }
 
-    for(int i = 0; i < node->mNumChildren; i++) {
+    for (int i = 0; i < node->mNumChildren; i++) {
         processNode(node->mChildren[i], scene);
     }
 }
@@ -33,13 +33,12 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    // ColorInformation colorInfo;
     std::vector<Texture> textures;
+    Vertex vertex;
     printf("Processing mesh: %s\n", mesh->mName.C_Str());
 
+    // process vertex
     for (int i = 0; i < mesh->mNumVertices; i++) {
-        Vertex vertex;
-        // process vertex position, normals and texture coords
         glm::vec3 vector;
         vector.x = mesh->mVertices[i].x;
         vector.y = mesh->mVertices[i].y;
@@ -56,49 +55,46 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
             vec.x = mesh->mTextureCoords[0][i].x;
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.texCoords = vec;
-        } 
+        }
         else {
-            vertex.texCoords = glm::vec2(0.0f, 0.0f);
+            vertex.texCoords = glm::vec2(0.0f);
         }
 
         vertices.push_back(vertex);
     }
-
+    
     // process indices
     for (int i = 0; i < mesh->mNumFaces; i++) {
+        // Get faces from mesh->mFaces[index]
         aiFace face = mesh->mFaces[i];
         for (int j = 0; j < face.mNumIndices; j++) {
+            //Get indices of each face from mesh->mIndices[index];
             indices.push_back(face.mIndices[j]);
         }
     }
 
     // process materials
     if (mesh->mMaterialIndex >= 0) {
+        // Get material from scene->mMaterials[index] using the meshs material index;
         // printf("Mesh size: %d\n", mesh->mMaterialIndex);
-        aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
         std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
+        
         std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         
         std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-        
-        // std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-        // textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-        
-        // colorInfo = {textures, {div   vffuse.r, diffuse.g, diffuse.b}, {specular.r, specular.g, specular.b}, shininess.r};
     }
-    
-    // printf("Number of textures: %d\n", textures.size());
-    
     return Mesh(vertices, indices, textures);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
     std::vector<Texture> textures;
     printf("Texture count for type: %s, Count: %d\n", typeName.c_str(), mat->GetTextureCount(type));
+
     for (int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
@@ -127,7 +123,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
             texture.path = str.C_Str();
             texture.ambient = {ambient.r, ambient.g, ambient.b};
             texture.diffuse = {diffuse.r, diffuse.g, diffuse.b};
-            texture.specular = {specular.r, diffuse.g, diffuse.b};
+            texture.specular = {specular.r, specular.g, specular.b};
             texture.shininess = shininess;
 
             textures.push_back(texture);
