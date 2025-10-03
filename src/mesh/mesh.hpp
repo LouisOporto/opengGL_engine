@@ -24,13 +24,6 @@ struct Texture {
     float shininess;
 };
 
-// struct ColorInformation {
-//     std::vector<Texture> textures;
-//     glm::vec3 diffuse;
-//     glm::vec3 specular;
-//     float shininess;
-// };
-
 class Mesh {
     public:
         // Mesh data
