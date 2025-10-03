@@ -10,7 +10,7 @@
 #include "../shader/shader.hpp"
 #include "../mesh/mesh.hpp"
 #include "../image_loader/image_loader.hpp"
-// #include "../engine/logger.hpp"
+#include "../engine/logger.hpp"
 
 class Model {
     public:

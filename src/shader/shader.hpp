@@ -13,6 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 // #include <glm/gtc/type_ptr.hpp>
 
+#include "../engine/logger.hpp"
+
 class Shader {
     public:
         Shader() {}

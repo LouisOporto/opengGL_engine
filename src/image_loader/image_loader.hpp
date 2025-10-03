@@ -3,6 +3,7 @@
 #include "stb_image.h"
 #include <GL/glew.h>
 #include <string>
+#include "../engine/logger.hpp"
 
 class ImageLoader {
     public:

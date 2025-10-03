@@ -24,7 +24,7 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
         fragFile.close();
     }
     catch (std::fstream::failure) {
-        fprintf(stderr, "SHADER::ERROR::FILE_LOADING\n");
+        Logger::Error("SHADER::ERROR::FILE_LOADING");
         return false;
     }
 
@@ -41,7 +41,7 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &status);
     if (!status) {
         glGetShaderInfoLog(vertex, 512, NULL, log);
-        fprintf(stderr, "SHADER::ERROR::VERTEX::COMPILE::%s\n", log);
+        Logger::Error("SHADER::ERROR::VERTEX::COMPILE::%s", log);
         return false;
     }
 
@@ -51,7 +51,7 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
     if (!status) {
         glGetShaderInfoLog(fragment, 512, NULL, log);
-        fprintf(stderr, "SHADER::ERROR::FRAGMENT::COMPILE::%s\n", log);
+        Logger::Error("SHADER::ERROR::FRAGMENT::COMPILE::%s\n", log);
         return false;
     }
 
@@ -62,7 +62,7 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
     glGetProgramiv(ID, GL_LINK_STATUS, &status);
     if (!status) {
         glGetProgramInfoLog(ID, 512, NULL, log);
-        fprintf(stderr, "SHADER::ERROR::PROGRAM::LINKING::%s\n", log);
+        Logger::Error("SHADER::ERROR::PROGRAM::LINKING::%s\n", log);
         return false;
     }
 

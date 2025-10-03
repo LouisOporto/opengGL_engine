@@ -11,7 +11,7 @@ void Model::loadModel(std::string path) {
     const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        printf("ERROR::ASSIMP::%s\n", import.GetErrorString());
+        Logger::Error("ERROR::ASSIMP::%s", import.GetErrorString());
         return;
     }
     directory = path.substr(0, path.find_last_of('/'));
@@ -35,7 +35,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
     Vertex vertex;
-    printf("Processing mesh: %s\n", mesh->mName.C_Str());
+    Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
 
     // process vertex
     for (int i = 0; i < mesh->mNumVertices; i++) {
@@ -93,7 +93,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
     std::vector<Texture> textures;
-    printf("Texture count for type: %s, Count: %d\n", typeName.c_str(), mat->GetTextureCount(type));
+    Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(), mat->GetTextureCount(type));
 
     for (int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
@@ -110,7 +110,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
             Texture texture;
             aiColor3D ambient, diffuse, specular;
             float shininess;
-            printf("Loading image file: %s\n", str.C_Str());
+            Logger::Log("Loading image file: %s", str.C_Str());
 
             mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
             mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
