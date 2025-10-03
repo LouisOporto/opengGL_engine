@@ -95,10 +95,6 @@ bool Engine::init(int argc, char* argv[]) {
     m_mouseVisible = false;
     float temp = m_timer.getElapsed(); // Not used
 
-    Vertex vertex;
-    vertex.position = glm::vec3(1.0f);
-    vertex.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-    vertex.texCoords = glm::vec2(0.0f, 0.0f);
 
     // Initialize imGUI context
     ImGui::GetVersion();
@@ -124,7 +120,7 @@ void Engine::event() {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
 }
 
 void Engine::handleKeyInput(float deltaTime) {
@@ -220,6 +216,10 @@ void Engine::render() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
+    ImGui::Begin("Statistics");
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("Average FPS: %f, Framerate: (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::End();
 
     // Display imGui context
     ImGui::Render();
