@@ -7,7 +7,7 @@
 #include <iomanip>
 
 #define LOG_COLOR_RESET "\x1b[0m"
-#define LOG_COLOR_LOG   "\x1b[30;44m"
+#define LOG_COLOR_LOG   "\x1b[34m"
 #define LOG_COLOR_WARN  "\x1b[30;43m"
 #define LOG_COLOR_ERROR "\x1b[41m"
 

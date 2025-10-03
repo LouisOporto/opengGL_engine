@@ -19,7 +19,7 @@ bool Engine::init(int argc, char* argv[]) {
     m_SCR_H = SCR_H;
     m_window = glfwCreateWindow(m_SCR_W, m_SCR_H, "Window", NULL, NULL);
     if (!m_window) {
-        fprintf(stderr, "Failed to create window\n");
+        Logger::Error("Failed to create window");
         return false;
     }
     
@@ -32,7 +32,7 @@ bool Engine::init(int argc, char* argv[]) {
     
     glewExperimental = true;
     if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "Failed to init glew\n");
+        Logger::Error("Failed to init glew");
         return false;
     }
     
@@ -67,15 +67,15 @@ bool Engine::init(int argc, char* argv[]) {
    
     
     // m_objModel = new Model("./images/backpack/backpack.obj");
-    m_objModel = new Model("./images/bunny/bunnygirl.obj");
+    m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
 
 
     // Shader setup
-    if (!m_objShader.initShader("src/shader/object.vert", "src/shader/object.frag")) {
+    if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
         return false;
     }
     
-    if (!m_lightShader.initShader("src/shader/light.vert", "src/shader/light.frag")) {
+    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
         return false;
     }
     
@@ -92,6 +92,7 @@ bool Engine::init(int argc, char* argv[]) {
     setFirstMouse(true);
     m_lightOn = false;
     m_NormalMapOn = true;
+    m_mouseVisible = false;
     float temp = m_timer.getElapsed(); // Not used
 
     Vertex vertex;
@@ -109,9 +110,6 @@ bool Engine::init(int argc, char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 
-    Logger::Log("Completed initial %d", 1);
-    Logger::Warn("Completed initial %d", 1);
-    Logger::Error("Completed initial %d", 1);
     return m_running = true;
 }
 
@@ -169,6 +167,7 @@ void Engine::update() {
     
     m_objShader.setBool("NormalOn", m_NormalMapOn);
 }
+
 void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
@@ -240,6 +239,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
     if (key == GLFW_KEY_F && action == GLFW_PRESS) { Engine::getInstance()->toggleLight(); }
     if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
+    if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleMouse(); }
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {

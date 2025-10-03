@@ -111,6 +111,16 @@ class Engine {
         Camera* getCamera() const { return m_camera; }
         void toggleLight() { m_lightOn = !m_lightOn; }
         void toggleNormalMap() { m_NormalMapOn = !m_NormalMapOn; }
+        void toggleMouse() { 
+            if (m_mouseVisible) {
+                Logger::Warn("Mouse Visible");
+            } else {
+                Logger::Warn("Mouse Hidden");
+            }
+            m_mouseVisible = !m_mouseVisible; 
+            glfwSetInputMode(m_window, GLFW_CURSOR, m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+        }
+
     private:
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
@@ -132,6 +142,7 @@ class Engine {
         bool m_firstMouse;
         bool m_lightOn;
         bool m_NormalMapOn;
+        bool m_mouseVisible;
         float m_lastX, m_lastY;
 
         Camera* m_camera;
