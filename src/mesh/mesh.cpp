@@ -57,9 +57,10 @@ void Mesh::draw(Shader& shader) {
         // else if (name == "textuer_height") number = std::to_string(heightNr++);
         // printf("Shader Name: %s, Number: %d\n", ("material." + name + number).c_str(), i);
         if (name == "texture_normal") {
-            shader.setInt((name + number).c_str(), i);
+            // shader.setInt((name + number).c_str(), i);
         } 
         else shader.setInt(("material." + name + number).c_str(), i);
+        // Logger::Log("Setting %s", (name + number).c_str());
         glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
 
         shader.setVec3("material.ambient", m_textures[i].diffuse);
@@ -68,11 +69,14 @@ void Mesh::draw(Shader& shader) {
         shader.setFloat("material.shininess", m_textures[i].shininess);
     }
 
-    if (!missingDiffuse) shader.setBool("material.missingDiffuse", true);
-    else shader.setBool("material.missingDiffuse", false);
+    // if (!missingDiffuse) shader.setBool("material.missingDiffuse", missingDiffuse);
+    // else shader.setBool("material.missingDiffuse", false);
 
-    if (!missingSpecular) shader.setBool("Material.missingSpecular", true);
-    else shader.setBool("material.missingSpecular", false);
+    // if (!missingSpecular) shader.setBool("Material.missingSpecular", true);
+    // else shader.setBool("material.missingSpecular", false);
+
+    shader.setBool("material.missingDiffuse", missingDiffuse);
+    shader.setBool("material.missingSpecular", missingSpecular);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
