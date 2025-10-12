@@ -142,7 +142,6 @@ void Engine::update() {
     m_lightShader.setMat4("projection", m_projection);
     m_lightShader.setMat4("view", m_view);
 
-    // glm::vec3 lightColor = glm::vec3(0.5f, 0.5f, 0.5f);
     glm::vec3 lightColor = glm::vec3(1.0f);
 
     m_objShader.use();
@@ -151,8 +150,8 @@ void Engine::update() {
     m_objShader.setVec3("viewPos", getCamera()->getPos());
     
     m_objShader.setDirLight("dirLight", directionVector, lightColor * AMB, lightColor * DIF, lightColor * SPE);
-    m_objShader.setInt("numPointLights", sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3));
-    for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
+    m_objShader.setInt("numPointLights", LIGHTPOSITIONS.size());
+    for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         glm::vec3 color = {iter == 0 ? 1.0f : 0.7f, iter == 1 ? 1.0f : 0.7f, iter == 2 ? 1.0f : 0.7f};
         color = glm::vec3(1.0f, 1.0f, 1.0f);
         m_objShader.setPointLight("pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter], color * AMB, color * DIF, color * SPE, CONSTANT, LINEAR, QUADRATIC);
@@ -218,7 +217,7 @@ void Engine::render() {
 
     ImGui::Begin("Statistics");
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::Text("Average FPS: %f, Framerate: (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
 
     // Display imGui context
