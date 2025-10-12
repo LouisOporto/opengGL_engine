@@ -70,6 +70,12 @@ bool Engine::init(int argc, char* argv[]) {
     glEnableVertexAttribArray(2);
     
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+    // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
     
     // m_objModel = new Model("./images/backpack/backpack.obj");
     m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
@@ -216,11 +222,17 @@ void Engine::render() {
 
     m_transparentShader.use();
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture0);
+    glBindTexture(GL_TEXTURE_2D, m_texture1);
 
+    std::map<float, glm::vec3> sorted;
     for (int i = 0; i < VEGETATION.size(); i++) {
+        float length = glm::length(m_camera->getPos() - VEGETATION[i]);
+        sorted[length] = VEGETATION[i];
+    }
+
+    for (auto i = sorted.rbegin(); i != sorted.rend(); i++) {
         m_model = glm::mat4(1.0f);
-        m_model = glm::translate(m_model, VEGETATION[i]);
+        m_model = glm::translate(m_model, i->second);
         glm::mat4 inverseModel = glm::inverse(m_model);
 
         m_transparentShader.setInt("texture0", 0);
@@ -228,7 +240,7 @@ void Engine::render() {
         m_transparentShader.setMat4("inverseModel", inverseModel);
         
         glBindVertexArray(m_vegetationVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
     } 
 
     // Light
