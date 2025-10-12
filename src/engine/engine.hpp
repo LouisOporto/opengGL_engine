@@ -69,17 +69,25 @@ const float VERTICES[] = {
     -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  0.0,
 };
 
-const glm::vec3 OBJECTPOSITIONS[] = {
+const std::vector<glm::vec3> OBJECTPOSITIONS = {
     glm::vec3(0.0f, 0.0f, 0.0f),
     glm::vec3(3.2f, 0.3f, -5.0f),
     glm::vec3(-2.4f, -2.f, 2.0f),
     glm::vec3(0.0f, 3.0f, -3.0f),
 };
 
-const glm::vec3 LIGHTPOSITIONS[] = {
+const std::vector<glm::vec3> LIGHTPOSITIONS = {
     glm::vec3(3.0f, 12.0f, 2.5f),
     glm::vec3(-3.0f, 6.0f, 1.3f),
     glm::vec3(0.0f, -1.2f, 3.2f),
+};
+
+const std::vector<glm::vec3> VEGETATION = {
+    glm::vec3(-1.5f, 0.0f, -0.48f),
+    glm::vec3(1.5f, 0.0f, 0.51f),
+    glm::vec3(0.0f, 0.0f, 0.7f),
+    glm::vec3(-0.3f, 0.0f, -2.3f),
+    glm::vec3(0.5f, 0.0f, -0.6f),
 };
 
 const float AMB = 0.1f; 
@@ -133,10 +141,11 @@ class Engine {
         Model* m_objModel;
         Shader m_objShader;
         Shader m_lightShader;
+        Shader m_transparentShader;
         Timer m_timer;
         bool m_running;
 
-        unsigned int m_VBO, m_objectVAO, m_lightVAO;
+        unsigned int m_VBO, m_objectVAO, m_lightVAO, m_vegetationVAO;
         unsigned int m_texture0, m_texture1;
 
         // World perspective        

@@ -39,6 +39,7 @@ bool Engine::init(int argc, char* argv[]) {
     // OPENGL setup
     glGenVertexArrays(1, &m_objectVAO);
     glGenVertexArrays(1, &m_lightVAO);
+    glGenVertexArrays(1, &m_vegetationVAO);
     glGenBuffers(1, &m_VBO);
     
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
@@ -57,18 +58,28 @@ bool Engine::init(int argc, char* argv[]) {
     glBindVertexArray(m_lightVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
+
+    glBindVertexArray(m_vegetationVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
+    glEnableVertexAttribArray(2);
     
     glEnable(GL_DEPTH_TEST);
     
-    // Textures setup
-    // stbi_set_flip_vertically_on_load(true);
-    // m_texture0 = ImageLoader::getInstance()->loadImage("box.png", "images");
-    // m_texture1 = ImageLoader::getInstance()->loadImage("box_specular.png", "images");
-   
-    
     // m_objModel = new Model("./images/backpack/backpack.obj");
     m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
-
+    
+    // Textures setup
+    // m_texture0 = ImageLoader::getInstance()->loadImage("box.png", "images");
+    // m_texture1 = ImageLoader::getInstance()->loadImage("box_specular.png", "images");
+    stbi_set_flip_vertically_on_load(true);
+    m_texture0 = ImageLoader::getInstance()->loadImage("grass.png", "RESOURCES/images");
+    m_texture1 = ImageLoader::getInstance()->loadImage("blending_transparent_window.png", "RESOURCES/images");
 
     // Shader setup
     if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
@@ -76,6 +87,10 @@ bool Engine::init(int argc, char* argv[]) {
     }
     
     if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
+        return false;
+    }
+
+    if (!m_transparentShader.initShader("RESOURCES/shaders/transparent.vert", "RESOURCES/shaders/transparent.frag")) {
         return false;
     }
     
@@ -161,6 +176,10 @@ void Engine::update() {
     m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), spotlightColor * AMB, spotlightColor * DIF, spotlightColor * SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
     
     m_objShader.setBool("NormalOn", m_NormalMapOn);
+
+    m_transparentShader.use();
+    m_transparentShader.setMat4("projection", m_projection);
+    m_transparentShader.setMat4("view", m_view);
 }
 
 void Engine::render() {
@@ -181,28 +200,41 @@ void Engine::render() {
 
     m_objModel->draw(m_objShader);
     
-    // glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, m_texture0);
-    // glActiveTexture(GL_TEXTURE1);
-    // glBindTexture(GL_TEXTURE_2D, m_texture1);
     
     // for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
-    //     m_model = glm::mat4(1.0f);
-    //     m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
-    //     m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
-    //     glm::mat4 inverseModel = glm::inverse(m_model);
+        //     m_model = glm::mat4(1.0f);
+        //     m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
+        //     m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
+        //     glm::mat4 inverseModel = glm::inverse(m_model);
+        
+        //     m_objShader.setMat4("model", m_model);
+        //     m_objShader.setMat4("inverseModel", inverseModel);
+        
+        //     glBindVertexArray(m_objectVAO);
+        //     glDrawArrays(GL_TRIANGLES, 0, 36);
+        // }
 
-    //     m_objShader.setMat4("model", m_model);
-    //     m_objShader.setMat4("inverseModel", inverseModel);
+    m_transparentShader.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture0);
 
-    //     glBindVertexArray(m_objectVAO);
-    //     glDrawArrays(GL_TRIANGLES, 0, 36);
-    // }
+    for (int i = 0; i < VEGETATION.size(); i++) {
+        m_model = glm::mat4(1.0f);
+        m_model = glm::translate(m_model, VEGETATION[i]);
+        glm::mat4 inverseModel = glm::inverse(m_model);
+
+        m_transparentShader.setInt("texture0", 0);
+        m_transparentShader.setMat4("model", m_model);
+        m_transparentShader.setMat4("inverseModel", inverseModel);
+        
+        glBindVertexArray(m_vegetationVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    } 
 
     // Light
     m_lightShader.use();
 
-    for (int iter = 0; iter < sizeof(LIGHTPOSITIONS) / sizeof(glm::vec3); iter++) {
+    for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
