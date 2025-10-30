@@ -61,6 +61,7 @@ void Mesh::draw(Shader& shader) {
         } 
         else shader.setInt(("material." + name + number).c_str(), i);
         // Logger::Log("Setting %s", (name + number).c_str());
+        glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
 
         shader.setVec3("material.ambient", m_textures[i].diffuse);
