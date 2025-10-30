@@ -152,11 +152,18 @@ bool Engine::init(int argc, char* argv[]) {
     if (!m_transparentShader.initShader("RESOURCES/shaders/transparent.vert", "RESOURCES/shaders/transparent.frag")) {
         return false;
     }
+
+    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
+        return false;
+    }
     
     m_objShader.use();
     // m_objShader.setInt("material.diffuse", 0);
     // m_objShader.setInt("material.specular", 1);
     m_objShader.setFloat("material.shininess", 32.0f);
+
+    m_screenShader.use();
+    m_screenShader.setInt("screenTexture", 0);
     
     // Camera setup
     m_camera = new Camera(m_SCR_W, m_SCR_H);
@@ -242,7 +249,9 @@ void Engine::update() {
 }
 
 void Engine::render() {
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
     glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
+    glEnable(GL_DEPTH_TEST);
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -295,6 +304,7 @@ void Engine::render() {
         glBindVertexArray(m_vegetationVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     } 
+    glBindVertexArray(0);
 
     // Light
     m_lightShader.use();
@@ -306,11 +316,22 @@ void Engine::render() {
 
         m_lightShader.setMat4("model", m_model);
         m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f : 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
-        m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
+        // m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
 
         glBindVertexArray(m_lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+    glBindVertexArray(0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    m_screenShader.use();
+    glBindVertexArray(m_quadVAO);
+    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     ImGui::Begin("Statistics");
     ImGuiIO& io = ImGui::GetIO();
@@ -327,6 +348,14 @@ void Engine::clean() {
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
+    glDeleteVertexArrays(1, &m_objectVAO);
+    glDeleteVertexArrays(1, &m_lightVAO);
+    glDeleteVertexArrays(1, &m_vegetationVAO);
+    glDeleteVertexArrays(1, &m_quadVAO);
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteBuffers(1, &m_quadVBO);
+    glDeleteRenderbuffers(1, &m_RBO);
+    glDeleteFramebuffers(1, &m_FBO);
     glfwTerminate();
 }
 
