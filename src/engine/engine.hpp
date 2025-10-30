@@ -91,6 +91,15 @@ const std::vector<glm::vec3> VEGETATION = {
     glm::vec3(0.5f, 0.0f, -0.6f),
 };
 
+const float QUADVERTICES[] = {
+    -1.0f,  1.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+     1.0f, -1.0f, 1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f, 1.0f,
+     1.0f,  -1.0f, 1.0f, 0.0f,
+     1.0f,  1.0f, 1.0f, 1.0f
+};
+
 const float AMB = 0.1f; 
 const float DIF = 0.7f;
 const float SPE = 1.0f;
@@ -143,11 +152,12 @@ class Engine {
         Shader m_objShader;
         Shader m_lightShader;
         Shader m_transparentShader;
+        Shader m_screenShader;
         Timer m_timer;
         bool m_running;
 
-        unsigned int m_VBO, m_objectVAO, m_lightVAO, m_vegetationVAO;
-        unsigned int m_texture0, m_texture1;
+        unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_vegetationVAO, m_FBO, m_RBO;
+        unsigned int m_texture0, m_texture1, m_textureColorBuffer;
 
         // World perspective        
         bool m_firstMouse;
