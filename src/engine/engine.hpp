@@ -100,6 +100,51 @@ const float QUADVERTICES[] = {
      1.0f,  1.0f, 1.0f, 1.0f
 };
 
+const float skyboxVertices[] = {
+    // positions          
+    -1.0f,  1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+    -1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f
+};
+
 const float AMB = 0.1f; 
 const float DIF = 0.7f;
 const float SPE = 1.0f;
@@ -151,13 +196,13 @@ class Engine {
         Model* m_objModel;
         Shader m_objShader;
         Shader m_lightShader;
-        Shader m_transparentShader;
         Shader m_screenShader;
+        Shader m_skyboxShader;
         Timer m_timer;
         bool m_running;
 
-        unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_vegetationVAO, m_FBO, m_RBO;
-        unsigned int m_texture0, m_texture1, m_textureColorBuffer;
+        unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_vegetationVAO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO;
+        unsigned int m_texture0, m_texture1, m_textureColorBuffer, m_cubemapTexture;
 
         // World perspective        
         bool m_firstMouse;

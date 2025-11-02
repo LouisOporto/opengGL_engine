@@ -141,17 +141,15 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-    if (!m_transparentShader.initShader("RESOURCES/shaders/transparent.vert", "RESOURCES/shaders/transparent.frag")) {
+    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
         return false;
     }
 
-    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
+    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
         return false;
     }
     
     m_objShader.use();
-    // m_objShader.setInt("material.diffuse", 0);
-    // m_objShader.setInt("material.specular", 1);
     m_objShader.setFloat("material.shininess", 32.0f);
 
     m_screenShader.use();
@@ -235,9 +233,9 @@ void Engine::update() {
     
     m_objShader.setBool("NormalOn", m_NormalMapOn);
 
-    m_transparentShader.use();
-    m_transparentShader.setMat4("projection", m_projection);
-    m_transparentShader.setMat4("view", m_view);
+    m_skyboxShader.use();
+    m_skyboxShader.setMat4("projection", m_projection);
+    m_skyboxShader.setMat4("view", glm::mat4(glm::mat3(m_view)));
 }
 
 void Engine::render() {
@@ -247,73 +245,58 @@ void Engine::render() {
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    
     // Cube
     m_objShader.use();
-
+    
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 inverseModel = glm::inverse(m_model);
-
+    
     m_objShader.setMat4("model", m_model);
     m_objShader.setMat4("inverseModel", inverseModel);
-
+    
     m_objModel->draw(m_objShader);
     
     
-    // for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
-        //     m_model = glm::mat4(1.0f);
-        //     m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
-        //     m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
-        //     glm::mat4 inverseModel = glm::inverse(m_model);
-        
-        //     m_objShader.setMat4("model", m_model);
-        //     m_objShader.setMat4("inverseModel", inverseModel);
-        
-        //     glBindVertexArray(m_objectVAO);
-        //     glDrawArrays(GL_TRIANGLES, 0, 36);
-        // }
-
-    m_transparentShader.use();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture1);
-
-    std::map<float, glm::vec3> sorted;
-    for (int i = 0; i < VEGETATION.size(); i++) {
-        float length = glm::length(m_camera->getPos() - VEGETATION[i]);
-        sorted[length] = VEGETATION[i];
-    }
-
-    for (auto i = sorted.rbegin(); i != sorted.rend(); i++) {
+    for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
         m_model = glm::mat4(1.0f);
-        m_model = glm::translate(m_model, i->second);
+        m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
+        m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
         glm::mat4 inverseModel = glm::inverse(m_model);
-
-        m_transparentShader.setInt("texture0", 0);
-        m_transparentShader.setMat4("model", m_model);
-        m_transparentShader.setMat4("inverseModel", inverseModel);
         
-        glBindVertexArray(m_vegetationVAO);
+        m_objShader.setMat4("model", m_model);
+        m_objShader.setMat4("inverseModel", inverseModel);
+        
+        glBindVertexArray(m_objectVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-    } 
-    glBindVertexArray(0);
-
+    }
+    
     // Light
     m_lightShader.use();
-
+    
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
-
+        
         m_lightShader.setMat4("model", m_model);
-        m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f : 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
-        // m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
-
+        // m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f : 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
+        m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
+        
         glBindVertexArray(m_lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+    
+    glDepthFunc(GL_LEQUAL);
+    // Skybox
+    m_skyboxShader.use();
+    glBindVertexArray(m_skyboxVAO);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
