@@ -29,3 +29,31 @@ unsigned int ImageLoader::loadImage(const char *path, const std::string &directo
 
     return texture;
 }
+
+unsigned int ImageLoader::loadCubemap(std::vector<std::string> faces, const std::string &directory) {
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+    int width, height, nrChannels;
+    for (int i = 0; i < faces.size(); i++) {
+        std::string path = directory + "/" + faces[i];
+        unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);\
+            stbi_image_free(data);
+        }
+        else {
+            Logger::Error("Textures failed to load path: %s", path.c_str());
+            stbi_image_free(data);
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    return texture;
+}
