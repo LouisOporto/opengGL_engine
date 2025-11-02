@@ -60,35 +60,25 @@ bool Engine::init(int argc, char* argv[]) {
     glEnableVertexAttribArray(2);
     glBindVertexArray(0);
 
-    // quadVAO
+    // QUAD VERTICES
     glGenVertexArrays(1, &m_quadVAO);
     glGenBuffers(1, &m_quadVBO);
     glBindVertexArray(m_quadVAO);
     glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(QUADVERTICES), &QUADVERTICES, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(sizeof(float) * 2));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
     glEnableVertexAttribArray(1);
-
-    // Framebuffers
-    glGenFramebuffers(1, &m_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0); // Default is the main window
-
-    // Temporary Texture usage for color attachment
+    
     glGenTextures(1, &m_textureColorBuffer);
     glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_SCR_W, m_SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_W, SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glBindTexture(GL_TEXTURE_2D, 0);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureColorBuffer, 0);
-
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
     // glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_SCR_W, m_SCR_H, 0, GL_DEPTH, GL_UNSIGNED_INT, NULL);
     // glTexIamge2D(GL_TEXTURE_2D, 0, GL_STENCIL_INDEX, m_SCR_W, m_SCR_H, 0, GL_STENCIL, GL_UNSIGNED_INT, NULL);
 
@@ -96,21 +86,22 @@ bool Engine::init(int argc, char* argv[]) {
 
     // glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_SCR_W, m_SCR_H, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
     // glFramebufferTexture2D(GL_FRAMEBUFFER< GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
-
-    // Renderbuffer object
+    
+    glGenFramebuffers(1, &m_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureColorBuffer, 0);
+    
     glGenRenderbuffers(1, &m_RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_SCR_W, m_SCR_H);
-    // glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_W, SCR_H);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        Logger::Error("FRAMEBUFFER:: Framebuffer is not complete!");
+        Logger::Error("Framebuffer is not complete, cannot proceed!");
         return false;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
     // glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
