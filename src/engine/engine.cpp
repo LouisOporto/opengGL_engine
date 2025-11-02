@@ -40,24 +40,33 @@ bool Engine::init(int argc, char* argv[]) {
     glGenVertexArrays(1, &m_objectVAO);
     glGenVertexArrays(1, &m_lightVAO);
     glGenVertexArrays(1, &m_vegetationVAO);
+    glGenVertexArrays(1, &m_skyboxVAO);
     glGenBuffers(1, &m_VBO);
+    glGenBuffers(1, &m_skyboxVBO);
     
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
-    
+
     glBindVertexArray(m_lightVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
-
+    
     glBindVertexArray(m_vegetationVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
-
+    
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
     glEnableVertexAttribArray(1);
-
+    
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
     glEnableVertexAttribArray(2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(m_skyboxVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
     // QUAD VERTICES
@@ -78,14 +87,6 @@ bool Engine::init(int argc, char* argv[]) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_W, SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_SCR_W, m_SCR_H, 0, GL_DEPTH, GL_UNSIGNED_INT, NULL);
-    // glTexIamge2D(GL_TEXTURE_2D, 0, GL_STENCIL_INDEX, m_SCR_W, m_SCR_H, 0, GL_STENCIL, GL_UNSIGNED_INT, NULL);
-
-    // or
-
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_SCR_W, m_SCR_H, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
-    // glFramebufferTexture2D(GL_FRAMEBUFFER< GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
     
     glGenFramebuffers(1, &m_FBO);
     glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
@@ -115,11 +116,21 @@ bool Engine::init(int argc, char* argv[]) {
     m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
     
     // Textures setup
-    // m_texture0 = ImageLoader::getInstance()->loadImage("box.png", "images");
-    // m_texture1 = ImageLoader::getInstance()->loadImage("box_specular.png", "images");
     stbi_set_flip_vertically_on_load(true);
     m_texture0 = ImageLoader::getInstance()->loadImage("grass.png", "RESOURCES/images");
     m_texture1 = ImageLoader::getInstance()->loadImage("blending_transparent_window.png", "RESOURCES/images");
+
+    std::vector<std::string> faces {
+        "right.jpg",
+        "left.jpg",
+        "top.jpg",
+        "bottom.jpg",
+        "front.jpg",
+        "back.jpg",
+    };
+
+    stbi_set_flip_vertically_on_load(false);
+    m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(faces, "RESOURCES/images/skybox");
 
     // Shader setup
     if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
