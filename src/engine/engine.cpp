@@ -215,22 +215,25 @@ void Engine::handleKeyInput(float deltaTime) {
 }
 
 void Engine::update() {
+    // General variables used by all shaders
     m_projection = getCamera()->getPerspective();
     m_view = getCamera()->getLookAt();
 
     glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
+    glm::vec3 lightColor = glm::vec3(1.0f);
 
+    // Light shader
     m_lightShader.use();
     m_lightShader.setMat4("projection", m_projection);
     m_lightShader.setMat4("view", m_view);
 
-    glm::vec3 lightColor = glm::vec3(1.0f);
-
+    // Model shader
     m_objShader.use();
     m_objShader.setMat4("projection", m_projection);
     m_objShader.setMat4("view", m_view);
     m_objShader.setVec3("viewPos", getCamera()->getPos());
     
+    // Model Lighting (Phong Lighting)
     m_objShader.setDirLight("dirLight", directionVector, lightColor * AMB, lightColor * DIF, lightColor * SPE);
     m_objShader.setInt("numPointLights", LIGHTPOSITIONS.size());
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
@@ -241,13 +244,14 @@ void Engine::update() {
     glm::vec3 spotlightColor = {1.0f, 1.0f, 0.3f};
     m_objShader.setBool("spotLightOn", m_lightOn);
     m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), spotlightColor * AMB, spotlightColor * DIF, spotlightColor * SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
-    
     m_objShader.setBool("NormalOn", m_NormalMapOn);
 
+    // Skybox Shader
     m_skyboxShader.use();
     m_skyboxShader.setMat4("projection", m_projection);
     m_skyboxShader.setMat4("view", glm::mat4(glm::mat3(m_view)));
 
+    // Cube Shader
     m_cubeShader.use();
     m_cubeShader.setMat4("projection", m_projection);
     m_cubeShader.setMat4("view", m_view);
