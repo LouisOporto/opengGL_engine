@@ -198,6 +198,7 @@ class Engine {
         Shader m_lightShader;
         Shader m_screenShader;
         Shader m_skyboxShader;
+        Shader m_cubeShader;
         Timer m_timer;
         bool m_running;
 

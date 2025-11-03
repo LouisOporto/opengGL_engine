@@ -47,6 +47,13 @@ bool Engine::init(int argc, char* argv[]) {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
 
+    glBindVertexArray(m_objectVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
+    glEnableVertexAttribArray(1);
+
     glBindVertexArray(m_lightVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
@@ -148,6 +155,10 @@ bool Engine::init(int argc, char* argv[]) {
     if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
         return false;
     }
+
+    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) {
+        return false;
+    }
     
     m_objShader.use();
     m_objShader.setFloat("material.shininess", 32.0f);
@@ -236,6 +247,11 @@ void Engine::update() {
     m_skyboxShader.use();
     m_skyboxShader.setMat4("projection", m_projection);
     m_skyboxShader.setMat4("view", glm::mat4(glm::mat3(m_view)));
+
+    m_cubeShader.use();
+    m_cubeShader.setMat4("projection", m_projection);
+    m_cubeShader.setMat4("view", m_view);
+    m_cubeShader.setVec3("cameraPos", getCamera()->getPos());
 }
 
 void Engine::render() {
