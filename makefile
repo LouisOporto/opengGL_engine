@@ -37,5 +37,4 @@ remove_app:
 	rm ./build/opengl_engine
 
 clean:
-	rm ./build/opengl_engine
 	rm -rf ./build
