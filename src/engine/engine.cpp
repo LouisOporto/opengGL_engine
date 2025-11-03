@@ -262,7 +262,7 @@ void Engine::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     
-    // Cube
+    // Model
     m_objShader.use();
     
     m_model = glm::mat4(1.0f);
@@ -273,19 +273,35 @@ void Engine::render() {
     m_objShader.setMat4("model", m_model);
     m_objShader.setMat4("inverseModel", inverseModel);
     
-    m_objModel->draw(m_objShader);
+    // m_objModel->draw(m_objShader);
+
+    // Reflecting model
+    m_cubeShader.use();
     
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    inverseModel = glm::inverse(m_model);
     
-    for (int iter = 0; iter < sizeof(OBJECTPOSITIONS) / sizeof(glm::vec3); iter++) {
+    m_cubeShader.setMat4("model", m_model);
+    m_cubeShader.setMat4("inverseModel", inverseModel);
+    
+    m_objModel->draw(m_cubeShader);
+    
+    // Reflecting cubes
+    m_cubeShader.use();
+    for (int iter = 0; iter < OBJECTPOSITIONS.size(); iter++) {
+        Logger::Log("Rendering cube: #%d", iter);
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
         m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
         glm::mat4 inverseModel = glm::inverse(m_model);
         
-        m_objShader.setMat4("model", m_model);
-        m_objShader.setMat4("inverseModel", inverseModel);
+        m_cubeShader.setMat4("model", m_model);
+        m_cubeShader.setMat4("inverseModel", inverseModel);
         
         glBindVertexArray(m_objectVAO);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
     
