@@ -35,7 +35,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
     Vertex vertex;
-    Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
+    // Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
 
     // process vertex
     for (int i = 0; i < mesh->mNumVertices; i++) {
@@ -93,7 +93,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
     std::vector<Texture> textures;
-    Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(), mat->GetTextureCount(type));
+    // Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(), mat->GetTextureCount(type));
 
     for (int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
@@ -110,7 +110,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
             Texture texture;
             aiColor3D ambient, diffuse, specular;
             float shininess;
-            Logger::Log("Loading image file: %s", str.C_Str());
+            // Logger::Log("Loading image file: %s", str.C_Str());
 
             mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
             mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);

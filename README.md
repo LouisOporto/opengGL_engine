@@ -12,3 +12,4 @@
 - Proper documentation for looking back at and for explaining
 
 # Notes
+- Lets clean up the structure of the code to make sure we don't need to look back at the current setup

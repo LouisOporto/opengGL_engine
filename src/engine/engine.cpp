@@ -295,7 +295,7 @@ void Engine::render() {
     // Reflecting cubes
     m_cubeShader.use();
     for (int iter = 0; iter < OBJECTPOSITIONS.size(); iter++) {
-        Logger::Log("Rendering cube: #%d", iter);
+        // Logger::Log("Rendering cube: #%d", iter);
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
         m_model = glm::rotate(m_model, glm::radians(iter * 15.f), glm::vec3(0.1f, 0.5f, 0.4f));
