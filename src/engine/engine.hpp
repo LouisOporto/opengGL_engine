@@ -70,37 +70,7 @@ const float VERTICES[] = {
     -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  0.0,
 };
 
-const std::vector<glm::vec3> OBJECTPOSITIONS = {
-    glm::vec3(0.0f, 0.0f, 0.0f),
-    glm::vec3(3.2f, 0.3f, -5.0f),
-    glm::vec3(-2.4f, -2.f, 2.0f),
-    glm::vec3(0.0f, 3.0f, -3.0f),
-};
-
-const std::vector<glm::vec3> LIGHTPOSITIONS = {
-    glm::vec3(3.0f, 12.0f, 2.5f),
-    glm::vec3(-3.0f, 6.0f, 1.3f),
-    glm::vec3(0.0f, -1.2f, 3.2f),
-};
-
-const std::vector<glm::vec3> VEGETATION = {
-    glm::vec3(-1.5f, 0.0f, -0.48f),
-    glm::vec3(1.5f, 0.0f, 0.51f),
-    glm::vec3(0.0f, 0.0f, 0.7f),
-    glm::vec3(-0.3f, 0.0f, -2.3f),
-    glm::vec3(0.5f, 0.0f, -0.6f),
-};
-
-const float QUADVERTICES[] = {
-    -1.0f,  1.0f, 0.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f,
-     1.0f, -1.0f, 1.0f, 0.0f,
-    -1.0f,  1.0f, 0.0f, 1.0f,
-     1.0f,  -1.0f, 1.0f, 0.0f,
-     1.0f,  1.0f, 1.0f, 1.0f
-};
-
-const float skyboxVertices[] = {
+const float SKYBOXVERTICES[] = {
     // positions          
     -1.0f,  1.0f, -1.0f,
     -1.0f, -1.0f, -1.0f,
@@ -145,6 +115,36 @@ const float skyboxVertices[] = {
      1.0f, -1.0f,  1.0f
 };
 
+const float QUADVERTICES[] = {
+    -1.0f,  1.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+     1.0f, -1.0f, 1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f, 1.0f,
+     1.0f,  -1.0f, 1.0f, 0.0f,
+     1.0f,  1.0f, 1.0f, 1.0f
+};
+
+const std::vector<glm::vec3> OBJECTPOSITIONS = {
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(3.2f, 0.3f, -5.0f),
+    glm::vec3(-2.4f, -2.f, 2.0f),
+    glm::vec3(0.0f, 3.0f, -3.0f),
+};
+
+const std::vector<glm::vec3> LIGHTPOSITIONS = {
+    glm::vec3(3.0f, 12.0f, 2.5f),
+    glm::vec3(-3.0f, 6.0f, 1.3f),
+    glm::vec3(0.0f, -1.2f, 3.2f),
+};
+
+const std::vector<glm::vec3> VEGETATION = {
+    glm::vec3(-1.5f, 0.0f, -0.48f),
+    glm::vec3(1.5f, 0.0f, 0.51f),
+    glm::vec3(0.0f, 0.0f, 0.7f),
+    glm::vec3(-0.3f, 0.0f, -2.3f),
+    glm::vec3(0.5f, 0.0f, -0.6f),
+};
+
 const float AMB = 0.1f; 
 const float DIF = 0.7f;
 const float SPE = 1.0f;
@@ -157,7 +157,7 @@ class Engine {
     public:
         static Engine* getInstance() { return m_instance = m_instance != nullptr ? m_instance : new Engine(); }
 
-        bool init(int argc, char* agrv[]);
+        bool init(int argc, char* argv[]);
 
         void update();
         void render();
@@ -212,12 +212,13 @@ class Engine {
         bool m_mouseVisible;
         float m_lastX, m_lastY;
 
+        // No need to change universal usage here
         Camera* m_camera;
         glm::mat4 m_projection;
         glm::mat4 m_view;
         glm::mat4 m_model; 
 
-        int m_SCR_W, m_SCR_H;
+        int m_SCR_W, m_SCR_H; // Functions that change with screen size needs to update with this
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
