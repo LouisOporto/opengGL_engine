@@ -178,7 +178,7 @@ class Engine {
             m_mouseVisible = !m_mouseVisible; 
             glfwSetInputMode(m_window, GLFW_CURSOR, m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
-        
+        bool isMouseVisible() { return m_mouseVisible; }
         Camera* getCamera() const { return m_camera; }
 
     private:
