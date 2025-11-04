@@ -37,6 +37,91 @@ bool Engine::init(int argc, char* argv[]) {
     }
     
     // OPENGL setup
+    if (!initOpenGLVariables()) {
+        Logger::Error("Failed to load something from OpenGL!");
+        return false;
+    }
+    
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+    
+    // m_objModel = new Model("./images/backpack/backpack.obj");
+    m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
+    
+    // Textures setup
+    stbi_set_flip_vertically_on_load(true);
+    // m_texture0 = ImageLoader::getInstance()->loadImage("grass.png", "RESOURCES/images");
+    // m_texture1 = ImageLoader::getInstance()->loadImage("blending_transparent_window.png", "RESOURCES/images");
+
+    std::vector<std::string> faces {
+        "right.jpg",
+        "left.jpg",
+        "top.jpg",
+        "bottom.jpg",
+        "front.jpg",
+        "back.jpg",
+    };
+
+    stbi_set_flip_vertically_on_load(false);
+    m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(faces, "RESOURCES/images/skybox");
+
+    // Shader setup
+    if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
+        return false;
+    }
+    
+    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
+        return false;
+    }
+
+    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
+        return false;
+    }
+
+    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
+        return false;
+    }
+
+    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) {
+        return false;
+    }
+    
+    m_objShader.use();
+    m_objShader.setFloat("material.shininess", 32.0f);
+
+    // m_screenShader.use();
+    // m_screenShader.setInt("screenTexture", 0);
+    
+    // Camera setup
+    m_camera = new Camera(m_SCR_W, m_SCR_H);
+    m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
+    m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    setFirstMouse(true);
+    m_lightOn = false;
+    m_NormalMapOn = true;
+    m_mouseVisible = false;
+    float temp = m_timer.getElapsed(); // Not used
+
+    // Initialize imGUI context
+    ImGui::GetVersion();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+    ImGui_ImplOpenGL3_Init();
+
+    return m_running = true;
+}
+
+bool Engine::initOpenGLVariables() {
     glGenVertexArrays(1, &m_objectVAO);
     glGenVertexArrays(1, &m_lightVAO);
     glGenVertexArrays(1, &m_vegetationVAO);
@@ -69,7 +154,7 @@ bool Engine::init(int argc, char* argv[]) {
     glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(SKYBOXVERTICES), SKYBOXVERTICES, GL_STATIC_DRAW);
 
     glBindVertexArray(m_skyboxVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
@@ -110,85 +195,8 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-    
-    // m_objModel = new Model("./images/backpack/backpack.obj");
-    m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
-    
-    // Textures setup
-    stbi_set_flip_vertically_on_load(true);
-    m_texture0 = ImageLoader::getInstance()->loadImage("grass.png", "RESOURCES/images");
-    m_texture1 = ImageLoader::getInstance()->loadImage("blending_transparent_window.png", "RESOURCES/images");
 
-    std::vector<std::string> faces {
-        "right.jpg",
-        "left.jpg",
-        "top.jpg",
-        "bottom.jpg",
-        "front.jpg",
-        "back.jpg",
-    };
-
-    stbi_set_flip_vertically_on_load(false);
-    m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(faces, "RESOURCES/images/skybox");
-
-    // Shader setup
-    if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
-        return false;
-    }
-    
-    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
-        return false;
-    }
-
-    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
-        return false;
-    }
-
-    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
-        return false;
-    }
-
-    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) {
-        return false;
-    }
-    
-    m_objShader.use();
-    m_objShader.setFloat("material.shininess", 32.0f);
-
-    m_screenShader.use();
-    m_screenShader.setInt("screenTexture", 0);
-    
-    // Camera setup
-    m_camera = new Camera(m_SCR_W, m_SCR_H);
-    m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
-    m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    setFirstMouse(true);
-    m_lightOn = false;
-    m_NormalMapOn = true;
-    m_mouseVisible = false;
-    float temp = m_timer.getElapsed(); // Not used
-
-
-    // Initialize imGUI context
-    ImGui::GetVersion();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-
-    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
-    ImGui_ImplOpenGL3_Init();
-
-    return m_running = true;
+    return true;
 }
 
 void Engine::event() {
