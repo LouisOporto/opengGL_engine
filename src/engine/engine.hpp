@@ -171,21 +171,18 @@ class Engine {
         void setLastY(const float& value) { m_lastY = value; }
         float getLastY() const { return m_lastY; }
         void setFirstMouse(const bool& value) { m_firstMouse = value; }
-        bool getFirstMouse() const { return m_firstMouse; }
-        Camera* getCamera() const { return m_camera; }
-        void toggleLight() { m_lightOn = !m_lightOn; }
-        void toggleNormalMap() { m_NormalMapOn = !m_NormalMapOn; }
-        void toggleMouse() { 
-            if (m_mouseVisible) {
-                Logger::Warn("Mouse Visible");
-            } else {
-                Logger::Warn("Mouse Hidden");
-            }
+        bool getFirstMouse() const { return m_firstMouse; } // Do we need this function and setter
+        void toggleLight() { m_lightOn = !m_lightOn; } // Maybe remove
+        void toggleNormalMap() { m_NormalMapOn = !m_NormalMapOn; } // Maybe remove
+        void toggleMouse() {  // Re-edit
             m_mouseVisible = !m_mouseVisible; 
             glfwSetInputMode(m_window, GLFW_CURSOR, m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
+        
+        Camera* getCamera() const { return m_camera; }
 
     private:
+        bool initOpenGLVariables();
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
 
@@ -193,6 +190,12 @@ class Engine {
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
+
+        // Streamline Model and Shader information (simplify if possible);
+        std::map<int, Shader> m_shaders;
+        std::map<std::string, int> m_shaderIndex;
+
+
         Model* m_objModel;
         Shader m_objShader;
         Shader m_lightShader;
@@ -201,6 +204,12 @@ class Engine {
         Shader m_cubeShader;
         Timer m_timer;
         bool m_running;
+
+        // Dynamically create VBO, VAO, (intialize by hard coding and reuse by caching)
+        std::map<std::string, unsigned int> m_VAOs;
+        std::map<std::string, unsigned int> m_VBOs;
+        // unsigned int m_FBO;
+        // unsigned int m_RBO;
 
         unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_vegetationVAO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO;
         unsigned int m_texture0, m_texture1, m_textureColorBuffer, m_cubemapTexture;
