@@ -188,6 +188,7 @@ bool Engine::initOpenGLVariables() {
         glEnableVertexAttribArray(1);
     }
 
+    // Framebuffer setup
     {
         glGenTextures(1, &m_textureColorBuffer);
         glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
