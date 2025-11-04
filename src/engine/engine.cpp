@@ -132,69 +132,85 @@ bool Engine::initOpenGLVariables() {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
 
-    glBindVertexArray(m_objectVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
-    glEnableVertexAttribArray(0);
+    // Object VAO
+    {
+        glBindVertexArray(m_objectVAO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+        glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
+        glEnableVertexAttribArray(1);
+    }
 
-    glBindVertexArray(m_lightVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
-    glEnableVertexAttribArray(0);
-    
-    glBindVertexArray(m_vegetationVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
-    glEnableVertexAttribArray(0);
-    
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
-    
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
-    glEnableVertexAttribArray(2);
+    // Light VAO (Phyiscal light objects)
+    {
+        glBindVertexArray(m_lightVAO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+        glEnableVertexAttribArray(0);
+    }
+
+    // Vegtation VAO
+    {
+        glBindVertexArray(m_vegetationVAO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+        glEnableVertexAttribArray(0);
+        
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));
+        glEnableVertexAttribArray(1);
+        
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 6));
+        glEnableVertexAttribArray(2);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_skyboxVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(SKYBOXVERTICES), SKYBOXVERTICES, GL_STATIC_DRAW);
 
-    glBindVertexArray(m_skyboxVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
+    // Skybox VAO
+    {
+        glBindVertexArray(m_skyboxVAO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
+    }
 
     // QUAD VERTICES
-    glGenVertexArrays(1, &m_quadVAO);
-    glGenBuffers(1, &m_quadVBO);
-    glBindVertexArray(m_quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QUADVERTICES), &QUADVERTICES, GL_STATIC_DRAW);
+    {
+        glGenVertexArrays(1, &m_quadVAO);
+        glGenBuffers(1, &m_quadVBO);
+        glBindVertexArray(m_quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(QUADVERTICES), &QUADVERTICES, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
-    glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
+        glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
-    glEnableVertexAttribArray(1);
-    
-    glGenTextures(1, &m_textureColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_W, SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    glGenFramebuffers(1, &m_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureColorBuffer, 0);
-    
-    glGenRenderbuffers(1, &m_RBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_W, SCR_H);
-
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        Logger::Error("Framebuffer is not complete, cannot proceed!");
-        return false;
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
+        glEnableVertexAttribArray(1);
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    {
+        glGenTextures(1, &m_textureColorBuffer);
+        glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_W, SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        
+        glGenFramebuffers(1, &m_FBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureColorBuffer, 0);
+        
+        glGenRenderbuffers(1, &m_RBO);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_W, SCR_H);
+
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            Logger::Error("Framebuffer is not complete, cannot proceed!");
+            return false;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
     return true;
 }
