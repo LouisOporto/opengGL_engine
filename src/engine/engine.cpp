@@ -359,6 +359,7 @@ void Engine::render() {
     glBindVertexArray(0);
     glDepthFunc(GL_LESS);
 
+    // Framebuffer render to the simplified triangle faces
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -369,15 +370,20 @@ void Engine::render() {
     glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    ImGui::Begin("Statistics");
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
+    // Handle ImGui a the end of render line
+    showFramerateStatistics();
 
     // Display imGui context
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(m_window);
+}
+
+void Engine::showFramerateStatistics() {
+    ImGui::Begin("Screentime Statistics");
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::End();
 }
 
 void Engine::clean() {

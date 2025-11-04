@@ -183,9 +183,9 @@ class Engine {
 
     private:
         bool initOpenGLVariables();
+        void showFramerateStatistics();
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
-
         
         Engine() {}
         static Engine* m_instance;
