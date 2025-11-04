@@ -227,7 +227,7 @@ void Engine::event() {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
-    // ImGui::ShowDemoWindow();
+    ImGui::ShowDemoWindow();
 }
 
 void Engine::handleKeyInput(float deltaTime) {
@@ -418,15 +418,17 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
         Engine::getInstance()->setFirstMouse(false);
     }
 
-    float xoffset = (float)xpos - Engine::getInstance()->getLastX();
-    float yoffset = Engine::getInstance()->getLastY() - (float)ypos;
-
-    // printf("xoffset: %f, yoffset: %f\n", xoffset, yoffset);
-    Engine::getInstance()->setLastX((float)xpos);
-    Engine::getInstance()->setLastY((float)ypos);
-
-    // Handle in camera
-    Engine::getInstance()->getCamera()->handleMouseInput(xoffset, yoffset);
+    if (!Engine::getInstance()->isMouseVisible()) {
+        float xoffset = (float)xpos - Engine::getInstance()->getLastX();
+        float yoffset = Engine::getInstance()->getLastY() - (float)ypos;
+    
+        // printf("xoffset: %f, yoffset: %f\n", xoffset, yoffset);
+        Engine::getInstance()->setLastX((float)xpos);
+        Engine::getInstance()->setLastY((float)ypos);
+    
+        // Handle in camera
+        Engine::getInstance()->getCamera()->handleMouseInput(xoffset, yoffset);
+    }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
