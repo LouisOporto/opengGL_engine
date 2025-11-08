@@ -10,6 +10,5 @@ class AudioEngine {
     private:
         AudioEngine() {}
         FMOD_STUDIO_SYSTEM* m_studioSystem = nullptr;
-        // FMOD::Studio::System* m_system = nullptr;
         static AudioEngine* m_instance;
 };
