@@ -414,8 +414,8 @@ void Engine::clean() {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
     if (key == GLFW_KEY_F && action == GLFW_PRESS) { Engine::getInstance()->toggleLight(); }
-    if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
-    if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleMouse(); }
+    if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
+    if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleMouse(); }
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {
@@ -433,14 +433,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
         Engine::getInstance()->setFirstMouse(false);
     }
 
+    float xoffset = (float)xpos - Engine::getInstance()->getLastX();
+    float yoffset = Engine::getInstance()->getLastY() - (float)ypos;
+    
+    // printf("xoffset: %f, yoffset: %f\n", xoffset, yoffset);
+    Engine::getInstance()->setLastX((float)xpos);
+    Engine::getInstance()->setLastY((float)ypos);
+    
     if (!Engine::getInstance()->isMouseVisible()) {
-        float xoffset = (float)xpos - Engine::getInstance()->getLastX();
-        float yoffset = Engine::getInstance()->getLastY() - (float)ypos;
-    
-        // printf("xoffset: %f, yoffset: %f\n", xoffset, yoffset);
-        Engine::getInstance()->setLastX((float)xpos);
-        Engine::getInstance()->setLastY((float)ypos);
-    
         // Handle in camera
         Engine::getInstance()->getCamera()->handleMouseInput(xoffset, yoffset);
     }
