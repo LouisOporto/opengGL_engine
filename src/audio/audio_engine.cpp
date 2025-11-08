@@ -28,8 +28,10 @@ void AudioEngine::loadSound(const char* filename) {
         Logger::Error("Error loading bank: %s", filename);
     }
 
-    FMOD_STUDIO_EVENTDESCRIPTION* descript[1];
-    FMOD_Studio_Bank_GetEventList(m_banks[0], descript, 1, (int*)0);
+    FMOD_STUDIO_EVENTDESCRIPTION* descript[10];
+    int numberLoaded = 0;
+    FMOD_Studio_Bank_GetEventList(m_banks[0], descript, 10, &numberLoaded);
+    Logger::Warn("Number of events in given file: %d", numberLoaded);
 
     // if(FMOD_Studio_System_GetEvent(m_studioSystem, 0, &descript[0]) != FMOD_OK) {
     //     Logger::Error("Failed get Event");
