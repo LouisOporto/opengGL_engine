@@ -25,20 +25,16 @@ add_library(studioFMOD SHARED IMPORTED)
 
 set_target_properties(studioFMOD PROPERTIES
     IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmodstudio.dll"
-    IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/libfmodstudio.a"
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API WIndows/api/studio/inc"
+    IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmodstudio.dll"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/studio/inc"
 )
 
 add_library(coreFMOD SHARED IMPORTED)
 
 set_target_properties(coreFMOD PROPERTIES
     IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmod.dll"
-    IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/libfmod.a"
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API WIndows/api/core/inc" 
-)
-
-include_directories(
-    "${CMAKE_CURRENT_SOURCE_DIR}/assimp"
+    IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmod.dll"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/core/inc" 
 )
 
 add_executable(${CMAKE_PROJECT_NAME} 
@@ -67,13 +63,21 @@ else()
     target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC RESOURCES="./resources")
 endif()
 
-target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API WIndows/api/studio/inc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API WIndows/api/core/inc"
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/assimp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/studio/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/core/inc"
 )
 
 # Linking all required libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OpenGL::GL GLEW::GLEW glfw libassimp coreFMOD studioFMOD)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE 
+    OpenGL::GL 
+    GLEW::GLEW 
+    glfw 
+    libassimp
+    studioFMOD
+    coreFMOD
+)
 
 # Include libgcc and libstdc++ for retrieving dll libraries
 if(${CMAKE_BUILD_TYPE} STREQUAL Release)
