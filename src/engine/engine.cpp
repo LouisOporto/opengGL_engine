@@ -119,10 +119,12 @@ bool Engine::init(int argc, char* argv[]) {
     ImGui_ImplOpenGL3_Init();
 
     if (!AudioEngine::getInstance()->init()) {
+        Logger::Error("Failed to load FMOD");
         return false;
     }
 
-    AudioEngine::getInstance()->loadSound("RESOURCES/audio/Master.bank");
+    AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
+    AudioEngine::getInstance()->play("Master.bank");
 
     return m_running = true;
 }
@@ -247,10 +249,11 @@ void Engine::handleKeyInput(float deltaTime) {
 
 void Engine::update() {
     AudioEngine::getInstance()->update();
-
+    
     // General variables used by all shaders
     m_projection = getCamera()->getPerspective();
-    m_view = getCamera()->getLookAt();
+    // m_view = getCamera()->getLookAt();
+    m_view = glm::lookAt(glm::vec3(15.0f *glm::sin(glfwGetTime() * 0.1f), 5.0, 15.0f * glm::cos(glfwGetTime() * 0.1f)), glm::vec3(0.0, 5.0, 0.0), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
     glm::vec3 lightColor = glm::vec3(1.0f);
@@ -289,6 +292,7 @@ void Engine::update() {
     m_cubeShader.setMat4("projection", m_projection);
     m_cubeShader.setMat4("view", m_view);
     m_cubeShader.setVec3("cameraPos", getCamera()->getPos());
+    m_cubeShader.setVec3("cameraPos", glm::vec3(15.0f *glm::sin(glfwGetTime() * 0.1f), 5.0, 15.0f * glm::cos(glfwGetTime() * 0.1f)));
 }
 
 void Engine::render() {
