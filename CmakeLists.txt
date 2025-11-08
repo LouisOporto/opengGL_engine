@@ -26,7 +26,7 @@ add_library(studioFMOD SHARED IMPORTED)
 set_target_properties(studioFMOD PROPERTIES
     IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmodstudio.dll"
     IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmodstudio.dll"
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/studio/inc"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/api/studio/inc"
 )
 
 add_library(coreFMOD SHARED IMPORTED)
@@ -34,7 +34,7 @@ add_library(coreFMOD SHARED IMPORTED)
 set_target_properties(coreFMOD PROPERTIES
     IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmod.dll"
     IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmod.dll"
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/core/inc" 
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/api/core/inc" 
 )
 
 add_executable(${CMAKE_PROJECT_NAME} 
@@ -65,8 +65,8 @@ endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include/assimp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/studio/inc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/FMOD Studio API Windows/api/core/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/api/studio/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FMOD/api/core/inc"
 )
 
 # Linking all required libraries

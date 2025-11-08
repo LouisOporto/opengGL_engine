@@ -1,6 +1,7 @@
-#pragma once
-#include "../../FMOD/FMOD Studio API Windows/api/studio/inc/fmod_studio.h"
-#include "../../FMOD/FMOD Studio API Windows/api/core/inc/fmod.h"
+#ifndef _AUDIO_ENGINE_H_
+#define _AUDIO_ENGINE_H_
+#include "../../FMOD/api/studio/inc/fmod_studio.h"
+#include "../../FMOD/api/core/inc/fmod.h"
 #include "../engine/logger.hpp"
 
 class AudioEngine {
@@ -18,3 +19,5 @@ class AudioEngine {
         FMOD_STUDIO_BANK* m_banks[4];
         static AudioEngine* m_instance;
 };
+
+#endif // _AUDIO_ENGINE_H_
