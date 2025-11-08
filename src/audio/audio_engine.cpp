@@ -5,13 +5,13 @@ AudioEngine* AudioEngine::m_instance = nullptr;
 bool AudioEngine::init() {
     FMOD_RESULT result;
 
-    FMOD::Studio::System::create(&m_system);
+    result = FMOD_Studio_System_Create(&m_studioSystem, FMOD_VERSION);
     if (result != FMOD_OK) {
         Logger::Error("FMOD::ERROR::(%d)", result);
         return false;
     }
 
-    result = m_system->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
+    result = FMOD_Studio_System_Initialize(m_studioSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
     if (result != FMOD_OK) {
         Logger::Error("FMOD::ERROR::(%d)", result);
         return false;

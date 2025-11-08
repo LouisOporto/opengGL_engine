@@ -1,5 +1,6 @@
 #pragma once
-#include "../../FMOD/FMOD Studio API Windows/api/studio/inc/fmod_studio.hpp"
+#include "../../FMOD/FMOD Studio API Windows/api/studio/inc/fmod_studio.h"
+#include "../../FMOD/FMOD Studio API Windows/api/core/inc/fmod.h"
 #include "../engine/logger.hpp"
 
 class AudioEngine {
@@ -8,6 +9,7 @@ class AudioEngine {
         bool init();
     private:
         AudioEngine() {}
-        FMOD::Studio::System* m_system = nullptr;
+        FMOD_STUDIO_SYSTEM* m_studioSystem = nullptr;
+        // FMOD::Studio::System* m_system = nullptr;
         static AudioEngine* m_instance;
 };
