@@ -15,6 +15,7 @@
 #include "../../imgui/backends/imgui_impl_opengl3.h"
 #include "../../imgui/backends/imgui_impl_glfw.h"
 
+#include "../audio/audio_engine.hpp"
 #include "../timer/timer.hpp"
 #include "../shader/shader.hpp"
 #include "../camera/camera.hpp"

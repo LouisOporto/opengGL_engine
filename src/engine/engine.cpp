@@ -118,6 +118,12 @@ bool Engine::init(int argc, char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 
+    if (!AudioEngine::getInstance()->init()) {
+        return false;
+    }
+
+    AudioEngine::getInstance()->loadSound("RESOURCES/audio/Master.bank");
+
     return m_running = true;
 }
 
@@ -240,6 +246,8 @@ void Engine::handleKeyInput(float deltaTime) {
 }
 
 void Engine::update() {
+    AudioEngine::getInstance()->update();
+
     // General variables used by all shaders
     m_projection = getCamera()->getPerspective();
     m_view = getCamera()->getLookAt();
@@ -399,6 +407,7 @@ void Engine::clean() {
     glDeleteRenderbuffers(1, &m_RBO);
     glDeleteFramebuffers(1, &m_FBO);
     glfwTerminate();
+    AudioEngine::getInstance()->clean();
 }
 
 // Callback functions
