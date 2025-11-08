@@ -5,13 +5,13 @@ AudioEngine* AudioEngine::m_instance = nullptr;
 bool AudioEngine::init() {
     FMOD_RESULT result;
 
-    result = FMOD_Studio_System_Create(&m_studioSystem, FMOD_VERSION);
+    result = FMOD_Studio_System_Create(&m_system, FMOD_VERSION);
     if (result != FMOD_OK) {
         Logger::Error("FMOD::ERROR::(%d)", result);
         return false;
     }
 
-    result = FMOD_Studio_System_Initialize(m_studioSystem, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
+    result = FMOD_Studio_System_Initialize(m_system, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
     if (result != FMOD_OK) {
         Logger::Error("FMOD::ERROR::(%d)", result);
         return false;
@@ -20,38 +20,57 @@ bool AudioEngine::init() {
     return true;
 }
 
-void AudioEngine::loadSound(const char* filename) {
-    FMOD_RESULT result;
-    result = FMOD_Studio_System_LoadBankFile(m_studioSystem, filename, FMOD_STUDIO_LOAD_BANK_NORMAL, &m_banks[0]);
-
-    if (result != FMOD_OK) {
-        Logger::Error("Error loading bank: %s", filename);
+void AudioEngine::loadBank(std::string filename, const std::string& directory) {
+    if (m_banks.count(filename) == 0) {
+        std::string path = directory + "/" + filename;
+        if (FMOD_Studio_System_LoadBankFile(m_system, path.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &m_banks[filename]) != FMOD_OK) {
+            Logger::Error("Error laoding bank from directory: %s", path.c_str());
+        }
     }
+}
 
+void AudioEngine::dropBank(std::string filename) {
+    if (m_banks.count(filename) != 0) {
+        FMOD_Studio_Bank_Unload(m_banks[filename]);
+        m_banks.erase(filename);
+    }
+}
+
+void AudioEngine::play(std::string filename) {
     FMOD_STUDIO_EVENTDESCRIPTION* descript[10];
     int numberLoaded = 0;
-    FMOD_Studio_Bank_GetEventList(m_banks[0], descript, 10, &numberLoaded);
-    Logger::Warn("Number of events in given file: %d", numberLoaded);
 
-    // if(FMOD_Studio_System_GetEvent(m_studioSystem, 0, &descript[0]) != FMOD_OK) {
-    //     Logger::Error("Failed get Event");
-    // }
+    FMOD_Studio_Bank_GetEventList(m_banks[filename], descript, 10, &numberLoaded);
+    Logger::Warn("Number of events in given bank file: %d", numberLoaded);
 
     FMOD_STUDIO_EVENTINSTANCE* instance;
-    if(FMOD_Studio_EventDescription_CreateInstance(descript[0], &instance) != FMOD_OK) {
+    if (FMOD_Studio_EventDescription_CreateInstance(descript[0], &instance) != FMOD_OK) {
         Logger::Error("Failed to create instance");
     }
 
-    if(FMOD_Studio_EventInstance_Start(instance) != FMOD_OK) {
+    if (FMOD_Studio_EventInstance_Start(instance) != FMOD_OK) {
         Logger::Error("Failed to start instance");
     }
 }
+
+void AudioEngine::stop(std::string filename) {
+    // if (FMOD_Studio_EventInstance_Stop())
+}
+
 void AudioEngine::update() {
-    if (FMOD_Studio_System_Update(m_studioSystem) != FMOD_OK) {
-        Logger::Error("Failed to update sound");
+    if (FMOD_Studio_System_Update(m_system) != FMOD_OK) {
+        Logger::Error("Failed to update FMOD");
     }
 }
 
 void AudioEngine::clean() {
-    FMOD_Studio_System_Release(m_studioSystem);
+    if (FMOD_Studio_System_Release(m_system) != FMOD_OK) {
+        Logger::Error("Failed to release FMOD files");
+    }
+
+    for (auto iter = m_banks.begin(); iter != m_banks.end(); iter++) {
+        FMOD_Studio_Bank_Unload(iter->second);
+        m_banks.erase(iter);
+    }
+    m_banks.clear();
 }

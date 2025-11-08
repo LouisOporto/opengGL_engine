@@ -1,5 +1,9 @@
 #ifndef _AUDIO_ENGINE_H_
 #define _AUDIO_ENGINE_H_
+
+#include <map>
+#include <string>
+
 #include "../../FMOD/api/studio/inc/fmod_studio.h"
 #include "../../FMOD/api/core/inc/fmod.h"
 #include "../engine/logger.hpp"
@@ -8,16 +12,20 @@ class AudioEngine {
     public:
         static AudioEngine* getInstance() { return m_instance = m_instance != nullptr ? m_instance : new AudioEngine(); }
         bool init();
-        void update();
-        void clean();
 
-        void loadSound(const char* filename);
-        
+        void loadBank(std::string filename, const std::string& directory);
+        void dropBank(std::string filename);
+
+        void play(std::string filename);
+        void stop(std::string filename);
+        void update();
+
+        void clean();
     private:
         AudioEngine() {}
-        FMOD_STUDIO_SYSTEM* m_studioSystem = nullptr;
-        FMOD_STUDIO_BANK* m_banks[4];
         static AudioEngine* m_instance;
+        FMOD_STUDIO_SYSTEM* m_system = nullptr;
+        std::map<std::string, FMOD_STUDIO_BANK*> m_banks;
 };
 
 #endif // _AUDIO_ENGINE_H_
