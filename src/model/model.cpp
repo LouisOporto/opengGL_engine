@@ -21,10 +21,12 @@ void Model::loadModel(std::string path) {
 
 void Model::processNode(aiNode *node, const aiScene *scene) {
     for (int i = 0; i < node->mNumMeshes; i++) {
+        // Logger::Warn("Processing Mesh: %d", i);
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         m_meshes.push_back(processMesh(mesh, scene));
     }
 
+    // Logger::Warn("Process Node Childern");
     for (int i = 0; i < node->mNumChildren; i++) {
         processNode(node->mChildren[i], scene);
     }
@@ -63,6 +65,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         vertices.push_back(vertex);
     }
     
+    // Logger::Log("Process Faces");
     // process indices
     for (int i = 0; i < mesh->mNumFaces; i++) {
         // Get faces from mesh->mFaces[index]
@@ -73,11 +76,13 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         }
     }
 
+    // Logger::Log("Process Materials");
     // process materials
     if (mesh->mMaterialIndex >= 0) {
         // Get material from scene->mMaterials[index] using the meshs material index;
-        // printf("Mesh size: %d\n", mesh->mMaterialIndex);
+        // Logger::Log("Mesh size: %d", mesh->mMaterialIndex);
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+        // Logger::Log("After material retrieval");
 
         std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
