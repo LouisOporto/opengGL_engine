@@ -378,7 +378,7 @@ void Engine::render() {
     }
     
     glDepthFunc(GL_LEQUAL);
-    // Skybox
+    // Skybox (Final Texture should be interchangeable if possible)
     m_skyboxShader.use();
     glBindVertexArray(m_skyboxVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
