@@ -105,8 +105,9 @@ bool Engine::init(int argc, char* argv[]) {
     setFirstMouse(true);
     m_lightOn = false;
     m_NormalMapOn = true;
-    m_mouseVisible = true;
+    m_mouseVisible = false;
     m_screenRotate = false;
+    toggleMouse();
     float temp = m_timer.getElapsed(); // Not used
 
     // Initialize imGUI context
@@ -389,6 +390,9 @@ void Engine::render() {
     // Handle ImGui a the end of render line
     renderImGuiInterface();
 
+    // Display ImGui context
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(m_window);
 }
 
@@ -468,12 +472,16 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 void Engine::renderImGuiInterface() {
     ImGui::ShowDemoWindow();
     showappMenuBar();
-    showFramerateStatistics();
-    showMusicPlayer();
 
-    // Display ImGui context
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    if (!ImGui::Begin("User Interface")) {
+        ImGui::End();
+        return;
+    }
+    else {
+        showFramerateStatistics();
+        showMusicPlayer();
+        ImGui::End();
+    }
 }
 
 void Engine::showappMenuBar() {
@@ -510,10 +518,10 @@ void Engine::showappMenuBar() {
 }
 
 void Engine::showFramerateStatistics() {
-    ImGui::Begin("Rendering Statistics");
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
+    if (ImGui::CollapsingHeader("Rendering Statistics")) {
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
+    }
 }
 
 void Engine::showMusicPlayer() {
