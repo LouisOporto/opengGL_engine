@@ -127,11 +127,12 @@ bool Engine::init(int argc, char* argv[]) {
     // AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
     // AudioEngine::getInstance()->loadBank("Master.strings.bank", "RESOURCES/audio");
     // AudioEngine::getInstance()->play("Master.bank");
-    // AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
-    
+    // AudioEngine::getInstance()->playByPath("event:/Music");
+
     AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio/Dispatch");
-    AudioEngine::getInstance()->loadBank("Ep106Cinematics.bank", "RESOURCES/audio/Dispatch");
-    AudioEngine::getInstance()->playByIndex("Ep106Cinematics.bank", 0);
+    AudioEngine::getInstance()->loadBank("Ep106Music.bank", "RESOURCES/audio/Dispatch");
+    // Radio by Bershy is Ep106Music index 12
+    AudioEngine::getInstance()->playByIndex("Ep106Music.bank", 15, 12);
     // playByPath
     // playTest();
 
