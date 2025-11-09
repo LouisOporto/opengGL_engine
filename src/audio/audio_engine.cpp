@@ -36,11 +36,11 @@ void AudioEngine::dropBank(std::string filename) {
     }
 }
 
-void AudioEngine::playByIndex(std::string filename, unsigned int index = 0) {
-    FMOD_STUDIO_EVENTDESCRIPTION* descript[10];
+void AudioEngine::playByIndex(std::string filename, int numberFiles, unsigned int index = 0) {
+    FMOD_STUDIO_EVENTDESCRIPTION** descript = new FMOD_STUDIO_EVENTDESCRIPTION*[numberFiles];
     int numberLoaded = 0;
 
-    FMOD_Studio_Bank_GetEventList(m_banks[filename], descript, 10, &numberLoaded);
+    FMOD_Studio_Bank_GetEventList(m_banks[filename], descript, numberFiles, &numberLoaded);
     Logger::Warn("Number of events in given bank file: %d", numberLoaded);
 
     FMOD_STUDIO_EVENTINSTANCE* instance;
@@ -51,6 +51,13 @@ void AudioEngine::playByIndex(std::string filename, unsigned int index = 0) {
     if (FMOD_Studio_EventInstance_Start(instance) != FMOD_OK) {
         Logger::Error("Failed to start instance");
     }
+
+    // Do this only if you are not planning to reuse this instance again (ie playing) or will not be manipulating in game parameters
+    if (FMOD_Studio_EventInstance_Release(instance) != FMOD_OK) {
+        Logger::Error("Failed to release instance");
+    }
+
+    delete[] descript;
 }
 
 void AudioEngine::playByPath(std::string index) {

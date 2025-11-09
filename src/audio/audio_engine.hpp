@@ -16,9 +16,9 @@ class AudioEngine {
         void loadBank(std::string filename, const std::string& directory);
         void dropBank(std::string filename);
 
-        void playByIndex(std::string filename, unsigned int index);
+        void playByIndex(std::string filename, int numberFiles, unsigned int index);
         void playByPath(std::string path);
-        void playTest(std::string filename) { playByIndex(filename, 0); }
+        void playTest(std::string filename) { playByIndex(filename, 10, 0); }
         void stop(std::string filename);
         void update();
 
