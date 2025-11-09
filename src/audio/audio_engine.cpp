@@ -24,8 +24,9 @@ void AudioEngine::loadBank(std::string filename, const std::string& directory) {
     if (m_banks.count(filename) == 0) {
         std::string path = directory + "/" + filename;
         if (FMOD_Studio_System_LoadBankFile(m_system, path.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &m_banks[filename]) != FMOD_OK) {
-            Logger::Error("Error laoding bank from directory: %s", path.c_str());
+            Logger::Error("Error loading bank from directory: %s", path.c_str());
         }
+        Logger::Log("Loading bank file: %s", filename.c_str());
     }
 }
 
@@ -33,6 +34,7 @@ void AudioEngine::dropBank(std::string filename) {
     if (m_banks.count(filename) != 0) {
         FMOD_Studio_Bank_Unload(m_banks[filename]);
         m_banks.erase(filename);
+        Logger::Log("Drop file: %s", filename.c_str());
     }
 }
 
