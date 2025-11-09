@@ -392,23 +392,6 @@ void Engine::render() {
     glfwSwapBuffers(m_window);
 }
 
-void Engine::renderImGuiInterface() {
-    ImGui::ShowDemoWindow();
-    showFramerateStatistics();
-
-    // Display ImGui context
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-// Move to dedicated ImGUI class??
-void Engine::showFramerateStatistics() {
-    ImGui::Begin("Screentime Statistics");
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
-}
-
 void Engine::clean() {
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
@@ -474,4 +457,25 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     // Handle in camera
     Engine::getInstance()->getCamera()->handleScrollInput((float)yoffset);
+}
+
+// ImGUI Functions
+void Engine::renderImGuiInterface() {
+    ImGui::ShowDemoWindow();
+    showFramerateStatistics();
+
+    // Display ImGui context
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Engine::showappMenuBar() {
+
+}
+
+void Engine::showFramerateStatistics() {
+    ImGui::Begin("Screentime Statistics");
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::End();
 }

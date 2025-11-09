@@ -191,6 +191,7 @@ class Engine {
         
         // ImGUI
         void renderImGuiInterface();
+        void showappMenuBar() {}
         void showFramerateStatistics();
 
         Engine() {}
