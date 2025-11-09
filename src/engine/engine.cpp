@@ -417,11 +417,13 @@ void Engine::handleKeyInput(float deltaTime) {
     if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS) getCamera()->handleKeyInput(LEFT, deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) getCamera()->handleKeyInput(RIGHT, deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS) getCamera()->handleKeyInput(UP, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) getCamera()->handleKeyInput(DOWN, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(m_window, GLFW_KEY_C) != GLFW_PRESS) getCamera()->handleKeyInput(DOWN, deltaTime);
 }
 
 // Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_C && action == GLFW_PRESS && mods == GLFW_MOD_CONTROL) { Engine::getInstance()->copyFunction(); }
+    // if (key == GLFW_KEY_C && action == GLFW_PRESS && mods != GLFW_MOD_CONTROL) {printf("Presing just C");}
     if (key == GLFW_KEY_Q && action == GLFW_PRESS) { glfwSetWindowShouldClose(window, GL_TRUE); }
     if (key == GLFW_KEY_F && action == GLFW_PRESS) { Engine::getInstance()->toggleLight(); }
     if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
@@ -465,7 +467,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 // ImGUI Functions
 void Engine::renderImGuiInterface() {
     ImGui::ShowDemoWindow();
+    showappMenuBar();
     showFramerateStatistics();
+    showMusicPlayer();
 
     // Display ImGui context
     ImGui::Render();
@@ -473,7 +477,33 @@ void Engine::renderImGuiInterface() {
 }
 
 void Engine::showappMenuBar() {
-
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Menu")) {
+            ImGui::MenuItem("Main menu", NULL, false, false); // No "Shortcut key provided"
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("New")) {}
+            if (ImGui::MenuItem("Open")) {}
+            if (ImGui::BeginMenu("Open Recent")) {
+                ImGui::MenuItem("last.c"); // Does nothing since no if () around
+                ImGui::MenuItem("previous.ini");
+                if (ImGui::MenuItem("engine.hpp")) { printf("Gets last engine if it existed\n"); }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            if (ImGui::MenuItem("Undo", "CTRL+Z")) { printf("Undo\n"); } // Match a shortcut key with callback key (if CTRL + Z) then relative
+            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // 1. False to just get to last bool 2. false to be not enabled (unless redo is available)
+            ImGui::Separator();
+            if (ImGui::MenuItem("Cut", "CTRL+X"));
+            if (ImGui::MenuItem("Copy", "CTRL+C")) { copyFunction(); }
+            if (ImGui::MenuItem("Paste", "CTRL+V"));
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
 }
 
 void Engine::showFramerateStatistics() {
@@ -481,4 +511,8 @@ void Engine::showFramerateStatistics() {
     ImGuiIO& io = ImGui::GetIO();
     ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
+}
+
+void Engine::showMusicPlayer() {
+
 }
