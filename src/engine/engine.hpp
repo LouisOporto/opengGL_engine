@@ -179,6 +179,11 @@ class Engine {
             m_mouseVisible = !m_mouseVisible; 
             glfwSetInputMode(m_window, GLFW_CURSOR, m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
+
+        void toggleRotate() {
+            m_screenRotate = !m_screenRotate;
+        }
+        bool isScreenRotate() { return m_screenRotate; }
         bool isMouseVisible() { return m_mouseVisible; }
         Camera* getCamera() const { return m_camera; }
 
@@ -220,6 +225,7 @@ class Engine {
         bool m_lightOn;
         bool m_NormalMapOn;
         bool m_mouseVisible;
+        bool m_screenRotate;
         float m_lastX, m_lastY;
 
         // No need to change universal usage here

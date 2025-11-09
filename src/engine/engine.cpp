@@ -106,6 +106,7 @@ bool Engine::init(int argc, char* argv[]) {
     m_lightOn = false;
     m_NormalMapOn = true;
     m_mouseVisible = false;
+    m_screenRotate = false;
     float temp = m_timer.getElapsed(); // Not used
 
     // Initialize imGUI context
@@ -124,6 +125,7 @@ bool Engine::init(int argc, char* argv[]) {
     }
 
     AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
+    AudioEngine::getInstance()->loadBank("Master.strings.bank", "RESOURCES/audio");
     AudioEngine::getInstance()->play("Master.bank");
 
     return m_running = true;
@@ -251,9 +253,14 @@ void Engine::update() {
     AudioEngine::getInstance()->update();
     
     // General variables used by all shaders
+    if (m_screenRotate) {
+        getCamera()->setPos(glm::vec3(20.0f * glm::sin(glfwGetTime() * 0.1f) + 2.5f, 5.0f, 20.0f * glm::cos(glfwGetTime() * 0.1f)));
+        getCamera()->setFront(glm::vec3(-20.0f * glm::sin(glfwGetTime() * 0.1f) + 2.5f, 0.0f, -20.0f * glm::cos(glfwGetTime() * 0.1f)));
+        getCamera()->setUp(glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    
     m_projection = getCamera()->getPerspective();
-    // m_view = getCamera()->getLookAt();
-    m_view = glm::lookAt(glm::vec3(15.0f *glm::sin(glfwGetTime() * 0.1f), 5.0, 15.0f * glm::cos(glfwGetTime() * 0.1f)), glm::vec3(0.0, 5.0, 0.0), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_view = getCamera()->getLookAt();
 
     glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
     glm::vec3 lightColor = glm::vec3(1.0f);
@@ -277,6 +284,7 @@ void Engine::update() {
         color = glm::vec3(1.0f, 1.0f, 1.0f);
         m_objShader.setPointLight("pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter], color * AMB, color * DIF, color * SPE, CONSTANT, LINEAR, QUADRATIC);
     }
+
     glm::vec3 spotlightColor = {1.0f, 1.0f, 0.3f};
     m_objShader.setBool("spotLightOn", m_lightOn);
     m_objShader.setSpotLight("spotLight", getCamera()->getPos(), getCamera()->getFront(), spotlightColor * AMB, spotlightColor * DIF, spotlightColor * SPE, cos(glm::radians(12.5f)), cos(glm::radians(17.5f)), CONSTANT, LINEAR, QUADRATIC);
@@ -292,7 +300,6 @@ void Engine::update() {
     m_cubeShader.setMat4("projection", m_projection);
     m_cubeShader.setMat4("view", m_view);
     m_cubeShader.setVec3("cameraPos", getCamera()->getPos());
-    m_cubeShader.setVec3("cameraPos", glm::vec3(15.0f *glm::sin(glfwGetTime() * 0.1f), 5.0, 15.0f * glm::cos(glfwGetTime() * 0.1f)));
 }
 
 void Engine::render() {
@@ -314,13 +321,13 @@ void Engine::render() {
     m_objShader.setMat4("model", m_model);
     m_objShader.setMat4("inverseModel", inverseModel);
     
-    // m_objModel->draw(m_objShader);
+    m_objModel->draw(m_objShader);
 
     // Reflecting model
     m_cubeShader.use();
     
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     inverseModel = glm::inverse(m_model);
     
@@ -420,6 +427,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_F && action == GLFW_PRESS) { Engine::getInstance()->toggleLight(); }
     if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
     if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleMouse(); }
+    if (key == GLFW_KEY_R && action == GLFW_PRESS) { Engine::getInstance()->toggleRotate(); }
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {
@@ -444,7 +452,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     Engine::getInstance()->setLastX((float)xpos);
     Engine::getInstance()->setLastY((float)ypos);
     
-    if (!Engine::getInstance()->isMouseVisible()) {
+    if (!Engine::getInstance()->isMouseVisible() && !Engine::getInstance()->isScreenRotate()) {
         // Handle in camera
         Engine::getInstance()->getCamera()->handleMouseInput(xoffset, yoffset);
     }
