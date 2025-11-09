@@ -105,7 +105,7 @@ bool Engine::init(int argc, char* argv[]) {
     setFirstMouse(true);
     m_lightOn = false;
     m_NormalMapOn = true;
-    m_mouseVisible = false;
+    m_mouseVisible = true;
     m_screenRotate = false;
     float temp = m_timer.getElapsed(); // Not used
 
@@ -124,15 +124,15 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-    // AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
-    // AudioEngine::getInstance()->loadBank("Master.strings.bank", "RESOURCES/audio");
+    AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
+    AudioEngine::getInstance()->loadBank("Master.strings.bank", "RESOURCES/audio");
     // AudioEngine::getInstance()->play("Master.bank");
-    // AudioEngine::getInstance()->playByPath("event:/Music");
+    AudioEngine::getInstance()->playByPath("event:/Music");
 
-    AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio/Dispatch");
-    AudioEngine::getInstance()->loadBank("Ep106Music.bank", "RESOURCES/audio/Dispatch");
+    // AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio/Dispatch");
+    // AudioEngine::getInstance()->loadBank("Ep106Music.bank", "RESOURCES/audio/Dispatch");
     // Radio by Bershy is Ep106Music index 12
-    AudioEngine::getInstance()->playByIndex("Ep106Music.bank", 15, 12);
+    // AudioEngine::getInstance()->playByIndex("Ep106Music.bank", 15, 12);
     // playByPath
     // playTest();
 
@@ -480,6 +480,9 @@ void Engine::showappMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Menu")) {
             ImGui::MenuItem("Main menu", NULL, false, false); // No "Shortcut key provided"
+            ImGui::Separator();
+            ImGui::MenuItem("Setttings");
+            if (ImGui::MenuItem("Quit")) { quit(); }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("File")) {
@@ -507,7 +510,7 @@ void Engine::showappMenuBar() {
 }
 
 void Engine::showFramerateStatistics() {
-    ImGui::Begin("Screentime Statistics");
+    ImGui::Begin("Rendering Statistics");
     ImGuiIO& io = ImGui::GetIO();
     ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
