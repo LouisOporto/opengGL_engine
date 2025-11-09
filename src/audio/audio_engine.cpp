@@ -53,19 +53,25 @@ void AudioEngine::playByIndex(std::string filename, unsigned int index = 0) {
     }
 }
 
-void AudioEngine::playByPath(std::string filename, int index) {
-    FMOD_STUDIO_EVENTDESCRIPTION descript;
+void AudioEngine::playByPath(std::string index) {
+    FMOD_STUDIO_EVENTDESCRIPTION* descript;
 
-    FMOD_Studio_Bank_GetEventList(m_banks[filename], descript, 10, &numberLoaded);
-    Logger::Warn("Number of events in given bank file: %d", numberLoaded);
+    if (FMOD_Studio_System_GetEvent(m_system, index.c_str(), &descript) != FMOD_OK) {
+        Logger::Error("Failed to retrieve event named: %s", index.c_str());
+    }
 
     FMOD_STUDIO_EVENTINSTANCE* instance;
-    if (FMOD_Studio_EventDescription_CreateInstance(descript[0], &instance) != FMOD_OK) {
+    if (FMOD_Studio_EventDescription_CreateInstance(descript, &instance) != FMOD_OK) {
         Logger::Error("Failed to create instance");
     }
 
     if (FMOD_Studio_EventInstance_Start(instance) != FMOD_OK) {
         Logger::Error("Failed to start instance");
+    }
+
+    // Do this only if you are not planning to reuse this instance again (ie playing) or will not be manipulating in game parameters
+    if (FMOD_Studio_EventInstance_Release(instance) != FMOD_OK) {
+        Logger::Error("Failed to release instance");
     }
 }
 
