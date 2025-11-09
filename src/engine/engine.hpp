@@ -184,12 +184,15 @@ class Engine {
         Camera* getCamera() const { return m_camera; }
 
     private:
+        // OpenlGL
         bool initOpenGLVariables();
-        void renderImGuiInterface();
-        void showFramerateStatistics();
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
         
+        // ImGUI
+        void renderImGuiInterface();
+        void showFramerateStatistics();
+
         Engine() {}
         static Engine* m_instance;
         GLFWwindow* m_window;
