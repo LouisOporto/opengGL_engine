@@ -166,29 +166,26 @@ class Engine {
 
         void clean();
         inline bool isRunning() { return m_running; }
-        
-        void setLastX(const float& value) { m_lastX = value; }
-        float getLastX() const { return m_lastX; }
-        void setLastY(const float& value) { m_lastY = value; }
-        float getLastY() const { return m_lastY; }
-        void setFirstMouse(const bool& value) { m_firstMouse = value; }
-        bool getFirstMouse() const { return m_firstMouse; } // Do we need this function and setter
-        void toggleLight() { m_lightOn = !m_lightOn; } // Maybe remove
-        void toggleNormalMap() { m_NormalMapOn = !m_NormalMapOn; } // Maybe remove
-        void toggleMouse() {  // Re-edit
-            m_mouseVisible = !m_mouseVisible; 
-            glfwSetInputMode(m_window, GLFW_CURSOR, m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-        }
-
-        void toggleRotate() {
-            m_screenRotate = !m_screenRotate;
-        }
         bool isScreenRotate() { return m_screenRotate; }
         bool isMouseVisible() { return m_mouseVisible; }
+        
+        void setLastX(const float& value) { m_lastX = value; }
+        void setLastY(const float& value) { m_lastY = value; }
+        void setFirstMouse(const bool& value) { m_firstMouse = value; }
+        float getLastX() const { return m_lastX; }
+        float getLastY() const { return m_lastY; }
+        inline bool getFirstMouse() const { return m_firstMouse; }
+
+        void toggleLight() { m_lightOn = !m_lightOn; }
+        void toggleNormalMap() { m_NormalMapOn = !m_NormalMapOn; }
+        void toggleMouse() { m_mouseVisible = !m_mouseVisible; glfwSetInputMode(m_window, GLFW_CURSOR, m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED); }
+        void toggleRotate() { m_screenRotate = !m_screenRotate; }
+
         Camera* getCamera() const { return m_camera; }
 
     private:
         bool initOpenGLVariables();
+        void renderImGuiInterface();
         void showFramerateStatistics();
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }

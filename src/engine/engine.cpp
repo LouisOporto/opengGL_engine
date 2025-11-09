@@ -245,16 +245,6 @@ void Engine::event() {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
-}
-
-void Engine::handleKeyInput(float deltaTime) {
-    if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS) getCamera()->handleKeyInput(FORWARD, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS) getCamera()->handleKeyInput(BACKWARD, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS) getCamera()->handleKeyInput(LEFT, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) getCamera()->handleKeyInput(RIGHT, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS) getCamera()->handleKeyInput(UP, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) getCamera()->handleKeyInput(DOWN, deltaTime);
 }
 
 void Engine::update() {
@@ -363,7 +353,6 @@ void Engine::render() {
     
     // Light
     m_lightShader.use();
-    
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
@@ -377,8 +366,8 @@ void Engine::render() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
     
-    glDepthFunc(GL_LEQUAL);
     // Skybox (Final Texture should be interchangeable if possible)
+    glDepthFunc(GL_LEQUAL);
     m_skyboxShader.use();
     glBindVertexArray(m_skyboxVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
@@ -398,14 +387,21 @@ void Engine::render() {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Handle ImGui a the end of render line
-    showFramerateStatistics();
+    renderImGuiInterface();
 
-    // Display imGui context
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(m_window);
 }
 
+void Engine::renderImGuiInterface() {
+    ImGui::ShowDemoWindow();
+    showFramerateStatistics();
+
+    // Display ImGui context
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+// Move to dedicated ImGUI class??
 void Engine::showFramerateStatistics() {
     ImGui::Begin("Screentime Statistics");
     ImGuiIO& io = ImGui::GetIO();
@@ -427,6 +423,15 @@ void Engine::clean() {
     glDeleteFramebuffers(1, &m_FBO);
     glfwTerminate();
     AudioEngine::getInstance()->clean();
+}
+
+void Engine::handleKeyInput(float deltaTime) {
+    if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS) getCamera()->handleKeyInput(FORWARD, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS) getCamera()->handleKeyInput(BACKWARD, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS) getCamera()->handleKeyInput(LEFT, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) getCamera()->handleKeyInput(RIGHT, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS) getCamera()->handleKeyInput(UP, deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) getCamera()->handleKeyInput(DOWN, deltaTime);
 }
 
 // Callback functions
