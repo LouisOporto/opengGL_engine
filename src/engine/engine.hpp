@@ -182,6 +182,8 @@ class Engine {
         void toggleRotate() { m_screenRotate = !m_screenRotate; }
 
         Camera* getCamera() const { return m_camera; }
+        
+        void copyFunction() { printf("Copying...\n"); } // Just testing
 
     private:
         // OpenlGL
@@ -191,8 +193,10 @@ class Engine {
         
         // ImGUI
         void renderImGuiInterface();
-        void showappMenuBar() {}
+        void showappMenuBar();
         void showFramerateStatistics();
+        void showMusicPlayer();
+
 
         Engine() {}
         static Engine* m_instance;
