@@ -478,8 +478,8 @@ void Engine::renderImGuiInterface() {
         return;
     }
     else {
-        showFramerateStatistics();
         showMusicPlayer();
+        showFramerateStatistics();
         ImGui::End();
     }
 }
@@ -525,5 +525,29 @@ void Engine::showFramerateStatistics() {
 }
 
 void Engine::showMusicPlayer() {
-
+    char buffer[512];
+    int index;
+    if (ImGui::CollapsingHeader("Music Player")) {
+        if (ImGui::TreeNode("Audio Engine Functions")) {
+            ImGui::SeparatorText("Load Bank");
+            ImGui::InputText("File Name", m_loadingBuffer, sizeof(m_loadingBuffer)); 
+            if (ImGui::Button("Load")) { AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "RESOURCES/audio/Dispatch"); }
+            ImGui::SeparatorText("Unload Bank");
+            ImGui::InputText("Filename", m_releasingBuffer, sizeof(m_releasingBuffer));
+            if (ImGui::Button("Release")) { AudioEngine::getInstance()->dropBank(std::string(m_releasingBuffer)); }
+            ImGui::Separator();
+            ImGui::SeparatorText("PlayByPath");
+            ImGui::InputText("Path", buffer, sizeof(buffer));
+            ImGui::Button("Play Event");
+            ImGui::SeparatorText("PlayByIndex");
+            ImGui::InputText("Bank Name", buffer, sizeof(buffer));
+            ImGui::InputInt("Index", &index);
+            ImGui::Button("Play Event");
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Selector")) {
+            ImGui::Text("Current song\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
+            ImGui::TreePop();
+        }
+    }
 }

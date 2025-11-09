@@ -240,6 +240,11 @@ class Engine {
         glm::mat4 m_model; 
 
         int m_SCR_W, m_SCR_H; // Functions that change with screen size needs to update with this
+
+
+        // ImGUI Variables
+        char m_loadingBuffer[512];
+        char m_releasingBuffer[512];
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
