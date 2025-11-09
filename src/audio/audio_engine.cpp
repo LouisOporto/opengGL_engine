@@ -36,9 +36,25 @@ void AudioEngine::dropBank(std::string filename) {
     }
 }
 
-void AudioEngine::play(std::string filename) {
+void AudioEngine::playByIndex(std::string filename, unsigned int index = 0) {
     FMOD_STUDIO_EVENTDESCRIPTION* descript[10];
     int numberLoaded = 0;
+
+    FMOD_Studio_Bank_GetEventList(m_banks[filename], descript, 10, &numberLoaded);
+    Logger::Warn("Number of events in given bank file: %d", numberLoaded);
+
+    FMOD_STUDIO_EVENTINSTANCE* instance;
+    if (FMOD_Studio_EventDescription_CreateInstance(descript[index], &instance) != FMOD_OK) {
+        Logger::Error("Failed to create instance");
+    }
+
+    if (FMOD_Studio_EventInstance_Start(instance) != FMOD_OK) {
+        Logger::Error("Failed to start instance");
+    }
+}
+
+void AudioEngine::playByPath(std::string filename, int index) {
+    FMOD_STUDIO_EVENTDESCRIPTION descript;
 
     FMOD_Studio_Bank_GetEventList(m_banks[filename], descript, 10, &numberLoaded);
     Logger::Warn("Number of events in given bank file: %d", numberLoaded);

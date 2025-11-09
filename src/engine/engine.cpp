@@ -124,9 +124,16 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-    AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
-    AudioEngine::getInstance()->loadBank("Master.strings.bank", "RESOURCES/audio");
-    AudioEngine::getInstance()->play("Master.bank");
+    // AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
+    // AudioEngine::getInstance()->loadBank("Master.strings.bank", "RESOURCES/audio");
+    // AudioEngine::getInstance()->play("Master.bank");
+    // AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
+    
+    AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio/Dispatch");
+    AudioEngine::getInstance()->loadBank("Ep106Cinematics.bank", "RESOURCES/audio/Dispatch");
+    AudioEngine::getInstance()->playByIndex("Ep106Cinematics.bank", 0);
+    // playByPath
+    // playTest();
 
     return m_running = true;
 }
