@@ -396,6 +396,8 @@ void Engine::clean() {
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
+
+    // Clean up by oject basis or keep this way
     glDeleteVertexArrays(1, &m_objectVAO);
     glDeleteVertexArrays(1, &m_lightVAO);
     glDeleteVertexArrays(1, &m_vegetationVAO);
@@ -404,6 +406,7 @@ void Engine::clean() {
     glDeleteBuffers(1, &m_quadVBO);
     glDeleteRenderbuffers(1, &m_RBO);
     glDeleteFramebuffers(1, &m_FBO);
+
     glfwTerminate();
     AudioEngine::getInstance()->clean();
 }
