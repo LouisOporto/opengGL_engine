@@ -39,6 +39,9 @@ class Camera {
         glm::mat4 getPerspective() { return glm::perspective(glm::radians(m_fov), m_SCR_W / (float)m_SCR_H, 0.1f, 100.0f); }
         glm::vec3 getPos() { return m_pos; }
         glm::vec3 getFront() { return m_front; }
+        void setPos(glm::vec3 pos) { m_pos = pos; }
+        void setFront(glm::vec3 front) { m_front = front; }
+        void setUp(glm::vec3 up) { m_up = up; }
 
         void setWidth(int value) { m_SCR_W = value; }
         void setHeight(int value) { m_SCR_H = value; }
