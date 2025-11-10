@@ -433,6 +433,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
     if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleMouse(); }
     if (key == GLFW_KEY_R && action == GLFW_PRESS) { Engine::getInstance()->toggleRotate(); }
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Parameter 1", 0.0); }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Parameter 1", 0.5); }
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Parameter 1", 1.0); }
+    
 }
 
 void frame_callback(GLFWwindow* window, int width, int height) {
