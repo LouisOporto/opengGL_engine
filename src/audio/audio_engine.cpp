@@ -45,7 +45,6 @@ void AudioEngine::playByIndex(std::string filename, int numberFiles, unsigned in
     FMOD_Studio_Bank_GetEventList(m_banks[filename], descript, numberFiles, &numberLoaded);
     Logger::Warn("Number of events in given bank file: %d", numberLoaded);
 
-    FMOD_STUDIO_EVENTINSTANCE* instance;
     if (FMOD_Studio_EventDescription_CreateInstance(descript[index], &instance) != FMOD_OK) {
         Logger::Error("Failed to create instance");
     }
@@ -54,10 +53,7 @@ void AudioEngine::playByIndex(std::string filename, int numberFiles, unsigned in
         Logger::Error("Failed to start instance");
     }
 
-    // Do this only if you are not planning to reuse this instance again (ie playing) or will not be manipulating in game parameters
-    if (FMOD_Studio_EventInstance_Release(instance) != FMOD_OK) {
-        Logger::Error("Failed to release instance");
-    }
+    // release();
 
     delete[] descript;
 }
@@ -69,16 +65,23 @@ void AudioEngine::playByPath(std::string index) {
         Logger::Error("Failed to retrieve event named: %s", index.c_str());
     }
 
-    FMOD_STUDIO_EVENTINSTANCE* instance;
+    // FMOD_STUDIO_EVENTINSTANCE* instance;
     if (FMOD_Studio_EventDescription_CreateInstance(descript, &instance) != FMOD_OK) {
         Logger::Error("Failed to create instance");
+    }
+
+    if (FMOD_Studio_EventInstance_SetParameterByName(instance, "Parameter 1", 1.0f, false) != FMOD_OK) {
+        Logger::Error("Fail to set parameter");
     }
 
     if (FMOD_Studio_EventInstance_Start(instance) != FMOD_OK) {
         Logger::Error("Failed to start instance");
     }
 
-    // Do this only if you are not planning to reuse this instance again (ie playing) or will not be manipulating in game parameters
+    // release();
+}
+
+void AudioEngine::release() {
     if (FMOD_Studio_EventInstance_Release(instance) != FMOD_OK) {
         Logger::Error("Failed to release instance");
     }
@@ -104,4 +107,27 @@ void AudioEngine::clean() {
         m_banks.erase(iter);
     }
     m_banks.clear();
+}
+
+void AudioEngine::setInstanceParemeter(std::string parameter, float value) {
+    if (FMOD_Studio_EventInstance_SetParameterByName(instance, parameter.c_str(), value, false) != FMOD_OK) {
+        Logger::Error("Failed to set parameter");
+    }
+
+    setTimelinePosition(value * 15000);
+}
+
+void AudioEngine::setTimelinePosition(int value) {
+    if (FMOD_Studio_EventInstance_SetTimelinePosition(instance, value) != FMOD_OK) {
+        Logger::Error("Failed to set FMOD value");
+    }
+    readTimelinePosition();
+}
+
+void AudioEngine::readTimelinePosition() {
+    int value = 0;
+    if (FMOD_Studio_EventInstance_GetTimelinePosition(instance, &value) != FMOD_OK) {
+        Logger::Error("Error reading");
+    }
+    Logger::Log("TimelinePosition: %f", value / 1000.f);
 }

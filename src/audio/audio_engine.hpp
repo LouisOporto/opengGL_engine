@@ -19,6 +19,11 @@ class AudioEngine {
         void playByIndex(std::string filename, int numberFiles, unsigned int index);
         void playByPath(std::string path);
         void playTest(std::string filename) { playByIndex(filename, 10, 0); }
+
+        void setInstanceParemeter(std::string parameter, float value);
+        void setTimelinePosition(int value);
+        void readTimelinePosition();
+        void release();
         void stop(std::string filename);
         void update();
 
@@ -28,6 +33,7 @@ class AudioEngine {
         static AudioEngine* m_instance;
         FMOD_STUDIO_SYSTEM* m_system = nullptr;
         std::map<std::string, FMOD_STUDIO_BANK*> m_banks;
+        FMOD_STUDIO_EVENTINSTANCE* instance;
 };
 
 #endif // _AUDIO_ENGINE_H_
