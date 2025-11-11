@@ -5,7 +5,7 @@ Engine* Engine::m_instance = nullptr;
 bool Engine::init(int argc, char* argv[]) {
 
     if (!glfwInit()) {
-        fprintf(stderr, "Failed to start glfw\n");
+        Logger::Error("Failed to start GLFW");
         return false;
     }
 
@@ -19,7 +19,7 @@ bool Engine::init(int argc, char* argv[]) {
     m_SCR_H = SCR_H;
     m_window = glfwCreateWindow(m_SCR_W, m_SCR_H, "Window", NULL, NULL);
     if (!m_window) {
-        Logger::Error("Failed to create window");
+        Logger::Error("Failed to create GLFW window");
         return false;
     }
     
@@ -32,13 +32,13 @@ bool Engine::init(int argc, char* argv[]) {
     
     glewExperimental = true;
     if (glewInit() != GLEW_OK) {
-        Logger::Error("Failed to init glew");
+        Logger::Error("Failed to init GLEW");
         return false;
     }
     
     // OPENGL setup
     if (!initOpenGLVariables()) {
-        Logger::Error("Failed to load something from OpenGL!");
+        Logger::Error("Failed to load something from OpenGL Variables!");
         return false;
     }
     
@@ -54,10 +54,6 @@ bool Engine::init(int argc, char* argv[]) {
     m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
     
     // Textures setup
-    stbi_set_flip_vertically_on_load(true);
-    // m_texture0 = ImageLoader::getInstance()->loadImage("grass.png", "RESOURCES/images");
-    // m_texture1 = ImageLoader::getInstance()->loadImage("blending_transparent_window.png", "RESOURCES/images");
-
     std::vector<std::string> faces {
         "right.jpg",
         "left.jpg",
@@ -67,7 +63,6 @@ bool Engine::init(int argc, char* argv[]) {
         "back.jpg",
     };
 
-    stbi_set_flip_vertically_on_load(false);
     m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(faces, "RESOURCES/images/skybox");
 
     // Shader setup
@@ -125,15 +120,16 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-    AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio");
-    AudioEngine::getInstance()->loadBank("Master.strings.bank", "RESOURCES/audio");
+    // AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio");
+    // AudioEngine::getInstance()->loadBank("Master.strings", "RESOURCES/audio");
+    // AuidoEngine::getInstance()->getBank()->
     // AudioEngine::getInstance()->play("Master.bank");
-    AudioEngine::getInstance()->playByPath("event:/Music");
+    // AudioEngine::getInstance()->playByPath("event:/Music");
 
-    // AudioEngine::getInstance()->loadBank("Master.bank", "RESOURCES/audio/Dispatch");
-    // AudioEngine::getInstance()->loadBank("Ep106Music.bank", "RESOURCES/audio/Dispatch");
+    AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio/Dispatch");
+    AudioEngine::getInstance()->loadBank("Ep106Music", "RESOURCES/audio/Dispatch");
     // Radio by Bershy is Ep106Music index 12
-    // AudioEngine::getInstance()->playByIndex("Ep106Music.bank", 15, 12);
+    AudioEngine::getInstance()->playByIndex("Ep106Music", 12);
     // playByPath
     // playTest();
 
