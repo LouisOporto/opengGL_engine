@@ -524,19 +524,18 @@ void Engine::showFramerateStatistics() {
 
 void Engine::showMusicPlayer(std::string name) {
     char buffer[512];
+    buffer[0] = '\0';
     int index;
     if (ImGui::CollapsingHeader("Music Player")) {
-        if (ImGui::TreeNode("Currently Playing")) {
-            if (AudioEngine::getInstance()->checkInstance(name)) {
-                Event event = AudioEngine::getInstance()->getEvent(name);
-                ImGui::Text("Current Song: %s", event.name.c_str());
-                ImGui::Text("Current: %d:%2d Total: %d:%2d", event.curMin, event.curSec, event.totalMin, event.totalSec);
-                ImGui::Text("Option to rewind, play, pause, stop, forward");
-            }
-            else {
-                ImGui::Text("Current song:\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
-            }
-            ImGui::TreePop();
+        if (AudioEngine::getInstance()->checkInstance(name)) {
+            Event event = AudioEngine::getInstance()->getEvent(name);
+            ImGui::Text("Current Song: %s", event.name.c_str());
+            ImGui::ProgressBar(event.currentPos / (float)event.totalPos);
+            ImGui::Text("Current: %d:%02d Total: %d:%02d", event.currentPos / 60000, event.currentPos / 1000 % 60, event.totalPos / 60000, event.totalPos / 1000 % 60);
+            ImGui::Text("Option to rewind, play, pause, stop, forward");
+        }
+        else {
+            ImGui::Text("Current song:\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
         }
         if (ImGui::TreeNode("Audio Engine Functions")) {
             ImGui::SeparatorText("Load Bank");
