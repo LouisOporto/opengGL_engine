@@ -11,8 +11,8 @@
 
 
 
-struct Music {
-    Music(std::string songName, int totalMins, int totalSecs, int currentMins = 0, int currentSecs = 0, bool paused = false, bool stop = false, bool released = false) {
+struct Event {
+    Event(std::string songName = "", int totalMins = 0, int totalSecs = 0, int currentMins = 0, int currentSecs = 0, bool paused = false, bool stop = false, bool released = false) {
         name = songName;
         totalMin = totalMins;
         totalSec = totalSecs;
@@ -21,6 +21,8 @@ struct Music {
         isPaused = paused;
         isStop = stop;
         isReleased = released;
+
+        FMOD_STUDIO_EVENTINSTANCE* instance = nullptr;
     }
 
     std::string name;
@@ -30,7 +32,9 @@ struct Music {
     int curSec;
     bool isPaused;
     bool isStop;
+    bool toRelease;
     bool isReleased;
+    FMOD_STUDIO_EVENTINSTANCE* instance;
 };
 
 class AudioEngine {
@@ -41,15 +45,19 @@ class AudioEngine {
         void loadBank(std::string bankName, const std::string& directory);
         void dropBank(std::string bankName);
 
-        void playByIndex(std::string bankName, unsigned int index = 0);
-        void playByPath(std::string path);
-        void playTest(std::string bankName) { playByIndex(bankName); }
+        bool checkInstance(std::string eventName);
+        Event getEvent(std::string eventName);
 
-        void setInstanceParemeter(std::string parameter, float value);
-        void setTimelinePosition(int value);
-        void readTimelinePosition();
-        void release();
-        void stop(std::string filename);
+        void playByIndex(std::string bankName, std::string name, unsigned int index = 0, bool release = false);
+        void playByPath(std::string path, std::string name, bool release = false);
+        void playTest(std::string bankName) { playByIndex(bankName, "Test"); }
+
+        void setInstanceParemeter(std::string name, std::string parameter, float value, bool release = false);
+        void setTimelinePosition(std::string eventName, int value, bool release = false);
+        void readTimelinePosition(std::string eventName);
+        void updateCurrentPosition(std::string eventName);
+        void releaseInstance(std::string eventName);
+        void stop(std::string eventName, bool release = false);
         void update();
 
         void clean();
@@ -58,8 +66,7 @@ class AudioEngine {
         static AudioEngine* m_instance;
         FMOD_STUDIO_SYSTEM* m_system = nullptr;
         std::map<std::string, FMOD_STUDIO_BANK*> m_banks;
-        std::map<std::string, FMOD_STUDIO_EVENTINSTANCE*> m_eventInstances;
-        FMOD_STUDIO_EVENTINSTANCE* instance; // Temp
+        std::map<std::string, Event> m_eventInstances;
         std::map<std::string, std::vector<unsigned int>> BANKMAP; // Relative bank directory
 };
 
