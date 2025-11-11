@@ -72,8 +72,8 @@ void AudioEngine::playByIndex(std::string bankName, std::string name, unsigned i
         Logger::Error("Failed to retrieve length");
     }
 
-    event = Event(name, length / 60000, length / 1000 % 60);
-    Logger::Warn("Total length of event: %d:%d", event.totalMin, event.totalSec);
+    event = Event(name, length);
+    Logger::Warn("Total length of event: %d:%d", length / 60000, length / 1000 % 60);
 
     if (FMOD_Studio_EventDescription_CreateInstance(descript[index], &event.instance) != FMOD_OK) {
         Logger::Error("Failed to create instance");
@@ -107,8 +107,8 @@ void AudioEngine::playByPath(std::string index, std::string name, bool release) 
         Logger::Error("Failed to retrieve length");
     }
     
-    event = Event(name, length / 60000, length / 1000 % 60);
-    Logger::Warn("Total length of event: %d:%d", event.totalMin, event.totalSec);
+    event = Event(name, length);
+    Logger::Warn("Total length of event: %d:%d", length / 60000, length / 1000 % 60);
 
     // FMOD_STUDIO_EVENTINSTANCE* instance;
     if (FMOD_Studio_EventDescription_CreateInstance(descript, &event.instance) != FMOD_OK) {
@@ -118,9 +118,15 @@ void AudioEngine::playByPath(std::string index, std::string name, bool release) 
     if (FMOD_Studio_EventInstance_Start(event.instance) != FMOD_OK) {
         Logger::Error("Failed to start instance");
     }
-
-    event.toRelease = release;
     m_eventInstances[name] = event;
+
+    if (release) setToRelease(name);
+}
+
+void AudioEngine::setToRelease(std::string eventName) {
+    if (checkInstance(eventName)) {
+        m_eventInstances[eventName].toRelease = true;
+    }
 }
 
 void AudioEngine::releaseInstance(std::string eventName) {
@@ -148,6 +154,10 @@ void AudioEngine::update() {
 
     for (auto iter = m_eventInstances.begin(); iter != m_eventInstances.end(); iter++) {
         if (iter->second.toRelease) releaseInstance(iter->first);
+
+        if (iter->second.isStop && iter->second.isReleased) {
+            m_eventInstances.erase(iter);
+        }
     }
 }
 
@@ -164,17 +174,16 @@ void AudioEngine::clean() {
     m_eventInstances.clear();
 }
 
-void AudioEngine::setInstanceParemeter(std::string eventName, std::string parameter, float value, bool release) {
+void AudioEngine::setInstanceParemeter(std::string eventName, std::string parameter, float value) {
     if (checkInstance(eventName)) {
         if (FMOD_Studio_EventInstance_SetParameterByName(m_eventInstances[eventName].instance, parameter.c_str(), value, false) != FMOD_OK) {
             Logger::Error("Failed to set parameter");
         }
-        setTimelinePosition(eventName, value * 15000, release);
-        m_eventInstances[eventName].toRelease = release;
+        setTimelinePosition(eventName, value * 15000);
     }
 }
 
-void AudioEngine::setTimelinePosition(std::string eventName, int value, bool release) {
+void AudioEngine::setTimelinePosition(std::string eventName, int value) {
     if (checkInstance(eventName)) {
         if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, value) != FMOD_OK) {
             Logger::Error("Failed to set FMOD value");
@@ -200,7 +209,6 @@ void AudioEngine::updateCurrentPosition(std::string eventName) {
             Logger::Error("Error reading");
         }
 
-        m_eventInstances[eventName].curMin = value / 60000;
-        m_eventInstances[eventName].curSec = value / 1000 % 60;
+        m_eventInstances[eventName].currentPos = value;
     }
 }

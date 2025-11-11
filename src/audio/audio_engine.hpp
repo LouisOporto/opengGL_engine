@@ -12,12 +12,10 @@
 
 
 struct Event {
-    Event(std::string songName = "", int totalMins = 0, int totalSecs = 0, int currentMins = 0, int currentSecs = 0, bool paused = false, bool stop = false, bool released = false) {
+    Event(std::string songName = "", int total = 0, int current = 0, bool paused = false, bool stop = false, bool released = false) {
         name = songName;
-        totalMin = totalMins;
-        totalSec = totalSecs;
-        curMin = currentMins;
-        curSec = currentSecs;
+        totalPos = total;
+        currentPos = current;
         isPaused = paused;
         isStop = stop;
         isReleased = released;
@@ -26,10 +24,8 @@ struct Event {
     }
 
     std::string name;
-    int totalMin;
-    int totalSec;
-    int curMin;
-    int curSec;
+    int totalPos;
+    int currentPos;
     bool isPaused;
     bool isStop;
     bool toRelease;
@@ -52,10 +48,11 @@ class AudioEngine {
         void playByPath(std::string path, std::string name, bool release = false);
         void playTest(std::string bankName) { playByIndex(bankName, "Test"); }
 
-        void setInstanceParemeter(std::string name, std::string parameter, float value, bool release = false);
-        void setTimelinePosition(std::string eventName, int value, bool release = false);
+        void setInstanceParemeter(std::string name, std::string parameter, float value);
+        void setTimelinePosition(std::string eventName, int value);
         void readTimelinePosition(std::string eventName);
         void updateCurrentPosition(std::string eventName);
+        void setToRelease(std::string eventName);
         void releaseInstance(std::string eventName);
         void stop(std::string eventName, bool release = false);
         void update();
