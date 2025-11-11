@@ -195,7 +195,7 @@ class Engine {
         void renderImGuiInterface();
         void showappMenuBar();
         void showFramerateStatistics();
-        void showMusicPlayer();
+        void showMusicPlayer(std::string name);
 
 
         Engine() {}

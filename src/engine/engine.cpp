@@ -122,16 +122,13 @@ bool Engine::init(int argc, char* argv[]) {
 
     // AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio");
     // AudioEngine::getInstance()->loadBank("Master.strings", "RESOURCES/audio");
-    // AuidoEngine::getInstance()->getBank()->
-    // AudioEngine::getInstance()->play("Master.bank");
-    // AudioEngine::getInstance()->playByPath("event:/Music");
+    // AudioEngine::getInstance()->playTest("Master.bank");
+    // AudioEngine::getInstance()->playByPath("event:/Music", "Radio");
 
     AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio/Dispatch");
     AudioEngine::getInstance()->loadBank("Ep106Music", "RESOURCES/audio/Dispatch");
     // Radio by Bershy is Ep106Music index 12
-    AudioEngine::getInstance()->playByIndex("Ep106Music", 12);
-    // playByPath
-    // playTest();
+    AudioEngine::getInstance()->playByIndex("Ep106Music", "Radio", 12);
 
     return m_running = true;
 }
@@ -246,6 +243,7 @@ void Engine::event() {
 
 void Engine::update() {
     AudioEngine::getInstance()->update();
+    AudioEngine::getInstance()->updateCurrentPosition("Radio");
     
     // General variables used by all shaders
     if (m_screenRotate) {
@@ -429,9 +427,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
     if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleMouse(); }
     if (key == GLFW_KEY_R && action == GLFW_PRESS) { Engine::getInstance()->toggleRotate(); }
-    if (key == GLFW_KEY_1 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Parameter 1", 0.0); }
-    if (key == GLFW_KEY_2 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Parameter 1", 0.5); }
-    if (key == GLFW_KEY_3 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Parameter 1", 1.0); }
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Radio","Parameter 1", 0.0); }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Radio", "Parameter 1", 0.5); }
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Radio", "Parameter 1", 1.0); }
     
 }
 
@@ -478,7 +476,7 @@ void Engine::renderImGuiInterface() {
         return;
     }
     else {
-        showMusicPlayer();
+        showMusicPlayer("Radio");
         showFramerateStatistics();
         ImGui::End();
     }
@@ -524,10 +522,22 @@ void Engine::showFramerateStatistics() {
     }
 }
 
-void Engine::showMusicPlayer() {
+void Engine::showMusicPlayer(std::string name) {
     char buffer[512];
     int index;
     if (ImGui::CollapsingHeader("Music Player")) {
+        if (ImGui::TreeNode("Currently Playing")) {
+            if (AudioEngine::getInstance()->checkInstance(name)) {
+                Event event = AudioEngine::getInstance()->getEvent(name);
+                ImGui::Text("Current Song: %s", event.name.c_str());
+                ImGui::Text("Current: %d:%2d Total: %d:%2d", event.curMin, event.curSec, event.totalMin, event.totalSec);
+                ImGui::Text("Option to rewind, play, pause, stop, forward");
+            }
+            else {
+                ImGui::Text("Current song:\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
+            }
+            ImGui::TreePop();
+        }
         if (ImGui::TreeNode("Audio Engine Functions")) {
             ImGui::SeparatorText("Load Bank");
             ImGui::InputText("File Name", m_loadingBuffer, sizeof(m_loadingBuffer)); 
@@ -545,9 +555,6 @@ void Engine::showMusicPlayer() {
             ImGui::Button("Play Event");
             ImGui::TreePop();
         }
-        if (ImGui::TreeNode("Selector")) {
-            ImGui::Text("Current song\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
-            ImGui::TreePop();
-        }
+
     }
 }
