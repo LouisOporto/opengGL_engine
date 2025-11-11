@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
     printf("Starting engine\n");
     if (!Engine::getInstance()->init(argc, argv)) {
-        Logger::Error("Failed to init engine\n");
+        Logger::Error("Failed to init engine");
         return -1;
     }
 
@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
         Engine::getInstance()->render();
     }
 
-    Logger::Log("Exiting\n");
+    Logger::Log("Exiting");
     Engine::getInstance()->clean();
     return 0;
 }
