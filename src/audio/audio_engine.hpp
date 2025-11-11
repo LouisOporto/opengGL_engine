@@ -59,7 +59,7 @@ class AudioEngine {
         FMOD_STUDIO_SYSTEM* m_system = nullptr;
         std::map<std::string, FMOD_STUDIO_BANK*> m_banks;
         std::map<std::string, FMOD_STUDIO_EVENTINSTANCE*> m_eventInstances;
-        FMOD_STUDIO_EVENTINSTANCE* instance;
+        FMOD_STUDIO_EVENTINSTANCE* instance; // Temp
         std::map<std::string, std::vector<unsigned int>> BANKMAP; // Relative bank directory
 };
 
