@@ -212,3 +212,12 @@ void AudioEngine::updateCurrentPosition(std::string eventName) {
         m_eventInstances[eventName].currentPos = value;
     }
 }
+
+void AudioEngine::setSoundVolume(std::string eventName, int volume) {
+    if (checkInstance(eventName)) {
+        if (FMOD_Studio_EventInstance_SetVolume(m_eventInstances[eventName].instance, volume / 100.f) != FMOD_OK) {
+            Logger::Error("Error setting volume");
+        }
+        Logger::Log("Setting volume");
+    }
+}

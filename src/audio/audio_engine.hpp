@@ -12,7 +12,7 @@
 
 
 struct Event {
-    Event(std::string songName = "", int total = 0, int current = 0, bool paused = false, bool stop = false, bool released = false) {
+    Event(std::string songName = "", int total = 0, int current = 0, int volume = 0, bool paused = false, bool stop = false, bool released = false) {
         name = songName;
         totalPos = total;
         currentPos = current;
@@ -26,6 +26,7 @@ struct Event {
     std::string name;
     int totalPos;
     int currentPos;
+    int volume;
     bool isPaused;
     bool isStop;
     bool toRelease;
@@ -50,6 +51,7 @@ class AudioEngine {
 
         void setInstanceParemeter(std::string name, std::string parameter, float value);
         void setTimelinePosition(std::string eventName, int value);
+        void setSoundVolume(std::string eventName, int value);
         void readTimelinePosition(std::string eventName);
         void updateCurrentPosition(std::string eventName);
         void setToRelease(std::string eventName);
