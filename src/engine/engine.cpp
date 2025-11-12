@@ -114,6 +114,8 @@ bool Engine::init(int argc, char* argv[]) {
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
+    m_releasingBuffer[0] = '\0';
+    m_loadingBuffer[0] = '\0';
 
     if (!AudioEngine::getInstance()->init()) {
         Logger::Error("Failed to load FMOD");
@@ -468,7 +470,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 // ImGUI Functions
 void Engine::renderImGuiInterface() {
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
     showappMenuBar();
 
     if (!ImGui::Begin("User Interface")) {
@@ -476,6 +478,7 @@ void Engine::renderImGuiInterface() {
         return;
     }
     else {
+        showTools();
         showMusicPlayer("Radio");
         showFramerateStatistics();
         ImGui::End();
@@ -515,10 +518,8 @@ void Engine::showappMenuBar() {
     }
 }
 
-void Engine::showFramerateStatistics() {
-    if (ImGui::CollapsingHeader("Rendering Statistics")) {
-        ImGuiIO& io = ImGui::GetIO();
-        ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
+void Engine::showTools() {
+    if (ImGui::CollapsingHeader("Tools")) {
     }
 }
 
@@ -533,6 +534,7 @@ void Engine::showMusicPlayer(std::string name) {
             ImGui::ProgressBar(event.currentPos / (float)event.totalPos);
             ImGui::Text("Current: %d:%02d Total: %d:%02d", event.currentPos / 60000, event.currentPos / 1000 % 60, event.totalPos / 60000, event.totalPos / 1000 % 60);
             ImGui::Text("Option to rewind, play, pause, stop, forward");
+            if (ImGui::DragInt("Volume", &m_volume, (0.5F), 0, 100, "%d%")) AudioEngine::getInstance()->setSoundVolume(name, m_volume);
         }
         else {
             ImGui::Text("Current song:\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
@@ -555,5 +557,23 @@ void Engine::showMusicPlayer(std::string name) {
             ImGui::TreePop();
         }
 
+    }
+}
+
+void Engine::showFramerateStatistics() {
+    ImGuiIO& io = ImGui::GetIO();
+    if (ImGui::CollapsingHeader("Rendering Statistics")) {
+        if (ImGui::TreeNode("Input")) {
+            if (ImGui::IsMousePosValid()) {
+                ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
+            }
+            else {
+                ImGui::Text("Mouse pos: <INVALID>");
+            }
+            ImGui::Text("Mouse delta: (%g, %g)", io.MouseDelta.x, io.MouseDelta.y);
+            
+            ImGui::TreePop();
+        }
+        ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
     }
 }

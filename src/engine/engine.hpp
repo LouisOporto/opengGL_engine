@@ -194,6 +194,7 @@ class Engine {
         // ImGUI
         void renderImGuiInterface();
         void showappMenuBar();
+        void showTools();
         void showFramerateStatistics();
         void showMusicPlayer(std::string name);
 
@@ -232,6 +233,7 @@ class Engine {
         bool m_mouseVisible;
         bool m_screenRotate;
         float m_lastX, m_lastY;
+        int m_volume = 100;
 
         // No need to change universal usage here
         Camera* m_camera;
