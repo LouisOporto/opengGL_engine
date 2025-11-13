@@ -243,7 +243,6 @@ class Engine {
 
         int m_SCR_W, m_SCR_H; // Functions that change with screen size needs to update with this
 
-
         // ImGUI Variables
         char m_loadingBuffer[512];
         char m_eventBuffer[512];

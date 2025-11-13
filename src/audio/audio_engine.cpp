@@ -3,17 +3,13 @@
 AudioEngine* AudioEngine::m_instance = nullptr;
 
 bool AudioEngine::init() {
-    FMOD_RESULT result;
-
-    result = FMOD_Studio_System_Create(&m_system, FMOD_VERSION);
-    if (result != FMOD_OK) {
-        Logger::Error("FMOD::ERROR::(%d)", result);
+    if (FMOD_Studio_System_Create(&m_system, FMOD_VERSION) != FMOD_OK) {
+        Logger::Error("FMOD::ERROR::Create");
         return false;
     }
 
-    result = FMOD_Studio_System_Initialize(m_system, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
-    if (result != FMOD_OK) {
-        Logger::Error("FMOD::ERROR::(%d)", result);
+    if (FMOD_Studio_System_Initialize(m_system, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0) != FMOD_OK) {
+        Logger::Error("FMOD::ERROR::Intialize");
         return false;
     }
 
