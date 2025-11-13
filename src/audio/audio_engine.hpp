@@ -56,7 +56,7 @@ class AudioEngine {
         void updateCurrentPosition(std::string eventName);
         void setToRelease(std::string eventName);
         void releaseInstance(std::string eventName);
-        void stop(std::string eventName, bool release = false);
+        void stop(std::string eventName);
         void update();
 
         void clean();

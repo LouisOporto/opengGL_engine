@@ -40,8 +40,7 @@ void AudioEngine::dropBank(std::string bankName) {
 }
 
 bool AudioEngine::checkInstance(std::string eventName) {
-    if (m_eventInstances.count(eventName) == 0) return false;
-    else return true;
+    return (m_eventInstances.count(eventName) != 0);
 }
 
 Event AudioEngine::getEvent(std::string eventName) {
@@ -134,12 +133,13 @@ void AudioEngine::releaseInstance(std::string eventName) {
     }
 }
 
-void AudioEngine::stop(std::string eventName, bool release) {
+void AudioEngine::stop(std::string eventName) {
     if (checkInstance(eventName) && !m_eventInstances[eventName].isReleased) {
         if (FMOD_Studio_EventInstance_Stop(m_eventInstances[eventName].instance, FMOD_STUDIO_STOP_IMMEDIATE) != FMOD_OK) {
             Logger::Error("Failed to stop event");
         }
-        m_eventInstances[eventName].toRelease = release;
+        m_eventInstances[eventName].toRelease = true;
+        m_eventInstances[eventName].isStop = true;
     }
 }
 
@@ -152,6 +152,7 @@ void AudioEngine::update() {
         if (iter->second.toRelease) releaseInstance(iter->first);
 
         if (iter->second.isStop && iter->second.isReleased) {
+            Logger::Warn("Removed event intance: %s", iter->first.c_str());
             m_eventInstances.erase(iter);
         }
     }

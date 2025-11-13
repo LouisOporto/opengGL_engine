@@ -3,7 +3,6 @@
 Engine* Engine::m_instance = nullptr;
 
 bool Engine::init(int argc, char* argv[]) {
-
     if (!glfwInit()) {
         Logger::Error("Failed to start GLFW");
         return false;
@@ -94,7 +93,7 @@ bool Engine::init(int argc, char* argv[]) {
     
     // Camera setup
     m_camera = new Camera(m_SCR_W, m_SCR_H);
-    m_projection = glm::perspective(glm::radians(45.0f), (float)SCR_W / SCR_H, 0.1f, 100.0f);
+    m_projection = glm::perspective(glm::radians(45.0f), (float)m_SCR_W / m_SCR_H, 0.1f, 100.0f);
     m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     setFirstMouse(true);
@@ -124,8 +123,8 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-    // AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio");
-    // AudioEngine::getInstance()->loadBank("Master.strings", "RESOURCES/audio");
+    AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio");
+    AudioEngine::getInstance()->loadBank("Master.strings", "RESOURCES/audio");
     // AudioEngine::getInstance()->playTest("Master.bank");
     // AudioEngine::getInstance()->playByPath("event:/Music", "Radio");
 
@@ -208,7 +207,7 @@ bool Engine::initOpenGLVariables() {
     {
         glGenTextures(1, &m_textureColorBuffer);
         glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_W, SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_SCR_W, m_SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         
@@ -218,7 +217,7 @@ bool Engine::initOpenGLVariables() {
         
         glGenRenderbuffers(1, &m_RBO);
         glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_W, SCR_H);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_SCR_W, m_SCR_H);
 
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
 
@@ -544,14 +543,15 @@ void Engine::showMusicPlayer(std::string name) {
             if (ImGui::Button("Load")) AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "./resources/audio");
             ImGui::SameLine(); if (ImGui::Button("Release")) AudioEngine::getInstance()->dropBank(std::string(m_loadingBuffer));
 
-            ImGui::Separator();
+            ImGui::SeparatorText("Play Events");
             ImGui::InputText("Selected Event Name", m_eventBuffer, sizeof(m_eventBuffer));
+            if (ImGui::Button("Remove Event")) { AudioEngine::getInstance()->stop(m_eventBuffer); }
 
-            ImGui::SeparatorText("PlayByPath");
+            ImGui::SeparatorText("ByPath");
             ImGui::InputText("Path", m_pathBuffer, sizeof(m_pathBuffer));
             if (ImGui::Button("Play Path")) { AudioEngine::getInstance()->playByPath(m_pathBuffer, m_eventBuffer); }
 
-            ImGui::SeparatorText("PlayByIndex");
+            ImGui::SeparatorText("ByIndex");
             ImGui::InputInt("Index", &m_playIndex, 0);
             if (ImGui::Button("Play Index")) { AudioEngine::getInstance()->playByIndex("Master", m_eventBuffer, m_playIndex); }
 
