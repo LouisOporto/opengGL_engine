@@ -114,8 +114,10 @@ bool Engine::init(int argc, char* argv[]) {
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
-    m_releasingBuffer[0] = '\0';
     m_loadingBuffer[0] = '\0';
+    m_eventBuffer[0] = '\0';
+    m_pathBuffer[0] = '\0';
+    m_playIndex = 0;
 
     if (!AudioEngine::getInstance()->init()) {
         Logger::Error("Failed to load FMOD");
@@ -127,10 +129,10 @@ bool Engine::init(int argc, char* argv[]) {
     // AudioEngine::getInstance()->playTest("Master.bank");
     // AudioEngine::getInstance()->playByPath("event:/Music", "Radio");
 
-    AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio/Dispatch");
-    AudioEngine::getInstance()->loadBank("Ep106Music", "RESOURCES/audio/Dispatch");
+    // AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio/Dispatch");
+    // AudioEngine::getInstance()->loadBank("Ep106Music", "RESOURCES/audio/Dispatch");
     // Radio by Bershy is Ep106Music index 12
-    AudioEngine::getInstance()->playByIndex("Ep106Music", "Radio", 12);
+    // AudioEngine::getInstance()->playByIndex("Ep106Music", "Radio", 12);
 
     return m_running = true;
 }
@@ -524,9 +526,6 @@ void Engine::showTools() {
 }
 
 void Engine::showMusicPlayer(std::string name) {
-    char buffer[512];
-    buffer[0] = '\0';
-    int index;
     if (ImGui::CollapsingHeader("Music Player")) {
         if (AudioEngine::getInstance()->checkInstance(name)) {
             Event event = AudioEngine::getInstance()->getEvent(name);
@@ -540,20 +539,22 @@ void Engine::showMusicPlayer(std::string name) {
             ImGui::Text("Current song:\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
         }
         if (ImGui::TreeNode("Audio Engine Functions")) {
-            ImGui::SeparatorText("Load Bank");
+            ImGui::SeparatorText("Load & Unload Bank");
             ImGui::InputText("File Name", m_loadingBuffer, sizeof(m_loadingBuffer)); 
-            if (ImGui::Button("Load")) { AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "RESOURCES/audio/Dispatch"); }
-            ImGui::SeparatorText("Unload Bank");
-            ImGui::InputText("Filename", m_releasingBuffer, sizeof(m_releasingBuffer));
-            if (ImGui::Button("Release")) { AudioEngine::getInstance()->dropBank(std::string(m_releasingBuffer)); }
+            if (ImGui::Button("Load")) AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "./resources/audio");
+            ImGui::SameLine(); if (ImGui::Button("Release")) AudioEngine::getInstance()->dropBank(std::string(m_loadingBuffer));
+
             ImGui::Separator();
+            ImGui::InputText("Selected Event Name", m_eventBuffer, sizeof(m_eventBuffer));
+
             ImGui::SeparatorText("PlayByPath");
-            ImGui::InputText("Path", buffer, sizeof(buffer));
-            ImGui::Button("Play Event");
+            ImGui::InputText("Path", m_pathBuffer, sizeof(m_pathBuffer));
+            if (ImGui::Button("Play Path")) { AudioEngine::getInstance()->playByPath(m_pathBuffer, m_eventBuffer); }
+
             ImGui::SeparatorText("PlayByIndex");
-            ImGui::InputText("Bank Name", buffer, sizeof(buffer));
-            ImGui::InputInt("Index", &index);
-            ImGui::Button("Play Event");
+            ImGui::InputInt("Index", &m_playIndex, 0);
+            if (ImGui::Button("Play Index")) { AudioEngine::getInstance()->playByIndex("Master", m_eventBuffer, m_playIndex); }
+
             ImGui::TreePop();
         }
 
