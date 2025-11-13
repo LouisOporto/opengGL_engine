@@ -246,7 +246,9 @@ class Engine {
 
         // ImGUI Variables
         char m_loadingBuffer[512];
-        char m_releasingBuffer[512];
+        char m_eventBuffer[512];
+        char m_pathBuffer[512];
+        int m_playIndex;
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
