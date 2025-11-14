@@ -65,8 +65,12 @@ class AudioEngine {
         static AudioEngine* m_instance;
         FMOD_STUDIO_SYSTEM* m_system = nullptr;
         std::map<std::string, FMOD_STUDIO_BANK*> m_banks;
-        std::map<std::string, Event> m_eventInstances;
-        std::map<std::string, std::vector<unsigned int>> BANKMAP; // Relative bank directory
+        std::map<std::string, Event> m_eventInstances; // Maybe inefficient if we need to remember all strin names. // Standard "effect1, effect2, background1, background2"
+
+        // An idea would be to have an actively selected bank, actively selected event when handling playing or parameter adjustments.
+        // Need a way to know if a event needs to be released and if the song is both released and stopped we can go ahead and remove it from the map of events.
+        // Current design has a boolean for both to check isTrue status, but waste another to set it to release.
+        // std::map<std::string, std::vector<unsigned int>> BANKMAP; // Relative bank directory
 };
 
 #endif // _AUDIO_ENGINE_H_
