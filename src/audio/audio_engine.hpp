@@ -29,7 +29,6 @@ struct Event {
     int volume;
     bool isPaused;
     bool isStop;
-    bool toRelease;
     bool isReleased;
     FMOD_STUDIO_EVENTINSTANCE* instance;
 };
@@ -54,7 +53,6 @@ class AudioEngine {
         void setSoundVolume(std::string eventName, int value);
         void readTimelinePosition(std::string eventName);
         void updateCurrentPosition(std::string eventName);
-        void setToRelease(std::string eventName);
         void releaseInstance(std::string eventName);
         void stop(std::string eventName);
         void update();

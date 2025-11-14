@@ -79,8 +79,8 @@ void AudioEngine::playByIndex(std::string bankName, std::string name, unsigned i
     }
 
     // Insert event into map
-    event.toRelease = release;
     m_eventInstances[name] = event;
+    if (release) releaseInstance(name);
 
     delete[] descript;
 }
@@ -113,15 +113,9 @@ void AudioEngine::playByPath(std::string index, std::string name, bool release) 
     if (FMOD_Studio_EventInstance_Start(event.instance) != FMOD_OK) {
         Logger::Error("Failed to start instance");
     }
+
     m_eventInstances[name] = event;
-
-    if (release) setToRelease(name);
-}
-
-void AudioEngine::setToRelease(std::string eventName) {
-    if (checkInstance(eventName)) {
-        m_eventInstances[eventName].toRelease = true;
-    }
+    if (release) releaseInstance(name);
 }
 
 void AudioEngine::releaseInstance(std::string eventName) {
@@ -138,7 +132,7 @@ void AudioEngine::stop(std::string eventName) {
         if (FMOD_Studio_EventInstance_Stop(m_eventInstances[eventName].instance, FMOD_STUDIO_STOP_IMMEDIATE) != FMOD_OK) {
             Logger::Error("Failed to stop event");
         }
-        m_eventInstances[eventName].toRelease = true;
+        releaseInstance(eventName);
         m_eventInstances[eventName].isStop = true;
     }
 }
@@ -149,8 +143,6 @@ void AudioEngine::update() {
     }
 
     for (auto iter = m_eventInstances.begin(); iter != m_eventInstances.end(); iter++) {
-        if (iter->second.toRelease) releaseInstance(iter->first);
-
         if (iter->second.isStop && iter->second.isReleased) {
             Logger::Warn("Removed event intance: %s", iter->first.c_str());
             m_eventInstances.erase(iter);
