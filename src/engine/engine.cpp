@@ -50,7 +50,7 @@ bool Engine::init(int argc, char* argv[]) {
     glFrontFace(GL_CCW);
     
     // m_objModel = new Model("./images/backpack/backpack.obj");
-    m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
+    m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj"); // Not all models are loading correctly
     
     // Textures setup
     std::vector<std::string> faces {
@@ -65,23 +65,7 @@ bool Engine::init(int argc, char* argv[]) {
     m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(faces, "RESOURCES/images/skybox");
 
     // Shader setup
-    if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
-        return false;
-    }
-    
-    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
-        return false;
-    }
-
-    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
-        return false;
-    }
-
-    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
-        return false;
-    }
-
-    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) {
+    if (!setupShaders()) {
         return false;
     }
     
@@ -231,11 +215,34 @@ bool Engine::initOpenGLVariables() {
     return true;
 }
 
+bool Engine::setupShaders() {
+    if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
+        return false;
+    }
+    
+    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
+        return false;
+    }
+
+    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
+        return false;
+    }
+
+    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
+        return false;
+    }
+
+    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) {
+        return false;
+    }
+
+    return true;
+}
+
 void Engine::event() {
     glfwPollEvents();
-    float dt = m_timer.getElapsed();
     if (glfwWindowShouldClose(m_window)) quit();
-    // camera handle keyboard input
+    float dt = m_timer.getElapsed();
     handleKeyInput(dt);
 
     // Handle imGui GUI
@@ -246,7 +253,7 @@ void Engine::event() {
 
 void Engine::update() {
     AudioEngine::getInstance()->update();
-    AudioEngine::getInstance()->updateCurrentPosition("Radio");
+    AudioEngine::getInstance()->updateCurrentPosition(m_eventBuffer);
     
     // General variables used by all shaders
     if (m_screenRotate) {

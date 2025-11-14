@@ -188,6 +188,7 @@ class Engine {
     private:
         // OpenlGL
         bool initOpenGLVariables();
+        bool setupShaders();
         void handleKeyInput(float deltaTime);
         inline void quit() { m_running = false; }
         
