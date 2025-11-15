@@ -42,29 +42,39 @@ class AudioEngine {
         void dropBank(std::string bankName);
 
         bool checkInstance(std::string eventName);
-        Event getEvent(std::string eventName);
-
-        void playByIndex(std::string bankName, std::string name, unsigned int index = 0, bool release = false);
-        void playByPath(std::string path, std::string name, bool release = false);
-        void playTest(std::string bankName) { playByIndex(bankName, "Test"); }
-
-        void setInstanceParemeter(std::string name, std::string parameter, float value);
-        void setTimelinePosition(std::string eventName, int value);
-        void setSoundVolume(std::string eventName, int value);
-        void readTimelinePosition(std::string eventName);
-        void updateCurrentPosition(std::string eventName);
-        void releaseInstance(std::string eventName);
-        void stop(std::string eventName);
+        
+        void playByIndex(std::string name, unsigned int index = 0, bool release = false);
+        void playByPath(std::string name, std::string path, bool release = false);
+        void playTest() { playByIndex("Master"); }
+        
+        void setInstanceParemeter(std::string parameter, float value);
+        void setSoundVolume(int value);
+        void releaseInstance();
+        
+        void readTimelinePosition();
+        void setTimelinePosition(float value);
+        void updateCurrentPosition();
+        
+        void setActiveBank(std::string bankName);
+        void setActiveEvent(std::string eventName);
+        Event getActiveEvent();
+        std::string getActiveBankName() { return m_activeBank; }
+        std::string getActiveEventName() { return m_activeEvent; }
+        
+        void stop();
         void update();
-
+        
         void clean();
     private:
         AudioEngine() {}
         static AudioEngine* m_instance;
         FMOD_STUDIO_SYSTEM* m_system = nullptr;
+        FMOD_STUDIO_BANK* getActiveBank();
         std::map<std::string, FMOD_STUDIO_BANK*> m_banks;
         std::map<std::string, Event> m_eventInstances; // Maybe inefficient if we need to remember all strin names. // Standard "effect1, effect2, background1, background2"
 
+        std::string m_activeBank;
+        std::string m_activeEvent;
         // An idea would be to have an actively selected bank, actively selected event when handling playing or parameter adjustments.
         // Need a way to know if a event needs to be released and if the song is both released and stopped we can go ahead and remove it from the map of events.
         // Current design has a boolean for both to check isTrue status, but waste another to set it to release.
