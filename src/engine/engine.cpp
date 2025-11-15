@@ -107,8 +107,9 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
-    AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio");
     AudioEngine::getInstance()->loadBank("Master.strings", "RESOURCES/audio");
+    AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio");
+    AudioEngine::getInstance()->setActiveBank("Master");
     // AudioEngine::getInstance()->playTest("Master.bank");
     // AudioEngine::getInstance()->playByPath("event:/Music", "Radio");
 
@@ -253,7 +254,6 @@ void Engine::event() {
 
 void Engine::update() {
     AudioEngine::getInstance()->update();
-    AudioEngine::getInstance()->updateCurrentPosition(m_eventBuffer);
     
     // General variables used by all shaders
     if (m_screenRotate) {
@@ -437,9 +437,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_N && action == GLFW_PRESS) { Engine::getInstance()->toggleNormalMap(); }
     if (key == GLFW_KEY_M && action == GLFW_PRESS) { Engine::getInstance()->toggleMouse(); }
     if (key == GLFW_KEY_R && action == GLFW_PRESS) { Engine::getInstance()->toggleRotate(); }
-    if (key == GLFW_KEY_1 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Radio","Parameter 1", 0.0); }
-    if (key == GLFW_KEY_2 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Radio", "Parameter 1", 0.5); }
-    if (key == GLFW_KEY_3 && action == GLFW_PRESS) { AudioEngine::getInstance()->setInstanceParemeter("Radio", "Parameter 1", 1.0); }
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) { AudioEngine::getInstance()->setTimelinePosition(0.0); }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS) { AudioEngine::getInstance()->setTimelinePosition(0.25); }
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS) { AudioEngine::getInstance()->setTimelinePosition(0.50); }
+    if (key == GLFW_KEY_4 && action == GLFW_PRESS) { AudioEngine::getInstance()->setTimelinePosition(0.75); }
     
 }
 
@@ -533,13 +534,17 @@ void Engine::showTools() {
 
 void Engine::showMusicPlayer(std::string name) {
     if (ImGui::CollapsingHeader("Music Player")) {
+        ImGui::Text("Active Bank: %s, Active Event: %s", AudioEngine::getInstance()->getActiveBankName().c_str(), AudioEngine::getInstance()->getActiveEventName().c_str());
         if (AudioEngine::getInstance()->checkInstance(name)) {
-            Event event = AudioEngine::getInstance()->getEvent(name);
+            Event event = AudioEngine::getInstance()->getActiveEvent();
             ImGui::Text("Current Song: %s", event.name.c_str());
-            ImGui::ProgressBar(event.currentPos / (float)event.totalPos);
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+            ImGui::ProgressBar(event.currentPos / (float)event.totalPos, ImVec2(0.0f, 20.0f), "Playing...");
+            ImGui::PopStyleColor(2);
             ImGui::Text("Current: %d:%02d Total: %d:%02d", event.currentPos / 60000, event.currentPos / 1000 % 60, event.totalPos / 60000, event.totalPos / 1000 % 60);
             ImGui::Text("Option to rewind, play, pause, stop, forward");
-            if (ImGui::DragInt("Volume", &m_volume, (0.5F), 0, 100, "%d%")) AudioEngine::getInstance()->setSoundVolume(name, m_volume);
+            if (ImGui::DragInt("Volume", &m_volume, (0.5F), 0, 100, "%d%")) AudioEngine::getInstance()->setSoundVolume(m_volume);
         }
         else {
             ImGui::Text("Current song:\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
@@ -547,20 +552,23 @@ void Engine::showMusicPlayer(std::string name) {
         if (ImGui::TreeNode("Audio Engine Functions")) {
             ImGui::SeparatorText("Load & Unload Bank");
             ImGui::InputText("File Name", m_loadingBuffer, sizeof(m_loadingBuffer)); 
-            if (ImGui::Button("Load")) AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "./resources/audio");
-            ImGui::SameLine(); if (ImGui::Button("Release")) AudioEngine::getInstance()->dropBank(std::string(m_loadingBuffer));
+            if (ImGui::Button("Set Active Bank")) AudioEngine::getInstance()->setActiveBank(std::string(m_loadingBuffer));
+            ImGui::SameLine(); if (ImGui::Button("Load")) AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "./resources/audio");
+            ImGui::SameLine(); if (ImGui::Button("Unload")) AudioEngine::getInstance()->dropBank(std::string(m_loadingBuffer));
 
             ImGui::SeparatorText("Play Events");
             ImGui::InputText("Selected Event Name", m_eventBuffer, sizeof(m_eventBuffer));
-            if (ImGui::Button("Remove Event")) { AudioEngine::getInstance()->stop(m_eventBuffer); }
+            if (ImGui::Button("Set Active Event")) { AudioEngine::getInstance()->setActiveEvent(m_eventBuffer); }
+            ImGui::SameLine(); if (ImGui::Button("Remove Event")) { AudioEngine::getInstance()->stop(); }
+            ImGui::SameLine(); if (ImGui::Button("Release Event")) { AudioEngine::getInstance()->releaseInstance(); }
 
             ImGui::SeparatorText("ByPath");
             ImGui::InputText("Path", m_pathBuffer, sizeof(m_pathBuffer));
-            if (ImGui::Button("Play Path")) { AudioEngine::getInstance()->playByPath(m_pathBuffer, m_eventBuffer); }
+            if (ImGui::Button("Play Path")) { AudioEngine::getInstance()->playByPath(m_eventBuffer, m_pathBuffer); }
 
             ImGui::SeparatorText("ByIndex");
             ImGui::InputInt("Index", &m_playIndex, 0);
-            if (ImGui::Button("Play Index")) { AudioEngine::getInstance()->playByIndex("Master", m_eventBuffer, m_playIndex); }
+            if (ImGui::Button("Play Index")) { AudioEngine::getInstance()->playByIndex(m_eventBuffer, m_playIndex); }
 
             ImGui::TreePop();
         }
