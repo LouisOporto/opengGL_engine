@@ -9,7 +9,7 @@
 #include "../../FMOD/api/core/inc/fmod.h"
 #include "../engine/logger.hpp"
 
-
+const float SONGADVANCE = 10000; // 10s in ms
 
 struct Event {
     Event(std::string songName = "", int total = 0, int current = 0, int volume = 0, bool paused = false, bool stop = false, bool released = false) {
@@ -51,6 +51,8 @@ class AudioEngine {
         void setSoundVolume(int value);
         void releaseInstance();
         
+        void rewind();
+        void forward();
         void pause();
         void resume();
         void stop();

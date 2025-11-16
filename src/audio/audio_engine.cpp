@@ -230,6 +230,28 @@ void AudioEngine::setInstanceParemeter(std::string parameter, float value) {
     }
 }
 
+void AudioEngine::forward() {
+    std::string eventName = m_activeEvent;
+    if (checkInstance(eventName)) {
+        int newPos = m_eventInstances[eventName].currentPos + SONGADVANCE;
+        if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
+            Logger::Error("Failed to forward player");
+        }
+    }
+    readTimelinePosition();
+}
+
+void AudioEngine::rewind() {
+    std::string eventName = m_activeEvent;
+    if (checkInstance(eventName)) {
+        int newPos = m_eventInstances[eventName].currentPos - SONGADVANCE;
+        if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
+            Logger::Error("Failed to rewind player");
+        }
+        readTimelinePosition();
+    }
+}
+
 void AudioEngine::setTimelinePosition(float value) {
     std::string eventName = m_activeEvent;
     // Set time line in milliseconds (set for now to by seconds)
