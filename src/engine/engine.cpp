@@ -540,7 +540,7 @@ void Engine::showMusicPlayer(std::string name) {
             ImGui::Text("Current Song: %s", event.name.c_str());
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
             ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
-            ImGui::ProgressBar(event.currentPos / (float)event.totalPos, ImVec2(0.0f, 20.0f), "Playing...");
+            ImGui::ProgressBar(event.currentPos / (float)event.totalPos, ImVec2(0.0f, 20.0f), event.isPaused ? "Paused..." : "Playing...");
             ImGui::PopStyleColor(2);
             ImGui::Text("Current: %d:%02d Total: %d:%02d", event.currentPos / 60000, event.currentPos / 1000 % 60, event.totalPos / 60000, event.totalPos / 1000 % 60);
             ImGui::Text("Option to rewind, play, pause, stop, forward");
@@ -561,6 +561,8 @@ void Engine::showMusicPlayer(std::string name) {
             if (ImGui::Button("Set Active Event")) { AudioEngine::getInstance()->setActiveEvent(m_eventBuffer); }
             ImGui::SameLine(); if (ImGui::Button("Remove Event")) { AudioEngine::getInstance()->stop(); }
             ImGui::SameLine(); if (ImGui::Button("Release Event")) { AudioEngine::getInstance()->releaseInstance(); }
+            ImGui::SameLine(); if (ImGui::Button("Pause Event")) { AudioEngine::getInstance()->pause(); }
+            ImGui::SameLine(); if (ImGui::Button("Play Event")) { AudioEngine::getInstance()->resume(); }
 
             ImGui::SeparatorText("ByPath");
             ImGui::InputText("Path", m_pathBuffer, sizeof(m_pathBuffer));
