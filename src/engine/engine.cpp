@@ -480,6 +480,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 // ImGUI Functions
 void Engine::renderImGuiInterface() {
     // ImGui::ShowDemoWindow();
+
+    showMusicPlayer();
     showappMenuBar();
 
     if (!ImGui::Begin("User Interface")) {
@@ -488,7 +490,7 @@ void Engine::renderImGuiInterface() {
     }
     else {
         showTools();
-        showMusicPlayer("Radio");
+        // showMusicPlayer("Radio");
         showFramerateStatistics();
         ImGui::End();
     }
@@ -532,18 +534,44 @@ void Engine::showTools() {
     }
 }
 
-void Engine::showMusicPlayer(std::string name) {
-    if (ImGui::CollapsingHeader("Music Player")) {
+void Engine::showMusicPlayer() {
+    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_DragDropTarget, ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
+    if (ImGui::Begin("Music Player")) {
         ImGui::Text("Active Bank: %s, Active Event: %s", AudioEngine::getInstance()->getActiveBankName().c_str(), AudioEngine::getInstance()->getActiveEventName().c_str());
-        if (AudioEngine::getInstance()->checkInstance(name)) {
+        if (AudioEngine::getInstance()->checkInstance(AudioEngine::getInstance()->getActiveEventName())) {
             Event event = AudioEngine::getInstance()->getActiveEvent();
+            float windowWidth = ImGui::GetWindowSize().x;
             ImGui::Text("Current Song: %s", event.name.c_str());
+
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
             ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
-            ImGui::ProgressBar(event.currentPos / (float)event.totalPos, ImVec2(0.0f, 20.0f), event.isPaused ? "Paused..." : "Playing...");
+            ImGui::ProgressBar(event.currentPos / (float)event.totalPos, ImVec2(-1.0f, 0.0f), event.isPaused ? "Paused..." : "Playing...");
             ImGui::PopStyleColor(2);
-            ImGui::Text("Current: %d:%02d Total: %d:%02d", event.currentPos / 60000, event.currentPos / 1000 % 60, event.totalPos / 60000, event.totalPos / 1000 % 60);
-            ImGui::Text("Option to rewind, play, pause, stop, forward");
+
+            float playtimeWidth = ImGui::CalcTextSize("Current: 00:00 Total: 00:00").x + ImGui::GetStyle().ItemSpacing.x;
+            float startX = (windowWidth - playtimeWidth) * 0.5f;
+            ImGui::SetCursorPosX(startX);
+            ImGui::Text("Current: %02d:%02d Total: %02d:%02d", event.currentPos / 60000, event.currentPos / 1000 % 60, event.totalPos / 60000, event.totalPos / 1000 % 60);
+
+            // Center Button Layout
+            float totalButtonsWidth = ImGui::CalcTextSize("<<").x + ImGui::GetStyle().ItemSpacing.x +
+                                     ImGui::CalcTextSize("Play").x + ImGui::GetStyle().ItemSpacing.x +
+                                     ImGui::CalcTextSize("||").x + ImGui::GetStyle().ItemSpacing.x +  
+                                     ImGui::CalcTextSize("Stop").x + ImGui::GetStyle().ItemSpacing.x +  
+                                     ImGui::CalcTextSize(">>").x;
+                                     
+            startX = (windowWidth - totalButtonsWidth) * 0.5f;
+            ImGui::SetCursorPosX(startX - 18);
+            if (ImGui::Button("<<")) AudioEngine::getInstance()->rewind();
+            ImGui::SameLine(); if (ImGui::Button("Play")) { AudioEngine::getInstance()->resume(); }
+            ImGui::SameLine(); if (ImGui::Button("||")) { AudioEngine::getInstance()->pause(); }
+            ImGui::SameLine(); if (ImGui::Button("Stop")) { AudioEngine::getInstance()->stop(); }
+            ImGui::SameLine(); if (ImGui::Button(">>")) AudioEngine::getInstance()->forward();
+
             if (ImGui::DragInt("Volume", &m_volume, (0.5F), 0, 100, "%d%")) AudioEngine::getInstance()->setSoundVolume(m_volume);
         }
         else {
@@ -552,17 +580,17 @@ void Engine::showMusicPlayer(std::string name) {
         if (ImGui::TreeNode("Audio Engine Functions")) {
             ImGui::SeparatorText("Load & Unload Bank");
             ImGui::InputText("File Name", m_loadingBuffer, sizeof(m_loadingBuffer)); 
+            
+            ImGui::Separator();
             if (ImGui::Button("Set Active Bank")) AudioEngine::getInstance()->setActiveBank(std::string(m_loadingBuffer));
             ImGui::SameLine(); if (ImGui::Button("Load")) AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "./resources/audio");
             ImGui::SameLine(); if (ImGui::Button("Unload")) AudioEngine::getInstance()->dropBank(std::string(m_loadingBuffer));
-
+            
             ImGui::SeparatorText("Play Events");
-            ImGui::InputText("Selected Event Name", m_eventBuffer, sizeof(m_eventBuffer));
+            ImGui::InputText("Event Name", m_eventBuffer, sizeof(m_eventBuffer));
             if (ImGui::Button("Set Active Event")) { AudioEngine::getInstance()->setActiveEvent(m_eventBuffer); }
             ImGui::SameLine(); if (ImGui::Button("Remove Event")) { AudioEngine::getInstance()->stop(); }
             ImGui::SameLine(); if (ImGui::Button("Release Event")) { AudioEngine::getInstance()->releaseInstance(); }
-            ImGui::SameLine(); if (ImGui::Button("Pause Event")) { AudioEngine::getInstance()->pause(); }
-            ImGui::SameLine(); if (ImGui::Button("Play Event")) { AudioEngine::getInstance()->resume(); }
 
             ImGui::SeparatorText("ByPath");
             ImGui::InputText("Path", m_pathBuffer, sizeof(m_pathBuffer));
@@ -576,6 +604,8 @@ void Engine::showMusicPlayer(std::string name) {
         }
 
     }
+    ImGui::End();
+    ImGui::PopStyleColor(5);
 }
 
 void Engine::showFramerateStatistics() {
