@@ -51,6 +51,9 @@ class AudioEngine {
         void setSoundVolume(int value);
         void releaseInstance();
         
+        void pause();
+        void resume();
+        void stop();
         void readTimelinePosition();
         void setTimelinePosition(float value);
         void updateCurrentPosition();
@@ -61,7 +64,6 @@ class AudioEngine {
         std::string getActiveBankName() { return m_activeBank; }
         std::string getActiveEventName() { return m_activeEvent; }
         
-        void stop();
         void update();
         
         void clean();

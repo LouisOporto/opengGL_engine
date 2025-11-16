@@ -158,6 +158,28 @@ void AudioEngine::releaseInstance() {
     }
 }
 
+void AudioEngine::pause() {
+    std::string eventName = m_activeEvent;
+    if (checkInstance(eventName) && !m_eventInstances[eventName].isPaused) {
+        if (FMOD_Studio_EventInstance_SetPaused(m_eventInstances[eventName].instance, true)) {
+            Logger::Error("Failed to pause instance");
+        }
+
+        m_eventInstances[eventName].isPaused = true;
+    }
+}
+
+void AudioEngine::resume() {
+    std::string eventName = m_activeEvent;
+    if (checkInstance(eventName) && m_eventInstances[eventName].isPaused) {
+        if (FMOD_Studio_EventInstance_SetPaused(m_eventInstances[eventName].instance, false)) {
+            Logger::Error("Failed to resume instance");
+        }
+
+        m_eventInstances[eventName].isPaused = false;
+    }
+}
+
 void AudioEngine::stop() {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
@@ -212,14 +234,12 @@ void AudioEngine::setTimelinePosition(float value) {
     std::string eventName = m_activeEvent;
     // Set time line in milliseconds (set for now to by seconds)
     // value = value * 1000; // one sec is 1000 ms
-    if (checkInstance(eventName)) {
-        Event event = getActiveEvent();
-        int newPos = event.totalPos * value;
-        if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
-            Logger::Error("Failed to set FMOD value");
-        }
-        readTimelinePosition();
+    Event event = getActiveEvent();
+    int newPos = event.totalPos * value;
+    if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
+        Logger::Error("Failed to set FMOD value");
     }
+    readTimelinePosition();
 }
 
 void AudioEngine::readTimelinePosition() {
