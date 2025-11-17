@@ -51,6 +51,7 @@ bool Engine::init(int argc, char* argv[]) {
     
     // m_objModel = new Model("./images/backpack/backpack.obj");
     m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj"); // Not all models are loading correctly
+    // Models should have a ambient, diffuse, and specular. A texture map for ambient (no light), diffuse (around light) and specular (light reflect from camera position)
     
     // Textures setup
     std::vector<std::string> faces {
@@ -82,7 +83,7 @@ bool Engine::init(int argc, char* argv[]) {
 
     setFirstMouse(true);
     m_lightOn = false;
-    m_NormalMapOn = true;
+    m_NormalMapOn = false;
     m_mouseVisible = false;
     m_screenRotate = false;
     toggleMouse();
@@ -318,7 +319,7 @@ void Engine::render() {
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
-    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 inverseModel = glm::inverse(m_model);
     
     m_objShader.setMat4("model", m_model);
