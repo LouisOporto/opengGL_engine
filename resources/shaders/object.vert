@@ -16,12 +16,14 @@ out vec2 TexCoord;
 
 void main() {
     gl_Position = projection * view * model * vec4(aPos, 1.0);
-    if (NormalOn) {
+    if (NormalOn) { // This is pointless, because it gives off inaccurate normals
         FragPos = vec3(model * vec4(vec3(texture(texture_normal1, aTexCoord)) + aPos, 1.0));
+        Normal = mat3(transpose(inverseModel)) * aNormal;
     }
     else {
         FragPos = vec3(model * vec4(aPos, 1.0));
+        Normal = mat3(transpose(inverseModel)) * aNormal;
     }
-    Normal = mat3(transpose(inverseModel)) * aNormal;
+    
     TexCoord = aTexCoord;
 }
