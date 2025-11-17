@@ -22,8 +22,7 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
 
         vertFile.close();
         fragFile.close();
-    }
-    catch (std::fstream::failure) {
+    } catch (std::fstream::failure) {
         Logger::Error("SHADER::ERROR::FILE_LOADING");
         return false;
     }
@@ -89,10 +88,14 @@ void Shader::setVec3(const std::string name, glm::vec3 value) const {
 }
 
 void Shader::setMat4(const std::string name, glm::mat4 value) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE,
+                       &value[0][0]);
 }
 
-void Shader::setPointLight(const std::string name, glm::vec3 pos, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant, float linear, float quadratic) {
+void Shader::setPointLight(const std::string name, glm::vec3 pos,
+                           glm::vec3 ambient, glm::vec3 diffuse,
+                           glm::vec3 specular, float constant, float linear,
+                           float quadratic) {
     setVec3(name + ".position", pos);
     setVec3(name + ".ambient", ambient);
     setVec3(name + ".diffuse", diffuse);
@@ -102,7 +105,11 @@ void Shader::setPointLight(const std::string name, glm::vec3 pos, glm::vec3 ambi
     setFloat(name + ".quadratic", quadratic);
 }
 
-void Shader::setSpotLight(const std::string name, glm::vec3 pos, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float cutOff, float outerCutOff, float constant, float linear, float quadratic) {
+void Shader::setSpotLight(const std::string name, glm::vec3 pos,
+                          glm::vec3 direction, glm::vec3 ambient,
+                          glm::vec3 diffuse, glm::vec3 specular, float cutOff,
+                          float outerCutOff, float constant, float linear,
+                          float quadratic) {
     setVec3(name + ".position", pos);
     setVec3(name + ".direction", direction);
     setVec3(name + ".ambient", ambient);
@@ -115,7 +122,9 @@ void Shader::setSpotLight(const std::string name, glm::vec3 pos, glm::vec3 direc
     setFloat(name + ".outerCutOff", outerCutOff);
 }
 
-void Shader::setDirLight(const std::string name, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) {
+void Shader::setDirLight(const std::string name, glm::vec3 direction,
+                         glm::vec3 ambient, glm::vec3 diffuse,
+                         glm::vec3 specular) {
     setVec3(name + ".direction", direction);
     setVec3(name + ".ambient", ambient);
     setVec3(name + ".diffuse", diffuse);
