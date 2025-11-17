@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 #include <vector>
+
 #include "../shader/shader.hpp"
 
 struct Vertex {
@@ -25,18 +26,20 @@ struct Texture {
 };
 
 class Mesh {
-    public:
-        // Mesh data
-        std::vector<Vertex> m_vertices;
-        std::vector<unsigned int> m_indices;
-        std::vector<Texture> m_textures;
+   public:
+    // Mesh data
+    std::vector<Vertex> m_vertices;
+    std::vector<unsigned int> m_indices;
+    std::vector<Texture> m_textures;
 
-        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-        void draw(Shader &shader);
-    private:
-        // render data
-        unsigned int VAO, VBO, EBO;
-        void setupMesh();
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+         std::vector<Texture> textures);
+    void draw(Shader &shader);
+
+   private:
+    // render data
+    unsigned int VAO, VBO, EBO;
+    void setupMesh();
 };
 
-#endif // _MESH_H_
+#endif  // _MESH_H_
