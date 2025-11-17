@@ -3,16 +3,29 @@
 void Camera::handleKeyInput(DIRECTION dir, float deltaTime) {
     float speed = deltaTime * VELOCITY;
     switch (dir) {
-        case FORWARD: m_pos += m_front * speed; break;
-        case BACKWARD: m_pos -= m_front * speed; break;
-        case LEFT: m_pos -= m_right * speed; break;
-        case RIGHT: m_pos += m_right * speed; break;
-        case UP: m_pos += m_up * speed; break;
-        case DOWN: m_pos -= m_up * speed; break;
+        case FORWARD:
+            m_pos += m_front * speed;
+            break;
+        case BACKWARD:
+            m_pos -= m_front * speed;
+            break;
+        case LEFT:
+            m_pos -= m_right * speed;
+            break;
+        case RIGHT:
+            m_pos += m_right * speed;
+            break;
+        case UP:
+            m_pos += m_up * speed;
+            break;
+        case DOWN:
+            m_pos -= m_up * speed;
+            break;
     }
 }
 
-void Camera::handleMouseInput(float xoffset, float yoffset, bool constrainPitch) {
+void Camera::handleMouseInput(float xoffset, float yoffset,
+                              bool constrainPitch) {
     xoffset *= SENSTIVITY;
     yoffset *= SENSTIVITY;
 
