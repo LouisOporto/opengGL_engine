@@ -114,7 +114,8 @@ bool Engine::init(int argc, char* argv[]) {
 
     AudioEngine::getInstance()->loadBank("Master.strings", "RESOURCES/audio");
     AudioEngine::getInstance()->loadBank("Master", "RESOURCES/audio");
-    AudioEngine::getInstance()->setActiveBank("Master");
+    AudioEngine::getInstance()->loadBank("Background", "RESOURCES/audio");
+    AudioEngine::getInstance()->setActiveBank("Background");
     // AudioEngine::getInstance()->playTest("Master.bank");
     // AudioEngine::getInstance()->playByPath("event:/Music", "Radio");
 
