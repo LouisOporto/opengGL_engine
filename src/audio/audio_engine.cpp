@@ -50,7 +50,7 @@ void AudioEngine::dropBank(std::string bankName) {
 }
 
 bool AudioEngine::checkInstance(std::string eventName) {
-    return (m_eventInstances.count(eventName) != 0);
+    return (m_eventInstances.count(eventName) != 0 && !eventName.empty());
 }
 
 Event AudioEngine::getActiveEvent() {
@@ -279,15 +279,17 @@ void AudioEngine::rewind() {
 
 void AudioEngine::setTimelinePosition(float value) {
     std::string eventName = m_activeEvent;
-    // Set time line in milliseconds (set for now to by seconds)
-    // value = value * 1000; // one sec is 1000 ms
-    Event event = getActiveEvent();
-    int newPos = event.totalPos * value;
-    if (FMOD_Studio_EventInstance_SetTimelinePosition(
-            m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
-        Logger::Error("Failed to set FMOD value");
+        if (checkInstance(eventName)) {
+        // Set time line in milliseconds (set for now to by seconds)
+        // value = value * 1000; // one sec is 1000 ms
+        Event event = getActiveEvent();
+        int newPos = event.totalPos * value;
+        if (FMOD_Studio_EventInstance_SetTimelinePosition(
+                m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
+            Logger::Error("Failed to set FMOD value");
+        }
+        readTimelinePosition();
     }
-    readTimelinePosition();
 }
 
 void AudioEngine::readTimelinePosition() {
@@ -296,7 +298,7 @@ void AudioEngine::readTimelinePosition() {
         int value = 0;
         if (FMOD_Studio_EventInstance_GetTimelinePosition(
                 m_eventInstances[eventName].instance, &value) != FMOD_OK) {
-            Logger::Error("Error reading");
+            Logger::Error("Error reading: %s", m_eventInstances[eventName].name.c_str());
         }
         Logger::Log("TimelinePosition: %2d:%2d", value / 60000,
                     value / 1000 % 60);
@@ -309,7 +311,7 @@ void AudioEngine::updateCurrentPosition() {
         int value = 0;
         if (FMOD_Studio_EventInstance_GetTimelinePosition(
                 m_eventInstances[eventName].instance, &value) != FMOD_OK) {
-            Logger::Error("Error reading");
+            Logger::Error("Error reading update");
         }
 
         m_eventInstances[eventName].currentPos = value;
