@@ -5,8 +5,14 @@ layout(location=1) in vec3 aNormal;
 out vec3 Normal;
 out vec3 FragPos;
 
-uniform mat4 projection;
-uniform mat4 view;
+layout(std140) uniform Matrices {
+    mat4 projection;
+    mat4 view;
+};
+
+// if Version >=4.2 use...
+// layout (std140, binding=2) uniform Lights {...};
+
 uniform mat4 model;
 uniform mat4 inverseModel;
 
