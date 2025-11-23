@@ -21,6 +21,7 @@ class Shader {
     bool initShader(const char* vertexFile, const char* fragmentFIle);
 
     void use();
+    unsigned int getProgram() { return ID; }
 
     void setInt(const std::string name, int value) const;
     void setBool(const std::string name, bool value) const;
