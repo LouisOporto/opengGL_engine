@@ -244,11 +244,13 @@ bool Engine::setupShaders() {
                                 "RESOURCES/shaders/object.frag")) {
         return false;
     }
+    bindUniformBlock(m_objShader, "Matrices", 0);
 
     if (!m_lightShader.initShader("RESOURCES/shaders/light.vert",
                                   "RESOURCES/shaders/light.frag")) {
         return false;
     }
+    bindUniformBlock(m_lightShader, "Matrices", 0);
 
     if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert",
                                    "RESOURCES/shaders/screen.frag")) {
@@ -264,8 +266,24 @@ bool Engine::setupShaders() {
                                  "RESOURCES/shaders/cube.frag")) {
         return false;
     }
+    bindUniformBlock(m_cubeShader, "Matrices", 0);
 
+    // Uniform Block Object
+    {
+        glGenBuffers(1, &m_UBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
+        glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW); // Size of two mat4 objects
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+
+    // glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_UBO);
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_UBO, 0, 2 * sizeof(glm::mat4));
     return true;
+}
+
+void Engine::bindUniformBlock(Shader shader, const char* blockName, unsigned int bindingPoint) {
+    unsigned int blockIndex = glGetUniformBlockIndex(shader.getProgram(), blockName);
+    glUniformBlockBinding(shader.getProgram(), blockIndex, bindingPoint);
 }
 
 void Engine::event() {
@@ -297,18 +315,20 @@ void Engine::update() {
     m_projection = getCamera()->getPerspective();
     m_view = getCamera()->getLookAt();
 
+    // Uniform Buffer Values
+    glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &m_projection[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &m_view[0][0]);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
     glm::vec3 lightColor = glm::vec3(1.0f);
 
     // Light shader
     m_lightShader.use();
-    m_lightShader.setMat4("projection", m_projection);
-    m_lightShader.setMat4("view", m_view);
 
     // Model shader
     m_objShader.use();
-    m_objShader.setMat4("projection", m_projection);
-    m_objShader.setMat4("view", m_view);
     m_objShader.setVec3("viewPos", getCamera()->getPos());
 
     // Model Lighting (Phong Lighting)
@@ -340,8 +360,6 @@ void Engine::update() {
 
     // Cube Shader
     m_cubeShader.use();
-    m_cubeShader.setMat4("projection", m_projection);
-    m_cubeShader.setMat4("view", m_view);
     m_cubeShader.setVec3("cameraPos", getCamera()->getPos());
 }
 

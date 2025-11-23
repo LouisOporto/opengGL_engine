@@ -162,6 +162,7 @@ class Engine {
    private:
     // OpenlGL
     bool initOpenGLVariables();
+    void bindUniformBlock(Shader shader, const char* blockName, unsigned int bindingPoint);
     bool setupShaders();
     void handleKeyInput(float deltaTime);
     inline void quit() { m_running = false; }
@@ -192,13 +193,13 @@ class Engine {
 
     // Dynamically create VBO, VAO, (intialize by hard coding and reuse by
     // caching)
-    std::map<std::string, unsigned int> m_VAOs;
-    std::map<std::string, unsigned int> m_VBOs;
+    // std::map<std::string, unsigned int> m_VAOs;
+    // std::map<std::string, unsigned int> m_VBOs;
     // unsigned int m_FBO;
     // unsigned int m_RBO;
 
     unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO,
-        m_vegetationVAO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO;
+        m_vegetationVAO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO, m_UBO;
     unsigned int m_texture0, m_texture1, m_textureColorBuffer, m_cubemapTexture;
 
     // World perspective
