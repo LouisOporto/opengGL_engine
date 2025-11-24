@@ -135,43 +135,47 @@ bool Engine::initOpenGLVariables() {
     glGenVertexArrays(1, &m_skyboxVAO);
     glGenBuffers(1, &m_VBO);
     glGenBuffers(1, &m_skyboxVBO);
+    glGenBuffers(1, &m_TEST);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
+    int size = sizeof(VERTICESPOS) + sizeof(VERTICESNORM) + sizeof(VERTICESTEX);
+    glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VERTICESPOS), &VERTICESPOS);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS), sizeof(VERTICESNORM), &VERTICESNORM);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS) + sizeof(VERTICESNORM), sizeof(VERTICESTEX), &VERTICESTEX);
 
     // Object VAO
     {
         glBindVertexArray(m_objectVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
                               (void*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                              (void*)(sizeof(float) * 3));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
+                              (void*)(sizeof(VERTICESPOS)));
         glEnableVertexAttribArray(1);
     }
 
     // Light VAO (Phyiscal light objects)
     {
         glBindVertexArray(m_lightVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                              (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
         glEnableVertexAttribArray(0);
     }
 
     // Vegtation VAO
     {
         glBindVertexArray(m_vegetationVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
                               (void*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                              (void*)(sizeof(float) * 3));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
+                              (void*)(sizeof(VERTICESPOS)));
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                              (void*)(sizeof(float) * 6));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
+                              (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
         glEnableVertexAttribArray(2);
     }
 
