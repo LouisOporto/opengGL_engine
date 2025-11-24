@@ -135,7 +135,6 @@ bool Engine::initOpenGLVariables() {
     glGenVertexArrays(1, &m_skyboxVAO);
     glGenBuffers(1, &m_VBO);
     glGenBuffers(1, &m_skyboxVBO);
-    glGenBuffers(1, &m_TEST);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     int size = sizeof(VERTICESPOS) + sizeof(VERTICESNORM) + sizeof(VERTICESTEX);
