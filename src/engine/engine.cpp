@@ -49,9 +49,10 @@ bool Engine::init(int argc, char* argv[]) {
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    // m_objModel = new Model("./images/backpack/backpack.obj");
-    m_objModel = new Model(
-        "RESOURCES/images/bunny/bunnygirl.obj");  // Not all models are loading
+    stbi_set_flip_vertically_on_load(true);
+    m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
+    // m_objModel = new Model(
+    //     "RESOURCES/images/bunny/bunnygirl.obj");  // Not all models are loading
                                                   // correctly
     // Models should have a ambient, diffuse, and specular. A texture map for
     // ambient (no light), diffuse (around light) and specular (light reflect
@@ -62,9 +63,17 @@ bool Engine::init(int argc, char* argv[]) {
         "right.jpg",  "left.jpg",  "top.jpg",
         "bottom.jpg", "front.jpg", "back.jpg",
     };
+    
+    std::vector<std::string> cubemap{
+        "Cubemap_Sky_25-512x512.png",
+    };
 
+    stbi_set_flip_vertically_on_load(false);
     m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(
         faces, "RESOURCES/images/skybox");
+
+    // m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(
+    //     cubemap, "RESOURCES/images/skybox");
 
     // Shader setup
     if (!setupShaders()) {
