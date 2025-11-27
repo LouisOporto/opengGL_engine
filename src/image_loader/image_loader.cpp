@@ -48,7 +48,7 @@ unsigned int ImageLoader::loadCubemap(std::vector<std::string> faces,
             int offsetW, offsetH;
             int newWidth = width / 4;
             int newHeight = height / 3;
-            Logger::Log("Width: %d and Height: %d (SubWidth %d : SubHeight %d)", width, height, newWidth, newHeight);
+            // Logger::Log("Width: %d and Height: %d (SubWidth %d : SubHeight %d)", width, height, newWidth, newHeight);
             for (int i = 0; i < 6; i++) {
                 switch (i) {
                     case 0: offsetW = newWidth * 2; offsetH = newHeight; break; // right
@@ -58,8 +58,8 @@ unsigned int ImageLoader::loadCubemap(std::vector<std::string> faces,
                     case 4: offsetW = newWidth; offsetH = newHeight; break; // front
                     case 5: offsetW = newWidth * 3; offsetH = newHeight; break; // bottom
                 }
-                Logger::Log("Offset for position: X=%d Y=%d", offsetW, offsetH);
-                Logger::Log("Format%d", nrChannels);
+                // Logger::Log("Offset for position: X=%d Y=%d", offsetW, offsetH);
+                // Logger::Log("Format: %d", nrChannels);
                 unsigned char* sideData = subImageGet(data, width, height, nrChannels, offsetW, offsetH, newWidth, newHeight);
                 if (sideData != NULL) {
                     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, (nrChannels == 4 ? GL_RGBA : GL_RGB), newWidth, 
