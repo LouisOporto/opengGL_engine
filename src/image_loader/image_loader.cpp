@@ -13,12 +13,16 @@ unsigned int ImageLoader::loadImage(const char* path,
     int width, height, nrChannels;
     unsigned char* data =
         stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
+    // Logger::Log("After loading");
     if (data) {
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, (nrChannels == 4 ? GL_RGBA : GL_RGB),
-                     width, height, 0, (nrChannels == 4 ? GL_RGBA : GL_RGB),
+        // Logger::Log("Channels: %d", nrChannels);
+        // Logger::Log("Before Binding");
+        glTexImage2D(GL_TEXTURE_2D, 0, (nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R),
+                     width, height, 0, (nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R),
                      GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        // Logger::Log("After binding");
 
         glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

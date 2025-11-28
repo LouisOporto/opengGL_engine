@@ -85,7 +85,7 @@ void main() {
         texColor = texture(material.texture_diffuse1, TexCoord);
     }
 
-    // result += calcDirLight(dirLight, normal, viewDir, texColor);
+    result += calcDirLight(dirLight, normal, viewDir, texColor);
 
     for (int iter = 0; iter < numPointLights; iter++) {
         result += calcPointLight(pointLights[iter], normal, viewDir, texColor, FragPos);
