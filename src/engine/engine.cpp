@@ -252,8 +252,8 @@ bool Engine::initOpenGLVariables() {
 }
 
 bool Engine::setupShaders() {
-    if (!m_objShader.initShader("RESOURCES/shaders/object.vert",
-                                "RESOURCES/shaders/object.frag")) {
+    if (!m_objShader.initShader("RESOURCES/shaders/newObject.vert",
+                                "RESOURCES/shaders/newObject.frag")) {
         return false;
     }
     bindUniformBlock(m_objShader, "Matrices", 0);
