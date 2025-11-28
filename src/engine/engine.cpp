@@ -51,9 +51,12 @@ bool Engine::init(int argc, char* argv[]) {
 
     // stbi_set_flip_vertically_on_load(true);
     // m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
-    m_objModel = new Model(
-        "RESOURCES/images/bunny/bunnygirl.obj");  // Not all models are loading
+    // m_objModel = new Model(
+        // "RESOURCES/images/bunny/bunnygirl.obj");  // Not all models are loading
                                                   // correctly
+    // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
+    unsigned int test = ImageLoader::getInstance()->loadImage("911_22_930_rim_Metallic.png", "RESOURCES/images/porsche");
+    m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
     // Models should have a ambient, diffuse, and specular. A texture map for
     // ambient (no light), diffuse (around light) and specular (light reflect
     // from camera position)
@@ -387,6 +390,7 @@ void Engine::render() {
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15),
                           glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 inverseModel = glm::inverse(m_model);
@@ -401,6 +405,7 @@ void Engine::render() {
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model =
         glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     inverseModel = glm::inverse(m_model);
