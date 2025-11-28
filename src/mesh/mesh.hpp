@@ -12,6 +12,7 @@ struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
+    glm::vec3 tangent;
 };
 
 struct Texture {
@@ -19,6 +20,14 @@ struct Texture {
     std::string type;
     std::string path;
 
+    // Use the provided textures instead of the
+    // glm::vec3 ambient;
+    // glm::vec3 diffuse;
+    // glm::vec3 specular;
+    // float shininess;
+};
+
+struct DefaultMaterials {
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
@@ -31,9 +40,10 @@ class Mesh {
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
     std::vector<Texture> m_textures;
+    DefaultMaterials m_meshMaterials;
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-         std::vector<Texture> textures);
+         std::vector<Texture> textures, DefaultMaterials defaultMat);
     void draw(Shader &shader);
 
    private:

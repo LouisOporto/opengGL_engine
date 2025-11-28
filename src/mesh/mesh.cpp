@@ -1,10 +1,11 @@
 #include "mesh.hpp"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-           std::vector<Texture> textures) {
+           std::vector<Texture> textures, DefaultMaterials defaultMat) {
     m_vertices = vertices;
     m_indices = indices;
     m_textures = textures;
+    m_meshMaterials = defaultMat;
 
     setupMesh();
 }
@@ -36,18 +37,23 @@ void Mesh::setupMesh() {
                           (void*)offsetof(Vertex, texCoords));
     glEnableVertexAttribArray(2);
 
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void*)offsetof(Vertex, tangent));
+    glEnableVertexAttribArray(3);
+
     glBindVertexArray(0);
 }
 
 void Mesh::draw(Shader& shader) {
-    // unsigned int ambientNr = 1;
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
+    unsigned int normalNr = 1;
     unsigned int heightNr = 1;
-    // unsigned int heightNr = 1;
+    
     bool missingDiffuse = true;
     bool missingSpecular = true;
-    // bool missingNormal = true;
+    bool missingHeight = true;
+    bool missingNormal = true;
 
     for (int i = 0; i < m_textures.size(); i++) {
         // printf("Texture Number: %d\n", i);
@@ -55,44 +61,43 @@ void Mesh::draw(Shader& shader) {
 
         std::string number;
         std::string name = m_textures[i].type;
-        // if (name == "texture_ambient") number = std::to_string(ambientNr++);
         if (name == "texture_diffuse") {
             number = std::to_string(diffuseNr++);
             missingDiffuse = false;
         } else if (name == "texture_specular") {
             number = std::to_string(specularNr++);
             missingSpecular = false;
+        } else if (name == "texture_normal") {
+            number = std::to_string(normalNr++);
+            missingNormal = false;
         } else if (name == "texture_height")
             number = std::to_string(heightNr++);
-        // else if (name == "texture_normal") number =
-        // std::to_string(normalNr++);
+            missingHeight = false;
 
-        // printf("Shader Name: %s, Number: %d\n", ("material." + name +
+        // Logger::Log("Shader Name: %s, Number: %d\n", ("material." + name +
         // number).c_str(), i);
-        if (name == "texture_height") {
-            shader.setInt((name + number).c_str(), i);
-        } else
+        if (name == "texture_height" || name == "texture_normal") {
+            shader.setInt(("materialVert." + name + number).c_str(), i);
+            // shader.setInt(("material" + name + number).c_str(), i);
+        }
+        else {
             shader.setInt(("material." + name + number).c_str(), i);
+        }
         // Logger::Log("Setting %s", (name + number).c_str());
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
-
-        if (name + number == "texture_diffuse1") {
-            shader.setVec3("material.ambient", m_textures[i].diffuse);
-            shader.setVec3("material.diffuse", m_textures[i].diffuse);
-            shader.setVec3("material.specular", m_textures[i].specular);
-            shader.setFloat("material.shininess", m_textures[i].shininess);
-        }
     }
-
-    // if (!missingDiffuse) shader.setBool("material.missingDiffuse",
-    // missingDiffuse); else shader.setBool("material.missingDiffuse", false);
-
-    // if (!missingSpecular) shader.setBool("Material.missingSpecular", true);
-    // else shader.setBool("material.missingSpecular", false);
 
     shader.setBool("material.missingDiffuse", missingDiffuse);
     shader.setBool("material.missingSpecular", missingSpecular);
+    // shader.setBool("material.missingNormal", missingNormal);
+    shader.setBool("materialVert.missingNormal", missingNormal);
+    shader.setBool("materialVert.missingHeight", missingHeight);
+
+    shader.setVec3("material.ambient", m_meshMaterials.ambient);
+    shader.setVec3("material.diffuse", m_meshMaterials.diffuse);
+    shader.setVec3("material.specular", m_meshMaterials.specular);
+    shader.setFloat("material.shininess", m_meshMaterials.shininess);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
