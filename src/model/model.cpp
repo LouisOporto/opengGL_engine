@@ -39,8 +39,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
+    DefaultMaterials materialColor;
+
     Vertex vertex;
-    // Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
+    Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
 
     // process vertex
     for (int i = 0; i < mesh->mNumVertices; i++) {
@@ -54,6 +56,11 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         vector.y = mesh->mNormals[i].y;
         vector.z = mesh->mNormals[i].z;
         vertex.normal = vector;
+
+        vector.x = mesh->mTangents[i].x;
+        vector.y = mesh->mTangents[i].y;
+        vector.z = mesh->mTangents[i].z;
+        vertex.tangent = vector;
 
         if (mesh->mTextureCoords[0]) {
             glm::vec2 vec;
@@ -80,36 +87,67 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
     // Logger::Log("Process Materials");
     // process materials
+    // NOTE: Focus on loading abedo (diffuse) and specular(metallic) (Add more texture material once we can figure that out) ie. shininess, roughness, normal map etc...
     if (mesh->mMaterialIndex >= 0) {
         // Get material from scene->mMaterials[index] using the meshs material
         // index; Logger::Log("Mesh size: %d", mesh->mMaterialIndex);
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
         // Logger::Log("After material retrieval");
+        bool noMaterials = true;
 
         std::vector<Texture> diffuseMaps = loadMaterialTextures(
-            material, aiTextureType_DIFFUSE, "texture_diffuse");
+            material, aiTextureType_DIFFUSE, "texture_diffuse"); // From abledo
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
         std::vector<Texture> specularMaps = loadMaterialTextures(
-            material, aiTextureType_SHININESS, "texture_specular");
+            material, aiTextureType_SPECULAR, "texture_specular"); // From Metallic
         textures.insert(textures.end(), specularMaps.begin(),
                         specularMaps.end());
 
         std::vector<Texture> normalMaps = loadMaterialTextures(
-            material, aiTextureType_HEIGHT, "texture_height");
+            material, aiTextureType_HEIGHT, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+        std::vector<Texture> heightMaps = loadMaterialTextures(
+            material, aiTextureType_NORMALS, "texture_height"); // Should be the roughness map
+        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
+        aiColor3D ambient, diffuse, specular;
+        float shininess;
+
+        material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+        material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+        material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+
+        material->Get(AI_MATKEY_SHININESS, shininess);
+        shininess = glm::max(glm::min(512.f, shininess), 0.f);
+
+        materialColor.ambient = {ambient.r, ambient.g, ambient.b};
+        materialColor.diffuse = {diffuse.r, diffuse.g, diffuse.b};
+        materialColor.specular = {specular.r, specular.g, specular.b};
+        materialColor.shininess = shininess;
+
+        Logger::Warn("Ka: %f, %f, %f\n"
+            "Kd: %f, %f, %f\n"
+            "Ks: %f, %f, %f\n"
+            "Shininess: %f",
+            ambient.r, ambient.g, ambient.b,
+            diffuse.r, diffuse.g, diffuse.b,
+            specular.r, specular.g, specular.b, shininess);
     }
-    return Mesh(vertices, indices, textures);
+    return Mesh(vertices, indices, textures, materialColor);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
                                                  aiTextureType type,
                                                  std::string typeName) {
     std::vector<Texture> textures;
-    Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(),
-                mat->GetTextureCount(type));
+    int count = mat->GetTextureCount(type);
 
-    for (int i = 0; i < mat->GetTextureCount(type); i++) {
+    Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(),
+                count);
+
+    for (int i = 0; i < count; i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
         bool skip = false;
@@ -123,14 +161,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
         }
         if (!skip) {
             Texture texture;
-            aiColor3D ambient, diffuse, specular;
-            float shininess;
-            // Logger::Log("Loading image file: %s", str.C_Str());
-
-            mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-            mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-            mat->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-            mat->Get(AI_MATKEY_SHININESS, shininess);
+            Logger::Log("Loading image file: %s", str.C_Str());
 
             texture.id =
                 ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
@@ -138,10 +169,6 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
             // typeName.c_str());
             texture.type = typeName;
             texture.path = str.C_Str();
-            texture.ambient = {ambient.r, ambient.g, ambient.b};
-            texture.diffuse = {diffuse.r, diffuse.g, diffuse.b};
-            texture.specular = {specular.r, specular.g, specular.b};
-            texture.shininess = shininess;
 
             textures.push_back(texture);
             m_texturesLoaded.push_back(texture);
