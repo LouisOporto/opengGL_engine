@@ -57,8 +57,8 @@ class AudioEngine {
     void setSoundVolume(int value);
     void releaseInstance();
 
-    void rewind();
-    void forward();
+    void rewind(int playbackDist = SONGADVANCE);
+    void forward(int playbackDist = SONGADVANCE);
     void pause();
     void resume();
     void stop();

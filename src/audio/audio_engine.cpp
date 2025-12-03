@@ -240,6 +240,7 @@ void AudioEngine::clean() {
     }
     m_banks.clear();
     m_eventInstances.clear();
+    Logger::Log("Cleaned up AudioEngine");
 }
 
 void AudioEngine::setInstanceParemeter(std::string parameter, float value) {
@@ -253,10 +254,10 @@ void AudioEngine::setInstanceParemeter(std::string parameter, float value) {
     }
 }
 
-void AudioEngine::forward() {
+void AudioEngine::forward(int playbackDist) {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
-        int newPos = m_eventInstances[eventName].currentPos + SONGADVANCE;
+        int newPos = m_eventInstances[eventName].currentPos + playbackDist;
         if (FMOD_Studio_EventInstance_SetTimelinePosition(
                 m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
             Logger::Error("Failed to forward player");
@@ -265,10 +266,10 @@ void AudioEngine::forward() {
     readTimelinePosition();
 }
 
-void AudioEngine::rewind() {
+void AudioEngine::rewind(int playbackDist) {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
-        int newPos = m_eventInstances[eventName].currentPos - SONGADVANCE;
+        int newPos = m_eventInstances[eventName].currentPos - playbackDist;
         if (FMOD_Studio_EventInstance_SetTimelinePosition(
                 m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
             Logger::Error("Failed to rewind player");
