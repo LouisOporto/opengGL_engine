@@ -51,12 +51,12 @@ bool Engine::init(int argc, char* argv[]) {
 
     // stbi_set_flip_vertically_on_load(true);
     // m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
-    // m_objModel = new Model(
-        // "RESOURCES/images/bunny/bunnygirl.obj");  // Not all models are loading
+    m_objModel = new Model(
+        "RESOURCES/images/bunny/bunnygirl.obj");  // Not all models are loading
                                                   // correctly
     // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
-    unsigned int test = ImageLoader::getInstance()->loadImage("911_22_930_rim_Metallic.png", "RESOURCES/images/porsche");
-    m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
+    // unsigned int test = ImageLoader::getInstance()->loadImage("911_22_930_rim_Metallic.png", "RESOURCES/images/porsche");
+    // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
     // Models should have a ambient, diffuse, and specular. A texture map for
     // ambient (no light), diffuse (around light) and specular (light reflect
     // from camera position)
@@ -479,6 +479,7 @@ void Engine::render() {
 }
 
 void Engine::clean() {
+    Logger::Log("Cleaning up application");
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
@@ -498,6 +499,7 @@ void Engine::clean() {
 }
 
 void Engine::handleKeyInput(float deltaTime) {
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) return;
     if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
         getCamera()->handleKeyInput(FORWARD, deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
@@ -516,14 +518,13 @@ void Engine::handleKeyInput(float deltaTime) {
 // Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
+    
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) return;
     if (key == GLFW_KEY_C && action == GLFW_PRESS && mods == GLFW_MOD_CONTROL) {
         Engine::getInstance()->copyFunction();
     }
     // if (key == GLFW_KEY_C && action == GLFW_PRESS && mods !=
     // GLFW_MOD_CONTROL) {printf("Presing just C");}
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    }
     if (key == GLFW_KEY_F && action == GLFW_PRESS) {
         Engine::getInstance()->toggleLight();
     }
