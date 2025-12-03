@@ -479,7 +479,7 @@ void Engine::render() {
 }
 
 void Engine::clean() {
-    Logger::Log("Cleaning up application");
+    Logger::Log("Cleaning up OpenGL Engine");
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();

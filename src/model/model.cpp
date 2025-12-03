@@ -42,7 +42,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     DefaultMaterials materialColor;
 
     Vertex vertex;
-    Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
+    // Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
 
     // process vertex
     for (int i = 0; i < mesh->mNumVertices; i++) {
@@ -127,13 +127,13 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         materialColor.specular = {specular.r, specular.g, specular.b};
         materialColor.shininess = shininess;
 
-        Logger::Warn("Ka: %f, %f, %f\n"
-            "Kd: %f, %f, %f\n"
-            "Ks: %f, %f, %f\n"
-            "Shininess: %f",
-            ambient.r, ambient.g, ambient.b,
-            diffuse.r, diffuse.g, diffuse.b,
-            specular.r, specular.g, specular.b, shininess);
+        // Logger::Warn("Ka: %f, %f, %f\n"
+        //     "Kd: %f, %f, %f\n"
+        //     "Ks: %f, %f, %f\n"
+        //     "Shininess: %f",
+        //     ambient.r, ambient.g, ambient.b,
+        //     diffuse.r, diffuse.g, diffuse.b,
+        //     specular.r, specular.g, specular.b, shininess);
     }
     return Mesh(vertices, indices, textures, materialColor);
 }
@@ -144,8 +144,8 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
     std::vector<Texture> textures;
     int count = mat->GetTextureCount(type);
 
-    Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(),
-                count);
+    // Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(),
+                // count);
 
     for (int i = 0; i < count; i++) {
         aiString str;
@@ -161,7 +161,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
         }
         if (!skip) {
             Texture texture;
-            Logger::Log("Loading image file: %s", str.C_Str());
+            // Logger::Log("Loading image file: %s", str.C_Str());
 
             texture.id =
                 ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
