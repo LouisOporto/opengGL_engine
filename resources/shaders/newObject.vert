@@ -21,10 +21,12 @@ uniform mat4 model;
 uniform mat4 inverseModel;
 uniform MaterialVert materialVert;
 
-out vec3 FragPos;
-out vec3 Normal;
-out vec2 TexCoord;
-out mat3 TBN;
+out VS_OUT {
+    vec3 FragPos;
+    vec3 Normal;
+    vec2 TexCoord;
+    mat3 TBN;
+} vs_out;
 
 void main() {
     mat3 normalMatrix = mat3(transpose(inverseModel));
@@ -34,18 +36,18 @@ void main() {
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
 
-    TBN = mat3(T, B, N);
+    vs_out.TBN = mat3(T, B, N);
 
     if (materialVert.missingNormal) {
-        Normal = mat3(transpose(model)) * aNormal;
+        vs_out.Normal = mat3(transpose(model)) * aNormal;
     }
     else {
-        Normal = texture(materialVert.texture_normal1, aTexCoord).rgb;
-        Normal = Normal * 2.0 - 1.0;
-        Normal = normalize(TBN * Normal);
+        vs_out.Normal = texture(materialVert.texture_normal1, aTexCoord).rgb;
+        vs_out.Normal = vs_out.Normal * 2.0 - 1.0;
+        vs_out.Normal = normalize(vs_out.TBN * vs_out.Normal);
     }
 
-    FragPos = vec3(model * vec4(aPos, 1.0));
-    TexCoord = aTexCoord;
+    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.TexCoord = aTexCoord;
     gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
