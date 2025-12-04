@@ -185,7 +185,7 @@ bool Engine::initOpenGLVariables() {
                               (void*)(sizeof(VERTICESPOS)));
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2,
                               (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
         glEnableVertexAttribArray(2);
     }
