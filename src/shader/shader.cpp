@@ -1,13 +1,16 @@
 #include "shader.hpp"
 
-bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
+bool Shader::initShader(const char* vertexFile, const char* fragmentFile, const char* geometryFile) {
     std::fstream vertFile;
     std::fstream fragFile;
+    std::fstream geomFile;
     std::string vertexCode;
     std::string fragmentCode;
+    std::string geometryCode;
 
     vertFile.exceptions(std::fstream::badbit | std::fstream::failbit);
     fragFile.exceptions(std::fstream::badbit | std::fstream::failbit);
+    geomFile.exceptions(std::fstream::badbit | std::fstream::failbit);
 
     try {
         vertFile.open(vertexFile);
@@ -22,6 +25,14 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
 
         vertFile.close();
         fragFile.close();
+
+        if (geometryFile != nullptr) {
+            geomFile.open(geometryFile);
+            std::stringstream geomStream;
+            geomStream << geomFile.rdbuf();
+            geometryCode = geomStream.str();
+            geomFile.close();
+        }
     } catch (std::fstream::failure) {
         Logger::Error("SHADER::ERROR::FILE_LOADING");
         return false;
@@ -54,9 +65,26 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile) {
         return false;
     }
 
+    unsigned int geometry;
+    if (geometryFile != nullptr) {
+        const char* gCode = geometryCode.c_str();
+        geometry = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometry, 1, &gCode, NULL);
+        glCompileShader(geometry);
+        glGetShaderiv(geometry, GL_COMPILE_STATUS, &status);
+        if (!status) {
+            glGetShaderInfoLog(geometry, 512, NULL, log);
+            Logger::Error("SHADER::ERROR::GEOMETRY::COMPILE::%s\n", log);
+            return false;
+        }
+    }
+
     ID = glCreateProgram();
     glAttachShader(ID, vertex);
     glAttachShader(ID, fragment);
+    if (geometryFile != nullptr) {
+        glAttachShader(ID, geometry);
+    }
     glLinkProgram(ID);
     glGetProgramiv(ID, GL_LINK_STATUS, &status);
     if (!status) {

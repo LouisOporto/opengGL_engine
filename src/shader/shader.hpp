@@ -18,7 +18,7 @@ class Shader {
    public:
     Shader() {}
 
-    bool initShader(const char* vertexFile, const char* fragmentFIle);
+    bool initShader(const char* vertexFile, const char* fragmentFile, const char* geometryFile = nullptr);
 
     void use();
     unsigned int getProgram() { return ID; }
