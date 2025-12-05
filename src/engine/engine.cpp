@@ -283,6 +283,13 @@ bool Engine::setupShaders() {
     }
     bindUniformBlock(m_cubeShader, "Matrices", 0);
 
+    if (!m_primShader.initShader("RESOURCES/shaders/prim.vert",
+                                 "RESOURCES/shaders/prim.frag",
+                                 "RESOURCES/shaders/prim.geom")) {
+        return false;
+    }
+    bindUniformBlock(m_primShader, "Matrices", 0);
+
     // Uniform Block Object
     {
         glGenBuffers(1, &m_UBO);
@@ -398,10 +405,11 @@ void Engine::render() {
     m_objShader.setMat4("model", m_model);
     m_objShader.setMat4("inverseModel", inverseModel);
 
-    m_objModel->draw(m_objShader);
+    // m_objModel->draw(m_objShader);
 
     // Reflecting model
     m_cubeShader.use();
+    // m_primShader.use();
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
@@ -412,34 +420,37 @@ void Engine::render() {
 
     m_cubeShader.setMat4("model", m_model);
     m_cubeShader.setMat4("inverseModel", inverseModel);
-
+    
     m_objModel->draw(m_cubeShader);
-
+    
     // Reflecting cubes
-    m_cubeShader.use();
+    // m_cubeShader.use();
+    m_primShader.use();
     for (int iter = 0; iter < OBJECTPOSITIONS.size(); iter++) {
         // Logger::Log("Rendering cube: #%d", iter);
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
         m_model = glm::rotate(m_model, glm::radians(iter * 15.f),
-                              glm::vec3(0.1f, 0.5f, 0.4f));
+        glm::vec3(0.1f, 0.5f, 0.4f));
         glm::mat4 inverseModel = glm::inverse(m_model);
-
-        m_cubeShader.setMat4("model", m_model);
-        m_cubeShader.setMat4("inverseModel", inverseModel);
-
+        
+        // m_cubeShader.setMat4("model", m_model);
+        // m_cubeShader.setMat4("inverseModel", inverseModel);
+        m_primShader.setMat4("model", m_model);
+        m_primShader.setMat4("inverseModel", inverseModel);
+        
         glBindVertexArray(m_objectVAO);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_POINTS, 0, 36);
     }
-
+    
     // Light
     m_lightShader.use();
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
-
+        
         m_lightShader.setMat4("model", m_model);
         // m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f :
         // 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
