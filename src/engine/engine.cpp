@@ -257,6 +257,7 @@ bool Engine::initOpenGLVariables() {
 bool Engine::setupShaders() {
     if (!m_objShader.initShader("RESOURCES/shaders/newObject.vert",
                                 "RESOURCES/shaders/newObject.frag")) {
+                                // "RESOURCES/shaders/newObject.geom")) {
         return false;
     }
     bindUniformBlock(m_objShader, "Matrices", 0);
@@ -289,6 +290,12 @@ bool Engine::setupShaders() {
         return false;
     }
     bindUniformBlock(m_primShader, "Matrices", 0);
+
+    if (!m_normalShader.initShader("RESOURCES/shaders/normalDisplay.vert",
+                                   "RESOURCES/shaders/normalDisplay.frag",
+                                   "RESOURCES/shaders/normalDisplay.geom")) {
+        return false;
+    }
 
     // Uniform Block Object
     {
@@ -352,6 +359,7 @@ void Engine::update() {
     // Model shader
     m_objShader.use();
     m_objShader.setVec3("viewPos", getCamera()->getPos());
+    // m_objShader.setFloat("time", 179.9087f);
 
     // Model Lighting (Phong Lighting)
     m_objShader.setDirLight("dirLight", directionVector, lightColor * AMB,
@@ -380,6 +388,11 @@ void Engine::update() {
     m_skyboxShader.setMat4("projection", m_projection);
     m_skyboxShader.setMat4("view", glm::mat4(glm::mat3(m_view)));
 
+    // Normal Shader
+    m_normalShader.use();
+    m_normalShader.setMat4("projection", m_projection);
+    m_normalShader.setMat4("view", m_view);
+
     // Cube Shader
     m_cubeShader.use();
     m_cubeShader.setVec3("cameraPos", getCamera()->getPos());
@@ -405,7 +418,11 @@ void Engine::render() {
     m_objShader.setMat4("model", m_model);
     m_objShader.setMat4("inverseModel", inverseModel);
 
-    // m_objModel->draw(m_objShader);
+    m_objModel->draw(m_objShader);
+
+    m_normalShader.use();
+    m_normalShader.setMat4("model", m_model);
+    m_objModel->draw(m_normalShader);
 
     // Reflecting model
     m_cubeShader.use();
