@@ -28,6 +28,10 @@ out VS_OUT {
     mat3 TBN;
 } vs_out;
 
+// out VS_OUT { // Explosion using geom
+//     vec2 texCoords;
+// } vs_out;
+
 void main() {
     mat3 normalMatrix = mat3(transpose(inverseModel));
 

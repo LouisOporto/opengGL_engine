@@ -73,6 +73,7 @@ in VS_OUT {
     vec2 TexCoord;
     mat3 TBN;
 } vs_in;
+// in vec2 TexCoord;
 
 void main() {
     vec4 texColor;
