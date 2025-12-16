@@ -18,7 +18,6 @@ struct MaterialVert {
 };
 
 uniform mat4 model;
-uniform mat4 inverseModel;
 uniform MaterialVert materialVert;
 
 out VS_OUT {
@@ -33,7 +32,7 @@ out VS_OUT {
 // } vs_out;
 
 void main() {
-    mat3 normalMatrix = mat3(transpose(inverseModel));
+    mat3 normalMatrix = mat3(transpose(inverse(model)));
 
     vec3 T = normalize(normalMatrix * aTangent);
     vec3 N = normalize(normalMatrix * aNormal);

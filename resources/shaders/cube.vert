@@ -14,10 +14,9 @@ layout(std140) uniform Matrices {
 // layout (std140, binding=2) uniform Lights {...};
 
 uniform mat4 model;
-uniform mat4 inverseModel;
 
 void main() {
-    Normal = mat3(transpose(inverseModel)) * aNormal;
+    Normal = mat3(transpose(inverse(model))) * aNormal;
     FragPos = vec3(model * vec4(aPos, 1.0));
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }
