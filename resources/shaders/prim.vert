@@ -13,11 +13,13 @@ out VS_OUT {
     out vec3 FragPos;
 } vs_out;
 
-uniform mat4 model;
-uniform mat4 inverseModel;
+// uniform mat4 model;
+// uniform mat4 inverseModel;
+uniform mat4 models[100];
+uniform mat4 inverseModels[100];
 
 void main() {
-    vs_out.Normal =  mat3(transpose(inverseModel)) * aNormal;
-    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.Normal =  mat3(transpose(inverseModels[gl_InstanceID])) * aNormal;
+    vs_out.FragPos = vec3(models[gl_InstanceID] * vec4(aPos, 1.0));
     gl_Position = projection * view * vec4(vs_out.FragPos, 1.0);
 }
