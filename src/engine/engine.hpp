@@ -314,6 +314,8 @@ class Engine {
     std::map<std::string, int> m_shaderIndex;
 
     Model* m_objModel;
+    Model* m_planetModel;
+    Model* m_rockModel;
     Shader m_objShader;
     Shader m_lightShader;
     Shader m_screenShader;
@@ -321,6 +323,7 @@ class Engine {
     Shader m_cubeShader;
     Shader m_normalShader;
     Shader m_primShader;
+    Shader m_instancedShader;
     Timer m_timer;
     bool m_running;
 
@@ -346,6 +349,7 @@ class Engine {
 
     // No need to change universal usage here
     Camera* m_camera;
+    glm::mat4* m_modelMatrices;
     glm::mat4 m_projection;
     glm::mat4 m_view;
     glm::mat4 m_model;
