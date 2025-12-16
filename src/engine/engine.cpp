@@ -35,6 +35,31 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
+    unsigned int amount = 10000;
+    m_modelMatrices = new glm::mat4[amount];
+    srand(static_cast<unsigned int>(glfwGetTime()));
+    float radius = 50.0f;
+    float offset = 2.5f;
+    for (int i = 0; i < amount; i++) {
+        glm::mat4 model =  glm::mat4(1.0f);
+        float angle = (float)i / (float)amount * 360.f;
+        float displacement = (rand() % (int)(2 * offset * 100)) / 100.f - offset;
+        float x = sin(angle) * radius + displacement;
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f; - offset;
+        float y = displacement * 0.4f;
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0 - offset;
+        float z = cos(angle) * radius + displacement;
+        model = glm::translate(model, glm::vec3(x, y, z - 50.f));
+
+        float scale = static_cast<float>((rand() % 20) / 100.0 + 0.05);
+        model = glm::scale(model, glm::vec3(scale));
+
+        float rotAngle = static_cast<float>((rand() % 360));
+        model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+        m_modelMatrices[i] = model;
+    }
+
     // OPENGL setup
     if (!initOpenGLVariables()) {
         Logger::Error("Failed to load something from OpenGL Variables!");
@@ -51,15 +76,17 @@ bool Engine::init(int argc, char* argv[]) {
 
     // stbi_set_flip_vertically_on_load(true);
     // m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
-    m_objModel = new Model(
-        "RESOURCES/images/bunny/bunnygirl.obj");  // Not all models are loading
-                                                  // correctly
     // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
-    // unsigned int test = ImageLoader::getInstance()->loadImage("911_22_930_rim_Metallic.png", "RESOURCES/images/porsche");
     // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
-    // Models should have a ambient, diffuse, and specular. A texture map for
-    // ambient (no light), diffuse (around light) and specular (light reflect
-    // from camera position)
+    m_objModel = new Model(
+        "RESOURCES/images/bunny/bunnygirl.obj");
+
+    m_planetModel = new Model(
+        "RESOURCES/images/planet/planet.obj");
+
+    m_rockModel = new Model(
+        "RESOURCES/images/rock/rock.obj");
+        
 
     // Textures setup
     std::vector<std::string> faces{
@@ -136,6 +163,7 @@ bool Engine::init(int argc, char* argv[]) {
     // AudioEngine::getInstance()->loadBank("Ep106Music",
     // "RESOURCES/audio/Dispatch"); Radio by Bershy is Ep106Music index 12
     // AudioEngine::getInstance()->playByIndex("Ep106Music", "Radio", 12);
+
 
     return m_running = true;
 }
@@ -297,6 +325,13 @@ bool Engine::setupShaders() {
         return false;
     }
 
+    if (!m_instancedShader.initShader("RESOURCES/shaders/instanced.vert",
+                                      "RESOURCES/shaders/newObject.frag",
+                                      "RESOURCES/shaders/newObject.geom")) {
+        return false;
+    }
+    bindUniformBlock(m_instancedShader, "Matrices", 0);
+
     // Uniform Block Object
     {
         glGenBuffers(1, &m_UBO);
@@ -413,35 +448,52 @@ void Engine::render() {
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15),
                           glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 inverseModel = glm::inverse(m_model);
+    // glm::mat4 inverseModel = glm::inverse(m_model);
 
     m_objShader.setMat4("model", m_model);
-    m_objShader.setMat4("inverseModel", inverseModel);
+    // m_objShader.setMat4("inverseModel", inverseModel);
 
     m_objModel->draw(m_objShader);
 
     m_normalShader.use();
     m_normalShader.setMat4("model", m_model);
-    // m_objModel->draw(m_normalShader);
+    m_objModel->draw(m_normalShader);
 
     // Reflecting model
     m_cubeShader.use();
-    // m_primShader.use();
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model =
         glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    inverseModel = glm::inverse(m_model);
+    // inverseModel = glm::inverse(m_model);
 
     m_cubeShader.setMat4("model", m_model);
-    m_cubeShader.setMat4("inverseModel", inverseModel);
+    // m_cubeShader.setMat4("inverseModel", inverseModel);
     
     m_objModel->draw(m_cubeShader);
     
-    // Reflecting cubes
-    // m_cubeShader.use();
+    // Planet Model
+    m_objShader.use();
+
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, -50.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
+    // inverseModel = glm::inverse(m_model);
+
+    m_objShader.setMat4("model", m_model);
+    // m_objShader.setMat4("inverseModel", inverseModel);
+
+    m_planetModel->draw(m_objShader);
+
+    for (int i = 0; i < 10000; i++) {
+        // m_objShader.setMat4("model", glm::translate(m_modelMatrices[i], glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f, (float)sin(glfwGetTime() * 5.f))));
+        m_objShader.setMat4("model", m_modelMatrices[i]);
+        m_rockModel->draw(m_objShader);
+    }
+
+    // Primitive cubes
     m_primShader.use();
     for (int iter = 0; iter < OBJECTPOSITIONS.size(); iter++) {
         // Logger::Log("Rendering cube: #%d", iter);
@@ -482,7 +534,7 @@ void Engine::render() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
-    // Skybox (Final Texture should be interchangeable if possible)
+    // Skybox
     glDepthFunc(GL_LEQUAL);
     m_skyboxShader.use();
     glBindVertexArray(m_skyboxVAO);
