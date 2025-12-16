@@ -422,7 +422,7 @@ void Engine::render() {
 
     m_normalShader.use();
     m_normalShader.setMat4("model", m_model);
-    m_objModel->draw(m_normalShader);
+    // m_objModel->draw(m_normalShader);
 
     // Reflecting model
     m_cubeShader.use();
@@ -453,13 +453,18 @@ void Engine::render() {
         
         // m_cubeShader.setMat4("model", m_model);
         // m_cubeShader.setMat4("inverseModel", inverseModel);
-        m_primShader.setMat4("model", m_model);
-        m_primShader.setMat4("inverseModel", inverseModel);
+        // Update this to for multiple instances
+        // m_primShader.setMat4("model", m_model);
+        // m_primShader.setMat4("inverseModel", inverseModel);
+        m_primShader.setMat4("models[" + std::to_string(iter) + ']', m_model);
+        m_primShader.setMat4("inverseModels[" + std::to_string(iter) + ']', inverseModel);
+    }
         
         glBindVertexArray(m_objectVAO);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-        glDrawArrays(GL_POINTS, 0, 36);
-    }
+        // glDrawArrays(GL_POINTS, 0, 36);
+        glDrawArraysInstanced(GL_POINTS, 0, 36, OBJECTPOSITIONS.size());
+    // }
     
     // Light
     m_lightShader.use();
