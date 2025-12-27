@@ -323,7 +323,6 @@ class Engine {
     Shader m_cubeShader;
     Shader m_normalShader;
     Shader m_primShader;
-    Shader m_instancedShader;
     Timer m_timer;
     bool m_running;
 

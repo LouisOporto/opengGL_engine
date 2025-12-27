@@ -325,13 +325,6 @@ bool Engine::setupShaders() {
         return false;
     }
 
-    if (!m_instancedShader.initShader("RESOURCES/shaders/instanced.vert",
-                                      "RESOURCES/shaders/newObject.frag",
-                                      "RESOURCES/shaders/newObject.geom")) {
-        return false;
-    }
-    bindUniformBlock(m_instancedShader, "Matrices", 0);
-
     // Uniform Block Object
     {
         glGenBuffers(1, &m_UBO);
