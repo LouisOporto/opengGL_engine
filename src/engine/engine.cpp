@@ -670,15 +670,12 @@ void Engine::renderImGuiInterface() {
     showMusicPlayer();
     showappMenuBar();
 
-    if (!ImGui::Begin("User Interface")) {
-        ImGui::End();
-        return;
-    } else {
+    if (ImGui::Begin("User Interface")) {
         showTools();
         // showMusicPlayer("Radio");
         showFramerateStatistics();
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void Engine::showappMenuBar() {
@@ -740,10 +737,8 @@ void Engine::showMusicPlayer() {
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive,
-                          ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_DragDropTarget,
-                          ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_DragDropTarget, ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
     if (ImGui::Begin("Music Player")) {
         ImGui::Text("Active Bank: %s, Active Event: %s",
                     AudioEngine::getInstance()->getActiveBankName().c_str(),
