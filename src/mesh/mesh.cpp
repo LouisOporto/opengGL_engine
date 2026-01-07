@@ -49,7 +49,7 @@ void Mesh::draw(Shader& shader) {
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
-    
+
     bool missingDiffuse = true;
     bool missingSpecular = true;
     bool missingHeight = true;
@@ -72,15 +72,14 @@ void Mesh::draw(Shader& shader) {
             missingNormal = false;
         } else if (name == "texture_height")
             number = std::to_string(heightNr++);
-            missingHeight = false;
+        missingHeight = false;
 
         // Logger::Log("Shader Name: %s, Number: %d\n", ("material." + name +
         // number).c_str(), i);
         if (name == "texture_height" || name == "texture_normal") {
             shader.setInt(("materialVert." + name + number).c_str(), i);
             // shader.setInt(("material" + name + number).c_str(), i);
-        }
-        else {
+        } else {
             shader.setInt(("material." + name + number).c_str(), i);
         }
         // Logger::Log("Setting %s", (name + number).c_str());

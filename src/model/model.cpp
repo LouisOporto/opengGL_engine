@@ -87,7 +87,9 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
     // Logger::Log("Process Materials");
     // process materials
-    // NOTE: Focus on loading abedo (diffuse) and specular(metallic) (Add more texture material once we can figure that out) ie. shininess, roughness, normal map etc...
+    // NOTE: Focus on loading abedo (diffuse) and specular(metallic) (Add more
+    // texture material once we can figure that out) ie. shininess, roughness,
+    // normal map etc...
     if (mesh->mMaterialIndex >= 0) {
         // Get material from scene->mMaterials[index] using the meshs material
         // index; Logger::Log("Mesh size: %d", mesh->mMaterialIndex);
@@ -96,11 +98,12 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         bool noMaterials = true;
 
         std::vector<Texture> diffuseMaps = loadMaterialTextures(
-            material, aiTextureType_DIFFUSE, "texture_diffuse"); // From abledo
+            material, aiTextureType_DIFFUSE, "texture_diffuse");  // From abledo
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Texture> specularMaps = loadMaterialTextures(
-            material, aiTextureType_SPECULAR, "texture_specular"); // From Metallic
+        std::vector<Texture> specularMaps =
+            loadMaterialTextures(material, aiTextureType_SPECULAR,
+                                 "texture_specular");  // From Metallic
         textures.insert(textures.end(), specularMaps.begin(),
                         specularMaps.end());
 
@@ -109,7 +112,8 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
         std::vector<Texture> heightMaps = loadMaterialTextures(
-            material, aiTextureType_NORMALS, "texture_height"); // Should be the roughness map
+            material, aiTextureType_NORMALS,
+            "texture_height");  // Should be the roughness map
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         aiColor3D ambient, diffuse, specular;
@@ -145,7 +149,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
     int count = mat->GetTextureCount(type);
 
     // Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(),
-                // count);
+    // count);
 
     for (int i = 0; i < count; i++) {
         aiString str;

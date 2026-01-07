@@ -21,7 +21,9 @@ class ImageLoader {
 
    private:
     ImageLoader() {}
-    unsigned char* subImageGet(unsigned char* originalData, int originalWidth, int originalHeight, int channels, int xOffset, int yOffset, int newWidth, int newHeight);
+    unsigned char* subImageGet(unsigned char* originalData, int originalWidth,
+                               int originalHeight, int channels, int xOffset,
+                               int yOffset, int newWidth, int newHeight);
     static ImageLoader* m_instance;
 };
 

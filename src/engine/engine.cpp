@@ -36,7 +36,7 @@ bool Engine::init(int argc, char* argv[]) {
     }
 
     // Asteroid Belt
-    unsigned int amount = 10000;
+    unsigned int amount = 100;
     m_modelMatrices = new glm::mat4[amount];
     srand(static_cast<unsigned int>(glfwGetTime()));
     float radius = 50.0f;
@@ -488,7 +488,7 @@ void Engine::render() {
 
     m_planetModel->draw(m_objShader);
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 100; i++) {
         // m_objShader.setMat4("model", glm::translate(m_modelMatrices[i],
         // glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
         // (float)sin(glfwGetTime() * 5.f))));

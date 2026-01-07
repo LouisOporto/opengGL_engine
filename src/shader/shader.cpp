@@ -1,6 +1,7 @@
 #include "shader.hpp"
 
-bool Shader::initShader(const char* vertexFile, const char* fragmentFile, const char* geometryFile) {
+bool Shader::initShader(const char* vertexFile, const char* fragmentFile,
+                        const char* geometryFile) {
     std::fstream vertFile;
     std::fstream fragFile;
     std::fstream geomFile;
