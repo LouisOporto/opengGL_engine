@@ -280,7 +280,7 @@ void AudioEngine::rewind(int playbackDist) {
 
 void AudioEngine::setTimelinePosition(float value) {
     std::string eventName = m_activeEvent;
-        if (checkInstance(eventName)) {
+    if (checkInstance(eventName)) {
         // Set time line in milliseconds (set for now to by seconds)
         // value = value * 1000; // one sec is 1000 ms
         Event event = getActiveEvent();
@@ -299,7 +299,8 @@ void AudioEngine::readTimelinePosition() {
         int value = 0;
         if (FMOD_Studio_EventInstance_GetTimelinePosition(
                 m_eventInstances[eventName].instance, &value) != FMOD_OK) {
-            Logger::Error("Error reading: %s", m_eventInstances[eventName].name.c_str());
+            Logger::Error("Error reading: %s",
+                          m_eventInstances[eventName].name.c_str());
         }
         Logger::Log("TimelinePosition: %2d:%2d", value / 60000,
                     value / 1000 % 60);
