@@ -35,17 +35,20 @@ bool Engine::init(int argc, char* argv[]) {
         return false;
     }
 
+    // Asteroid Belt
     unsigned int amount = 10000;
     m_modelMatrices = new glm::mat4[amount];
     srand(static_cast<unsigned int>(glfwGetTime()));
     float radius = 50.0f;
     float offset = 2.5f;
     for (int i = 0; i < amount; i++) {
-        glm::mat4 model =  glm::mat4(1.0f);
+        glm::mat4 model = glm::mat4(1.0f);
         float angle = (float)i / (float)amount * 360.f;
-        float displacement = (rand() % (int)(2 * offset * 100)) / 100.f - offset;
+        float displacement =
+            (rand() % (int)(2 * offset * 100)) / 100.f - offset;
         float x = sin(angle) * radius + displacement;
-        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f; - offset;
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f;
+        -offset;
         float y = displacement * 0.4f;
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0 - offset;
         float z = cos(angle) * radius + displacement;
@@ -78,22 +81,18 @@ bool Engine::init(int argc, char* argv[]) {
     // m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
     // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
     // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
-    m_objModel = new Model(
-        "RESOURCES/images/bunny/bunnygirl.obj");
+    m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
 
-    m_planetModel = new Model(
-        "RESOURCES/images/planet/planet.obj");
+    m_planetModel = new Model("RESOURCES/images/planet/planet.obj");
 
-    m_rockModel = new Model(
-        "RESOURCES/images/rock/rock.obj");
-        
+    m_rockModel = new Model("RESOURCES/images/rock/rock.obj");
 
     // Textures setup
     std::vector<std::string> faces{
         "right.jpg",  "left.jpg",  "top.jpg",
         "bottom.jpg", "front.jpg", "back.jpg",
     };
-    
+
     std::vector<std::string> cubemap{
         "cubemap.png",
     };
@@ -164,7 +163,6 @@ bool Engine::init(int argc, char* argv[]) {
     // "RESOURCES/audio/Dispatch"); Radio by Bershy is Ep106Music index 12
     // AudioEngine::getInstance()->playByIndex("Ep106Music", "Radio", 12);
 
-
     return m_running = true;
 }
 
@@ -180,8 +178,10 @@ bool Engine::initOpenGLVariables() {
     int size = sizeof(VERTICESPOS) + sizeof(VERTICESNORM) + sizeof(VERTICESTEX);
     glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VERTICESPOS), &VERTICESPOS);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS), sizeof(VERTICESNORM), &VERTICESNORM);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS) + sizeof(VERTICESNORM), sizeof(VERTICESTEX), &VERTICESTEX);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS), sizeof(VERTICESNORM),
+                    &VERTICESNORM);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS) + sizeof(VERTICESNORM),
+                    sizeof(VERTICESTEX), &VERTICESTEX);
 
     // Object VAO
     {
@@ -198,7 +198,8 @@ bool Engine::initOpenGLVariables() {
     // Light VAO (Phyiscal light objects)
     {
         glBindVertexArray(m_lightVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
+                              (void*)0);
         glEnableVertexAttribArray(0);
     }
 
@@ -213,8 +214,9 @@ bool Engine::initOpenGLVariables() {
                               (void*)(sizeof(VERTICESPOS)));
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2,
-                              (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
+        glVertexAttribPointer(
+            2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2,
+            (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
         glEnableVertexAttribArray(2);
     }
 
@@ -285,7 +287,7 @@ bool Engine::initOpenGLVariables() {
 bool Engine::setupShaders() {
     if (!m_objShader.initShader("RESOURCES/shaders/newObject.vert",
                                 "RESOURCES/shaders/newObject.frag")) {
-                                // "RESOURCES/shaders/newObject.geom")) {
+        // "RESOURCES/shaders/newObject.geom")) {
         return false;
     }
     bindUniformBlock(m_objShader, "Matrices", 0);
@@ -329,7 +331,8 @@ bool Engine::setupShaders() {
     {
         glGenBuffers(1, &m_UBO);
         glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
-        glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW); // Size of two mat4 objects
+        glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL,
+                     GL_STATIC_DRAW);  // Size of two mat4 objects
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
@@ -338,8 +341,10 @@ bool Engine::setupShaders() {
     return true;
 }
 
-void Engine::bindUniformBlock(Shader shader, const char* blockName, unsigned int bindingPoint) {
-    unsigned int blockIndex = glGetUniformBlockIndex(shader.getProgram(), blockName);
+void Engine::bindUniformBlock(Shader shader, const char* blockName,
+                              unsigned int bindingPoint) {
+    unsigned int blockIndex =
+        glGetUniformBlockIndex(shader.getProgram(), blockName);
     glUniformBlockBinding(shader.getProgram(), blockIndex, bindingPoint);
 }
 
@@ -374,8 +379,10 @@ void Engine::update() {
 
     // Uniform Buffer Values
     glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &m_projection[0][0]);
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &m_view[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+                    &m_projection[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4),
+                    &m_view[0][0]);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
@@ -464,15 +471,16 @@ void Engine::render() {
 
     m_cubeShader.setMat4("model", m_model);
     // m_cubeShader.setMat4("inverseModel", inverseModel);
-    
+
     m_objModel->draw(m_cubeShader);
-    
+
     // Planet Model
     m_objShader.use();
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, -50.0f));
-    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5),
+                          glm::vec3(0.0f, 1.0f, 0.0f));
     // inverseModel = glm::inverse(m_model);
 
     m_objShader.setMat4("model", m_model);
@@ -481,7 +489,9 @@ void Engine::render() {
     m_planetModel->draw(m_objShader);
 
     for (int i = 0; i < 10000; i++) {
-        // m_objShader.setMat4("model", glm::translate(m_modelMatrices[i], glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f, (float)sin(glfwGetTime() * 5.f))));
+        // m_objShader.setMat4("model", glm::translate(m_modelMatrices[i],
+        // glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
+        // (float)sin(glfwGetTime() * 5.f))));
         m_objShader.setMat4("model", m_modelMatrices[i]);
         m_rockModel->draw(m_objShader);
     }
@@ -493,31 +503,32 @@ void Engine::render() {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
         m_model = glm::rotate(m_model, glm::radians(iter * 15.f),
-        glm::vec3(0.1f, 0.5f, 0.4f));
+                              glm::vec3(0.1f, 0.5f, 0.4f));
         glm::mat4 inverseModel = glm::inverse(m_model);
-        
+
         // m_cubeShader.setMat4("model", m_model);
         // m_cubeShader.setMat4("inverseModel", inverseModel);
         // Update this to for multiple instances
         // m_primShader.setMat4("model", m_model);
         // m_primShader.setMat4("inverseModel", inverseModel);
         m_primShader.setMat4("models[" + std::to_string(iter) + ']', m_model);
-        m_primShader.setMat4("inverseModels[" + std::to_string(iter) + ']', inverseModel);
+        m_primShader.setMat4("inverseModels[" + std::to_string(iter) + ']',
+                             inverseModel);
     }
-        
-        glBindVertexArray(m_objectVAO);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-        // glDrawArrays(GL_POINTS, 0, 36);
-        glDrawArraysInstanced(GL_POINTS, 0, 36, OBJECTPOSITIONS.size());
+
+    glBindVertexArray(m_objectVAO);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
+    // glDrawArrays(GL_POINTS, 0, 36);
+    glDrawArraysInstanced(GL_POINTS, 0, 36, OBJECTPOSITIONS.size());
     // }
-    
+
     // Light
     m_lightShader.use();
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
-        
+
         m_lightShader.setMat4("model", m_model);
         // m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f :
         // 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
@@ -596,7 +607,6 @@ void Engine::handleKeyInput(float deltaTime) {
 // Callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
-    
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) return;
     if (key == GLFW_KEY_C && action == GLFW_PRESS && mods == GLFW_MOD_CONTROL) {
         Engine::getInstance()->copyFunction();
@@ -737,8 +747,10 @@ void Engine::showMusicPlayer() {
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_DragDropTarget, ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive,
+                          ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_DragDropTarget,
+                          ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
     if (ImGui::Begin("Music Player")) {
         ImGui::Text("Active Bank: %s, Active Event: %s",
                     AudioEngine::getInstance()->getActiveBankName().c_str(),
