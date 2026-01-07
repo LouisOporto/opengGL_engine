@@ -293,7 +293,6 @@ class Engine {
    private:
     // OpenlGL
     bool initOpenGLVariables();
-    void bindUniformBlock(Shader shader, const char* blockName, unsigned int bindingPoint);
     bool setupShaders();
     void handleKeyInput(float deltaTime);
     inline void quit() { m_running = false; }

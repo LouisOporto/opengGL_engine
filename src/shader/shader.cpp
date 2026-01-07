@@ -161,3 +161,8 @@ void Shader::setDirLight(const std::string name, glm::vec3 direction,
 }
 
 void Shader::use() { glUseProgram(ID); }
+
+void Shader::bindUniformBlock(const char* blockName, unsigned int bindingPoint) {
+    unsigned int blockIndex = glGetUniformBlockIndex(ID, blockName);
+    glUniformBlockBinding(ID, blockIndex, bindingPoint);
+}

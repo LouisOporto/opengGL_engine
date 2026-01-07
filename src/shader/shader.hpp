@@ -23,6 +23,7 @@ class Shader {
 
     void use();
     unsigned int getProgram() { return ID; }
+    void bindUniformBlock(const char* blockName, unsigned int bindingPoint);
 
     void setInt(const std::string name, int value) const;
     void setBool(const std::string name, bool value) const;

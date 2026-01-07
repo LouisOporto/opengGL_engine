@@ -290,13 +290,13 @@ bool Engine::setupShaders() {
         // "RESOURCES/shaders/newObject.geom")) {
         return false;
     }
-    bindUniformBlock(m_objShader, "Matrices", 0);
+    m_objShader.bindUniformBlock("Matrices", 0);
 
     if (!m_lightShader.initShader("RESOURCES/shaders/light.vert",
                                   "RESOURCES/shaders/light.frag")) {
         return false;
     }
-    bindUniformBlock(m_lightShader, "Matrices", 0);
+    m_lightShader.bindUniformBlock("Matrices", 0);
 
     if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert",
                                    "RESOURCES/shaders/screen.frag")) {
@@ -312,14 +312,14 @@ bool Engine::setupShaders() {
                                  "RESOURCES/shaders/cube.frag")) {
         return false;
     }
-    bindUniformBlock(m_cubeShader, "Matrices", 0);
+    m_cubeShader.bindUniformBlock("Matrices", 0);
 
-    if (!m_primShader.initShader("RESOURCES/shaders/prim.vert",
-                                 "RESOURCES/shaders/prim.frag",
-                                 "RESOURCES/shaders/prim.geom")) {
-        return false;
-    }
-    bindUniformBlock(m_primShader, "Matrices", 0);
+    // if (!m_primShader.initShader("RESOURCES/shaders/prim.vert",
+    //                              "RESOURCES/shaders/prim.frag",
+    //                              "RESOURCES/shaders/prim.geom")) {
+    //     return false;
+    // }
+    // m_primShader.bindUniformBlock("Matrices", 0);
 
     if (!m_normalShader.initShader("RESOURCES/shaders/normalDisplay.vert",
                                    "RESOURCES/shaders/normalDisplay.frag",
@@ -339,13 +339,6 @@ bool Engine::setupShaders() {
     // glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_UBO);
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_UBO, 0, 2 * sizeof(glm::mat4));
     return true;
-}
-
-void Engine::bindUniformBlock(Shader shader, const char* blockName,
-                              unsigned int bindingPoint) {
-    unsigned int blockIndex =
-        glGetUniformBlockIndex(shader.getProgram(), blockName);
-    glUniformBlockBinding(shader.getProgram(), blockIndex, bindingPoint);
 }
 
 void Engine::event() {
@@ -488,6 +481,7 @@ void Engine::render() {
 
     m_planetModel->draw(m_objShader);
 
+    // Asteroid Belt
     for (int i = 0; i < 100; i++) {
         // m_objShader.setMat4("model", glm::translate(m_modelMatrices[i],
         // glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
@@ -496,25 +490,25 @@ void Engine::render() {
         m_rockModel->draw(m_objShader);
     }
 
-    // Primitive cubes
-    m_primShader.use();
-    for (int iter = 0; iter < OBJECTPOSITIONS.size(); iter++) {
-        // Logger::Log("Rendering cube: #%d", iter);
-        m_model = glm::mat4(1.0f);
-        m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
-        m_model = glm::rotate(m_model, glm::radians(iter * 15.f),
-                              glm::vec3(0.1f, 0.5f, 0.4f));
-        glm::mat4 inverseModel = glm::inverse(m_model);
+    // Primitive cubes // TURNED OFF
+    // m_primShader.use();
+    // for (int iter = 0; iter < OBJECTPOSITIONS.size(); iter++) {
+    //     // Logger::Log("Rendering cube: #%d", iter);
+    //     m_model = glm::mat4(1.0f);
+    //     m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
+    //     m_model = glm::rotate(m_model, glm::radians(iter * 15.f),
+    //                           glm::vec3(0.1f, 0.5f, 0.4f));
+    //     glm::mat4 inverseModel = glm::inverse(m_model);
 
-        // m_cubeShader.setMat4("model", m_model);
-        // m_cubeShader.setMat4("inverseModel", inverseModel);
-        // Update this to for multiple instances
-        // m_primShader.setMat4("model", m_model);
-        // m_primShader.setMat4("inverseModel", inverseModel);
-        m_primShader.setMat4("models[" + std::to_string(iter) + ']', m_model);
-        m_primShader.setMat4("inverseModels[" + std::to_string(iter) + ']',
-                             inverseModel);
-    }
+    //     // m_cubeShader.setMat4("model", m_model);
+    //     // m_cubeShader.setMat4("inverseModel", inverseModel);
+    //     // Update this to for multiple instances
+    //     // m_primShader.setMat4("model", m_model);
+    //     // m_primShader.setMat4("inverseModel", inverseModel);
+    //     m_primShader.setMat4("models[" + std::to_string(iter) + ']', m_model);
+    //     m_primShader.setMat4("inverseModels[" + std::to_string(iter) + ']',
+    //                          inverseModel);
+    // }
 
     glBindVertexArray(m_objectVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
