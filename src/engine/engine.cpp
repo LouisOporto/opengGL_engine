@@ -76,6 +76,7 @@ bool Engine::init(int argc, char* argv[]) {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
+    glEnable(GL_MULTISAMPLE);
 
     // stbi_set_flip_vertically_on_load(true);
     // m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
