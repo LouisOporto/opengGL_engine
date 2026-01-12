@@ -449,9 +449,9 @@ void Engine::render() {
 
     m_objModel->draw(m_objShader);
 
-    m_normalShader.use();
-    m_normalShader.setMat4("model", m_model);
-    m_objModel->draw(m_normalShader);
+    // m_normalShader.use();
+    // m_normalShader.setMat4("model", m_model);
+    // m_objModel->draw(m_normalShader);
 
     // Reflecting model
     m_cubeShader.use();
