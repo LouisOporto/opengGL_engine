@@ -286,8 +286,8 @@ bool Engine::initOpenGLVariables() {
 }
 
 bool Engine::setupShaders() {
-    if (!m_objShader.initShader("RESOURCES/shaders/newObject.vert",
-                                "RESOURCES/shaders/newObject.frag")) {
+    if (!m_objShader.initShader("RESOURCES/shaders/object.vert",
+                                "RESOURCES/shaders/object.frag")) {
         // "RESOURCES/shaders/newObject.geom")) {
         return false;
     }
