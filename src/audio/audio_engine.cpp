@@ -8,8 +8,7 @@ bool AudioEngine::init() {
         return false;
     }
 
-    if (FMOD_Studio_System_Initialize(m_system, 512, FMOD_STUDIO_INIT_NORMAL,
-                                      FMOD_INIT_NORMAL, 0) != FMOD_OK) {
+    if (FMOD_Studio_System_Initialize(m_system, 512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0) != FMOD_OK) {
         Logger::Error("FMOD::ERROR::Intialize");
         return false;
     }
@@ -27,11 +26,8 @@ void AudioEngine::loadBank(std::string bankName, const std::string& directory) {
     std::string filename = bankName + ".bank";
     if (m_banks.count(bankName) == 0) {
         std::string path = directory + "/" + filename;
-        if (FMOD_Studio_System_LoadBankFile(m_system, path.c_str(),
-                                            FMOD_STUDIO_LOAD_BANK_NORMAL,
-                                            &m_banks[bankName]) != FMOD_OK) {
-            Logger::Error("Error loading bank from directory: %s",
-                          path.c_str());
+        if (FMOD_Studio_System_LoadBankFile(m_system, path.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &m_banks[bankName]) != FMOD_OK) {
+            Logger::Error("Error loading bank from directory: %s", path.c_str());
         }
         Logger::Log("Loading bank file: %s", filename.c_str());
     }
@@ -79,18 +75,15 @@ void AudioEngine::setActiveBank(std::string bankName) {
         Logger::Error("No bank with name: %s exists", bankName.c_str());
 }
 
-void AudioEngine::playByIndex(std::string name, unsigned int index,
-                              bool release) {
+void AudioEngine::playByIndex(std::string name, unsigned int index, bool release) {
     FMOD_STUDIO_BANK* bank = getActiveBank();
     if (checkInstance(name) && bank) {
-        Logger::Warn("Event instance with name: %s already exists",
-                     name.c_str());
+        Logger::Warn("Event instance with name: %s already exists", name.c_str());
         return;
     }
 
     // If we want index i. Get event list of i + 1
-    FMOD_STUDIO_EVENTDESCRIPTION** descript =
-        new FMOD_STUDIO_EVENTDESCRIPTION*[index + 1];
+    FMOD_STUDIO_EVENTDESCRIPTION** descript = new FMOD_STUDIO_EVENTDESCRIPTION*[index + 1];
     int numberLoaded = 0;
     int length = 0;
     Event event;
@@ -98,14 +91,12 @@ void AudioEngine::playByIndex(std::string name, unsigned int index,
     FMOD_Studio_Bank_GetEventList(bank, descript, index + 1, &numberLoaded);
     Logger::Warn("Number of events in given bank file: %d", numberLoaded);
 
-    if (FMOD_Studio_EventDescription_GetLength(descript[index], &length) !=
-        FMOD_OK) {
+    if (FMOD_Studio_EventDescription_GetLength(descript[index], &length) != FMOD_OK) {
         Logger::Error("Failed to retrieve length");
     }
 
     event = Event(name, length);
-    Logger::Warn("Total length of event: %d:%d", length / 60000,
-                 length / 1000 % 60);
+    Logger::Warn("Total length of event: %d:%d", length / 60000, length / 1000 % 60);
 
     if (FMOD_Studio_EventDescription_CreateInstance(
             descript[index], &event.instance) != FMOD_OK) {
@@ -126,15 +117,13 @@ void AudioEngine::playByIndex(std::string name, unsigned int index,
 
 void AudioEngine::playByPath(std::string name, std::string path, bool release) {
     if (checkInstance(name)) {
-        Logger::Warn("Event instance with name: %s already exists",
-                     name.c_str());
+        Logger::Warn("Event instance with name: %s already exists", name.c_str());
         return;
     }
     FMOD_STUDIO_EVENTDESCRIPTION* descript;
     Event event;
 
-    if (FMOD_Studio_System_GetEvent(m_system, path.c_str(), &descript) !=
-        FMOD_OK) {
+    if (FMOD_Studio_System_GetEvent(m_system, path.c_str(), &descript) != FMOD_OK) {
         Logger::Error("Failed to retrieve event named: %s", path.c_str());
     }
 
@@ -144,12 +133,10 @@ void AudioEngine::playByPath(std::string name, std::string path, bool release) {
     }
 
     event = Event(name, length);
-    Logger::Warn("Total length of event: %d:%d", length / 60000,
-                 length / 1000 % 60);
+    Logger::Warn("Total length of event: %d:%d", length / 60000, length / 1000 % 60);
 
     // FMOD_STUDIO_EVENTINSTANCE* instance;
-    if (FMOD_Studio_EventDescription_CreateInstance(
-            descript, &event.instance) != FMOD_OK) {
+    if (FMOD_Studio_EventDescription_CreateInstance(descript, &event.instance) != FMOD_OK) {
         Logger::Error("Failed to create instance");
     }
 
@@ -165,8 +152,7 @@ void AudioEngine::playByPath(std::string name, std::string path, bool release) {
 void AudioEngine::releaseInstance() {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
-        if (FMOD_Studio_EventInstance_Release(
-                m_eventInstances[eventName].instance) != FMOD_OK) {
+        if (FMOD_Studio_EventInstance_Release(m_eventInstances[eventName].instance) != FMOD_OK) {
             Logger::Error("Failed to release instance");
         }
         Logger::Log("Release instance");
@@ -177,8 +163,7 @@ void AudioEngine::releaseInstance() {
 void AudioEngine::pause() {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName) && !m_eventInstances[eventName].isPaused) {
-        if (FMOD_Studio_EventInstance_SetPaused(
-                m_eventInstances[eventName].instance, true)) {
+        if (FMOD_Studio_EventInstance_SetPaused(m_eventInstances[eventName].instance, true)) {
             Logger::Error("Failed to pause instance");
         }
 
@@ -189,8 +174,7 @@ void AudioEngine::pause() {
 void AudioEngine::resume() {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName) && m_eventInstances[eventName].isPaused) {
-        if (FMOD_Studio_EventInstance_SetPaused(
-                m_eventInstances[eventName].instance, false)) {
+        if (FMOD_Studio_EventInstance_SetPaused(m_eventInstances[eventName].instance, false)) {
             Logger::Error("Failed to resume instance");
         }
 
@@ -201,9 +185,7 @@ void AudioEngine::resume() {
 void AudioEngine::stop() {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
-        if (FMOD_Studio_EventInstance_Stop(m_eventInstances[eventName].instance,
-                                           FMOD_STUDIO_STOP_IMMEDIATE) !=
-            FMOD_OK) {
+        if (FMOD_Studio_EventInstance_Stop(m_eventInstances[eventName].instance, FMOD_STUDIO_STOP_IMMEDIATE) != FMOD_OK) {
             Logger::Error("Failed to stop event");
         }
         Logger::Log("Stopping instance");
@@ -219,8 +201,7 @@ void AudioEngine::update() {
 
     updateCurrentPosition();
 
-    for (auto iter = m_eventInstances.begin(); iter != m_eventInstances.end();
-         iter++) {
+    for (auto iter = m_eventInstances.begin(); iter != m_eventInstances.end(); iter++) {
         if (iter->second.isStop && iter->second.isReleased) {
             Logger::Warn("Removed event instance: %s", iter->first.c_str());
             if (iter->first == m_activeEvent) m_activeEvent = "";
@@ -247,8 +228,7 @@ void AudioEngine::setInstanceParemeter(std::string parameter, float value) {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
         if (FMOD_Studio_EventInstance_SetParameterByName(
-                m_eventInstances[eventName].instance, parameter.c_str(), value,
-                false) != FMOD_OK) {
+                m_eventInstances[eventName].instance, parameter.c_str(), value, false) != FMOD_OK) {
             Logger::Error("Failed to set parameter");
         }
     }
@@ -258,8 +238,7 @@ void AudioEngine::forward(int playbackDist) {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
         int newPos = m_eventInstances[eventName].currentPos + playbackDist;
-        if (FMOD_Studio_EventInstance_SetTimelinePosition(
-                m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
+        if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
             Logger::Error("Failed to forward player");
         }
     }
@@ -270,8 +249,7 @@ void AudioEngine::rewind(int playbackDist) {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
         int newPos = m_eventInstances[eventName].currentPos - playbackDist;
-        if (FMOD_Studio_EventInstance_SetTimelinePosition(
-                m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
+        if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
             Logger::Error("Failed to rewind player");
         }
         readTimelinePosition();
@@ -285,8 +263,7 @@ void AudioEngine::setTimelinePosition(float value) {
         // value = value * 1000; // one sec is 1000 ms
         Event event = getActiveEvent();
         int newPos = event.totalPos * value;
-        if (FMOD_Studio_EventInstance_SetTimelinePosition(
-                m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
+        if (FMOD_Studio_EventInstance_SetTimelinePosition(m_eventInstances[eventName].instance, newPos) != FMOD_OK) {
             Logger::Error("Failed to set FMOD value");
         }
         readTimelinePosition();
@@ -297,13 +274,10 @@ void AudioEngine::readTimelinePosition() {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
         int value = 0;
-        if (FMOD_Studio_EventInstance_GetTimelinePosition(
-                m_eventInstances[eventName].instance, &value) != FMOD_OK) {
-            Logger::Error("Error reading: %s",
-                          m_eventInstances[eventName].name.c_str());
+        if (FMOD_Studio_EventInstance_GetTimelinePosition(m_eventInstances[eventName].instance, &value) != FMOD_OK) {
+            Logger::Error("Error reading: %s", m_eventInstances[eventName].name.c_str());
         }
-        Logger::Log("TimelinePosition: %2d:%2d", value / 60000,
-                    value / 1000 % 60);
+        Logger::Log("TimelinePosition: %2d:%2d", value / 60000, value / 1000 % 60);
     }
 }
 
@@ -311,8 +285,7 @@ void AudioEngine::updateCurrentPosition() {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
         int value = 0;
-        if (FMOD_Studio_EventInstance_GetTimelinePosition(
-                m_eventInstances[eventName].instance, &value) != FMOD_OK) {
+        if (FMOD_Studio_EventInstance_GetTimelinePosition(m_eventInstances[eventName].instance, &value) != FMOD_OK) {
             Logger::Error("Error reading update");
         }
 
@@ -323,9 +296,7 @@ void AudioEngine::updateCurrentPosition() {
 void AudioEngine::setSoundVolume(int volume) {
     std::string eventName = m_activeEvent;
     if (checkInstance(eventName)) {
-        if (FMOD_Studio_EventInstance_SetVolume(
-                m_eventInstances[eventName].instance, volume / 100.f) !=
-            FMOD_OK) {
+        if (FMOD_Studio_EventInstance_SetVolume(m_eventInstances[eventName].instance, volume / 100.f) != FMOD_OK) {
             Logger::Error("Error setting volume");
         }
         Logger::Log("Setting volume");
