@@ -315,13 +315,6 @@ bool Engine::setupShaders() {
     }
     m_cubeShader.bindUniformBlock("Matrices", 0);
 
-    // if (!m_primShader.initShader("RESOURCES/shaders/prim.vert",
-    //                              "RESOURCES/shaders/prim.frag",
-    //                              "RESOURCES/shaders/prim.geom")) {
-    //     return false;
-    // }
-    // m_primShader.bindUniformBlock("Matrices", 0);
-
     if (!m_normalShader.initShader("RESOURCES/shaders/normalDisplay.vert",
                                    "RESOURCES/shaders/normalDisplay.frag",
                                    "RESOURCES/shaders/normalDisplay.geom")) {
@@ -332,13 +325,11 @@ bool Engine::setupShaders() {
     {
         glGenBuffers(1, &m_UBO);
         glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
-        glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL,
-                     GL_STATIC_DRAW);  // Size of two mat4 objects
+        glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_UBO, 0, 2 * sizeof(glm::mat4));
     }
-
-    // glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_UBO);
-    glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_UBO, 0, 2 * sizeof(glm::mat4));
+    
     return true;
 }
 
@@ -373,10 +364,8 @@ void Engine::update() {
 
     // Uniform Buffer Values
     glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-                    &m_projection[0][0]);
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4),
-                    &m_view[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &m_projection[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &m_view[0][0]);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
@@ -391,8 +380,7 @@ void Engine::update() {
     // m_objShader.setFloat("time", 179.9087f);
 
     // Model Lighting (Phong Lighting)
-    m_objShader.setDirLight("dirLight", directionVector, lightColor * AMB,
-                            lightColor * DIF, lightColor * SPE);
+    m_objShader.setDirLight("dirLight", directionVector, lightColor * AMB, lightColor * DIF, lightColor * SPE);
     m_objShader.setInt("numPointLights", LIGHTPOSITIONS.size());
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         glm::vec3 color = {iter == 0 ? 1.0f : 0.7f, iter == 1 ? 1.0f : 0.7f,
@@ -575,6 +563,7 @@ void Engine::clean() {
     glDeleteVertexArrays(1, &m_quadVAO);
     glDeleteBuffers(1, &m_VBO);
     glDeleteBuffers(1, &m_quadVBO);
+    glDeleteBuffers(1, &m_UBO);
     glDeleteRenderbuffers(1, &m_RBO);
     glDeleteFramebuffers(1, &m_FBO);
 
@@ -600,8 +589,7 @@ void Engine::handleKeyInput(float deltaTime) {
 }
 
 // Callback functions
-void key_callback(GLFWwindow* window, int key, int scancode, int action,
-                  int mods) {
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) return;
     if (key == GLFW_KEY_C && action == GLFW_PRESS && mods == GLFW_MOD_CONTROL) {
         Engine::getInstance()->copyFunction();
