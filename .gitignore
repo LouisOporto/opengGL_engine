@@ -9,8 +9,9 @@
 /.vscode
 /include
 /images
+/lib
 /assimp
-/resources/images
+/resources
 /imgui
 /FMOD
 **/Dispatch
