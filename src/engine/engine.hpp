@@ -280,9 +280,7 @@ class Engine {
     void toggleNormalMap() { m_NormalMapOn = !m_NormalMapOn; }
     void toggleMouse() {
         m_mouseVisible = !m_mouseVisible;
-        glfwSetInputMode(
-            m_window, GLFW_CURSOR,
-            m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(m_window, GLFW_CURSOR, m_mouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
     void toggleRotate() { m_screenRotate = !m_screenRotate; }
 
@@ -362,8 +360,7 @@ class Engine {
     int m_playIndex;
 };
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action,
-                  int mods);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void frame_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);

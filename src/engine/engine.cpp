@@ -44,11 +44,9 @@ bool Engine::init(int argc, char* argv[]) {
     for (int i = 0; i < amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
         float angle = (float)i / (float)amount * 360.f;
-        float displacement =
-            (rand() % (int)(2 * offset * 100)) / 100.f - offset;
+        float displacement = (rand() % (int)(2 * offset * 100)) / 100.f - offset;
         float x = sin(angle) * radius + displacement;
-        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f;
-        -offset;
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
         float y = displacement * 0.4f;
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0 - offset;
         float z = cos(angle) * radius + displacement;
@@ -118,11 +116,8 @@ bool Engine::init(int argc, char* argv[]) {
 
     // Camera setup
     m_camera = new Camera(m_SCR_W, m_SCR_H);
-    m_projection = glm::perspective(glm::radians(45.0f),
-                                    (float)m_SCR_W / m_SCR_H, 0.1f, 100.0f);
-    m_view =
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-                    glm::vec3(0.0f, 1.0f, 0.0f));
+    m_projection = glm::perspective(glm::radians(45.0f), (float)m_SCR_W / m_SCR_H, 0.1f, 100.0f);
+    m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     setFirstMouse(true);
     m_lightOn = false;
@@ -179,57 +174,46 @@ bool Engine::initOpenGLVariables() {
     int size = sizeof(VERTICESPOS) + sizeof(VERTICESNORM) + sizeof(VERTICESTEX);
     glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VERTICESPOS), &VERTICESPOS);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS), sizeof(VERTICESNORM),
-                    &VERTICESNORM);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS) + sizeof(VERTICESNORM),
-                    sizeof(VERTICESTEX), &VERTICESTEX);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS), sizeof(VERTICESNORM), &VERTICESNORM);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS) + sizeof(VERTICESNORM), sizeof(VERTICESTEX), &VERTICESTEX);
 
     // Object VAO
     {
         glBindVertexArray(m_objectVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
-                              (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
-                              (void*)(sizeof(VERTICESPOS)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(VERTICESPOS)));
         glEnableVertexAttribArray(1);
     }
 
     // Light VAO (Phyiscal light objects)
     {
         glBindVertexArray(m_lightVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
-                              (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
         glEnableVertexAttribArray(0);
     }
 
     // Vegtation VAO
     {
         glBindVertexArray(m_vegetationVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
-                              (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
-                              (void*)(sizeof(VERTICESPOS)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(VERTICESPOS)));
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(
-            2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2,
-            (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
         glEnableVertexAttribArray(2);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(SKYBOXVERTICES), SKYBOXVERTICES,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(SKYBOXVERTICES), SKYBOXVERTICES, GL_STATIC_DRAW);
 
     // Skybox VAO
     {
         glBindVertexArray(m_skyboxVAO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
-                              (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);
     }
@@ -240,15 +224,12 @@ bool Engine::initOpenGLVariables() {
         glGenBuffers(1, &m_quadVBO);
         glBindVertexArray(m_quadVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(QUADVERTICES), &QUADVERTICES,
-                     GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(QUADVERTICES), &QUADVERTICES, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4,
-                              (void*)0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4,
-                              (void*)(sizeof(float) * 2));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
         glEnableVertexAttribArray(1);
     }
 
@@ -256,26 +237,21 @@ bool Engine::initOpenGLVariables() {
     {
         glGenTextures(1, &m_textureColorBuffer);
         glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_SCR_W, m_SCR_H, 0, GL_RGB,
-                     GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_SCR_W, m_SCR_H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glGenFramebuffers(1, &m_FBO);
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                               GL_TEXTURE_2D, m_textureColorBuffer, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureColorBuffer, 0);
 
         glGenRenderbuffers(1, &m_RBO);
         glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_SCR_W,
-                              m_SCR_H);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_SCR_W, m_SCR_H);
 
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                                  GL_RENDERBUFFER, m_RBO);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
-            GL_FRAMEBUFFER_COMPLETE) {
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             Logger::Error("Framebuffer is not complete, cannot proceed!");
             return false;
         }
@@ -286,38 +262,31 @@ bool Engine::initOpenGLVariables() {
 }
 
 bool Engine::setupShaders() {
-    if (!m_objShader.initShader("RESOURCES/shaders/object.vert",
-                                "RESOURCES/shaders/object.frag")) {
+    if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
         // "RESOURCES/shaders/newObject.geom")) {
         return false;
     }
     m_objShader.bindUniformBlock("Matrices", 0);
 
-    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert",
-                                  "RESOURCES/shaders/light.frag")) {
+    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
         return false;
     }
     m_lightShader.bindUniformBlock("Matrices", 0);
 
-    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert",
-                                   "RESOURCES/shaders/screen.frag")) {
+    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
         return false;
     }
 
-    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert",
-                                   "RESOURCES/shaders/skybox.frag")) {
+    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
         return false;
     }
 
-    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert",
-                                 "RESOURCES/shaders/cube.frag")) {
+    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) {
         return false;
     }
     m_cubeShader.bindUniformBlock("Matrices", 0);
 
-    if (!m_normalShader.initShader("RESOURCES/shaders/normalDisplay.vert",
-                                   "RESOURCES/shaders/normalDisplay.frag",
-                                   "RESOURCES/shaders/normalDisplay.geom")) {
+    if (!m_normalShader.initShader("RESOURCES/shaders/normalDisplay.vert", "RESOURCES/shaders/normalDisplay.frag", "RESOURCES/shaders/normalDisplay.geom")) {
         return false;
     }
 
@@ -329,7 +298,7 @@ bool Engine::setupShaders() {
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
         glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_UBO, 0, 2 * sizeof(glm::mat4));
     }
-    
+
     return true;
 }
 
@@ -428,8 +397,7 @@ void Engine::render() {
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
-    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15),
-                          glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
     // glm::mat4 inverseModel = glm::inverse(m_model);
 
     m_objShader.setMat4("model", m_model);
@@ -447,8 +415,7 @@ void Engine::render() {
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
-    m_model =
-        glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     // inverseModel = glm::inverse(m_model);
 
     m_cubeShader.setMat4("model", m_model);
@@ -461,8 +428,7 @@ void Engine::render() {
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, -50.0f));
-    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5),
-                          glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
     // inverseModel = glm::inverse(m_model);
 
     m_objShader.setMat4("model", m_model);
@@ -730,37 +696,24 @@ void Engine::showMusicPlayer() {
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive,
-                          ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_DragDropTarget,
-                          ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_DragDropTarget, ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
     if (ImGui::Begin("Music Player")) {
-        ImGui::Text("Active Bank: %s, Active Event: %s",
-                    AudioEngine::getInstance()->getActiveBankName().c_str(),
-                    AudioEngine::getInstance()->getActiveEventName().c_str());
-        if (AudioEngine::getInstance()->checkInstance(
-                AudioEngine::getInstance()->getActiveEventName())) {
+        ImGui::Text("Active Bank: %s, Active Event: %s", AudioEngine::getInstance()->getActiveBankName().c_str(), AudioEngine::getInstance()->getActiveEventName().c_str());
+        if (AudioEngine::getInstance()->checkInstance(AudioEngine::getInstance()->getActiveEventName())) {
             Event event = AudioEngine::getInstance()->getActiveEvent();
             float windowWidth = ImGui::GetWindowSize().x;
             ImGui::Text("Current Song: %s", event.name.c_str());
 
-            ImGui::PushStyleColor(ImGuiCol_PlotHistogram,
-                                  ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_FrameBg,
-                                  ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
-            ImGui::ProgressBar(event.currentPos / (float)event.totalPos,
-                               ImVec2(-1.0f, 0.0f),
-                               event.isPaused ? "Paused..." : "Playing...");
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+            ImGui::ProgressBar(event.currentPos / (float)event.totalPos, ImVec2(-1.0f, 0.0f), event.isPaused ? "Paused..." : "Playing...");
             ImGui::PopStyleColor(2);
 
-            float playtimeWidth =
-                ImGui::CalcTextSize("Current: 00:00 Total: 00:00").x +
-                ImGui::GetStyle().ItemSpacing.x;
+            float playtimeWidth = ImGui::CalcTextSize("Current: 00:00 Total: 00:00").x + ImGui::GetStyle().ItemSpacing.x;
             float startX = (windowWidth - playtimeWidth) * 0.5f;
             ImGui::SetCursorPosX(startX);
-            ImGui::Text("Current: %02d:%02d Total: %02d:%02d",
-                        event.currentPos / 60000, event.currentPos / 1000 % 60,
-                        event.totalPos / 60000, event.totalPos / 1000 % 60);
+            ImGui::Text("Current: %02d:%02d Total: %02d:%02d", event.currentPos / 60000, event.currentPos / 1000 % 60, event.totalPos / 60000, event.totalPos / 1000 % 60);
 
             // Center Button Layout
             float totalButtonsWidth =
@@ -792,56 +745,34 @@ void Engine::showMusicPlayer() {
             if (ImGui::DragInt("Volume", &m_volume, (0.5F), 0, 100, "%d%"))
                 AudioEngine::getInstance()->setSoundVolume(m_volume);
         } else {
-            ImGui::Text(
-                "Current song:\nCurrent point in the song\nOptions to rewind, "
-                "play, pause, stop, forward\n");
+            ImGui::Text("Current song:\nCurrent point in the song\nOptions to rewind, play, pause, stop, forward\n");
         }
         if (ImGui::TreeNode("Audio Engine Functions")) {
             ImGui::SeparatorText("Load & Unload Bank");
-            ImGui::InputText("File Name", m_loadingBuffer,
-                             sizeof(m_loadingBuffer));
+            ImGui::InputText("File Name", m_loadingBuffer, sizeof(m_loadingBuffer));
 
             ImGui::Separator();
-            if (ImGui::Button("Set Active Bank"))
-                AudioEngine::getInstance()->setActiveBank(
-                    std::string(m_loadingBuffer));
+            if (ImGui::Button("Set Active Bank")) AudioEngine::getInstance()->setActiveBank(std::string(m_loadingBuffer));
             ImGui::SameLine();
-            if (ImGui::Button("Load"))
-                AudioEngine::getInstance()->loadBank(
-                    std::string(m_loadingBuffer), "./resources/audio");
+            if (ImGui::Button("Load")) AudioEngine::getInstance()->loadBank(std::string(m_loadingBuffer), "./resources/audio");
             ImGui::SameLine();
-            if (ImGui::Button("Unload"))
-                AudioEngine::getInstance()->dropBank(
-                    std::string(m_loadingBuffer));
+            if (ImGui::Button("Unload")) AudioEngine::getInstance()->dropBank(std::string(m_loadingBuffer));
 
             ImGui::SeparatorText("Play Events");
-            ImGui::InputText("Event Name", m_eventBuffer,
-                             sizeof(m_eventBuffer));
-            if (ImGui::Button("Set Active Event")) {
-                AudioEngine::getInstance()->setActiveEvent(m_eventBuffer);
-            }
+            ImGui::InputText("Event Name", m_eventBuffer, sizeof(m_eventBuffer));
+            if (ImGui::Button("Set Active Event")) AudioEngine::getInstance()->setActiveEvent(m_eventBuffer);
             ImGui::SameLine();
-            if (ImGui::Button("Remove Event")) {
-                AudioEngine::getInstance()->stop();
-            }
+            if (ImGui::Button("Remove Event")) AudioEngine::getInstance()->stop();
             ImGui::SameLine();
-            if (ImGui::Button("Release Event")) {
-                AudioEngine::getInstance()->releaseInstance();
-            }
+            if (ImGui::Button("Release Event")) AudioEngine::getInstance()->releaseInstance();
 
             ImGui::SeparatorText("ByPath");
             ImGui::InputText("Path", m_pathBuffer, sizeof(m_pathBuffer));
-            if (ImGui::Button("Play Path")) {
-                AudioEngine::getInstance()->playByPath(m_eventBuffer,
-                                                       m_pathBuffer);
-            }
+            if (ImGui::Button("Play Path")) AudioEngine::getInstance()->playByPath(m_eventBuffer, m_pathBuffer);
 
             ImGui::SeparatorText("ByIndex");
             ImGui::InputInt("Index", &m_playIndex, 0);
-            if (ImGui::Button("Play Index")) {
-                AudioEngine::getInstance()->playByIndex(m_eventBuffer,
-                                                        m_playIndex);
-            }
+            if (ImGui::Button("Play Index")) AudioEngine::getInstance()->playByIndex(m_eventBuffer, m_playIndex);
 
             ImGui::TreePop();
         }
@@ -855,17 +786,14 @@ void Engine::showFramerateStatistics() {
     if (ImGui::CollapsingHeader("Rendering Statistics")) {
         if (ImGui::TreeNode("Input")) {
             if (ImGui::IsMousePosValid()) {
-                ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x,
-                            io.MousePos.y);
+                ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
             } else {
                 ImGui::Text("Mouse pos: <INVALID>");
             }
-            ImGui::Text("Mouse delta: (%g, %g)", io.MouseDelta.x,
-                        io.MouseDelta.y);
+            ImGui::Text("Mouse delta: (%g, %g)", io.MouseDelta.x, io.MouseDelta.y);
 
             ImGui::TreePop();
         }
-        ImGui::Text("Average m/s: %f, Framerate: %.1f FPS",
-                    1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Average m/s: %f, Framerate: %.1f FPS", 1000.0f / io.Framerate, io.Framerate);
     }
 }

@@ -12,9 +12,7 @@
 const float SONGADVANCE = 10000;  // 10s in ms
 
 struct Event {
-    Event(std::string songName = "", int total = 0, int current = 0,
-          int volume = 0, bool paused = false, bool stop = false,
-          bool released = false) {
+    Event(std::string songName = "", int total = 0, int current = 0, int volume = 0, bool paused = false, bool stop = false, bool released = false) {
         name = songName;
         totalPos = total;
         currentPos = current;
@@ -38,8 +36,7 @@ struct Event {
 class AudioEngine {
    public:
     static AudioEngine* getInstance() {
-        return m_instance =
-                   m_instance != nullptr ? m_instance : new AudioEngine();
+        return m_instance = m_instance != nullptr ? m_instance : new AudioEngine();
     }
     bool init();
 
@@ -82,11 +79,9 @@ class AudioEngine {
     FMOD_STUDIO_SYSTEM* m_system = nullptr;
     FMOD_STUDIO_BANK* getActiveBank();
     std::map<std::string, FMOD_STUDIO_BANK*> m_banks;
-    std::map<std::string, Event>
-        m_eventInstances;  // Maybe inefficient if we need to remember all strin
-                           // names. // Standard "effect1, effect2, background1,
-                           // background2"
-
+    std::map<std::string, Event> m_eventInstances;  // Maybe inefficient if we need to remember all strin
+                                                    // names. // Standard "effect1, effect2, background1,
+                                                    // background2"
     std::string m_activeBank;
     std::string m_activeEvent;
     // An idea would be to have an actively selected bank, actively selected

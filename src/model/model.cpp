@@ -8,11 +8,7 @@ void Model::draw(Shader &shader) {
 
 void Model::loadModel(std::string path) {
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(path, 
-                                           aiProcess_Triangulate | 
-                                           aiProcess_FlipUVs |
-                                           aiProcess_GenSmoothNormals | 
-                                           aiProcess_CalcTangentSpace);
+    const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         Logger::Error("ERROR::ASSIMP::%s", import.GetErrorString());
@@ -101,11 +97,8 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");  // From abledo
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Texture> specularMaps =
-            loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");  // From Metallic
-        textures.insert(textures.end(), 
-                        specularMaps.begin(),
-                        specularMaps.end());
+        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");  // From Metallic
+        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
         std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
@@ -139,9 +132,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     return Mesh(vertices, indices, textures, materialColor);
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
-                                                 aiTextureType type,
-                                                 std::string typeName) {
+std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
     std::vector<Texture> textures;
     int count = mat->GetTextureCount(type);
 
@@ -163,8 +154,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
             Texture texture;
             // Logger::Log("Loading image file: %s", str.C_Str());
 
-            texture.id =
-                ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
+            texture.id = ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
             // printf("texture.id = %d, Typename: %s\n", texture.id,
             // typeName.c_str());
             texture.type = typeName;
