@@ -83,9 +83,8 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile,
     ID = glCreateProgram();
     glAttachShader(ID, vertex);
     glAttachShader(ID, fragment);
-    if (geometryFile != nullptr) {
-        glAttachShader(ID, geometry);
-    }
+    if (geometryFile != nullptr) glAttachShader(ID, geometry);
+
     glLinkProgram(ID);
     glGetProgramiv(ID, GL_LINK_STATUS, &status);
     if (!status) {
@@ -96,6 +95,7 @@ bool Shader::initShader(const char* vertexFile, const char* fragmentFile,
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+    glDeleteShader(geometry);
 
     return true;
 }
