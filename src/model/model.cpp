@@ -8,12 +8,13 @@ void Model::draw(Shader &shader) {
 
 void Model::loadModel(std::string path) {
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(
-        path, aiProcess_Triangulate | aiProcess_FlipUVs |
-                  aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+    const aiScene *scene = import.ReadFile(path, 
+                                           aiProcess_Triangulate | 
+                                           aiProcess_FlipUVs |
+                                           aiProcess_GenSmoothNormals | 
+                                           aiProcess_CalcTangentSpace);
 
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
-        !scene->mRootNode) {
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         Logger::Error("ERROR::ASSIMP::%s", import.GetErrorString());
         return;
     }
@@ -97,23 +98,19 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         // Logger::Log("After material retrieval");
         bool noMaterials = true;
 
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(
-            material, aiTextureType_DIFFUSE, "texture_diffuse");  // From abledo
+        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");  // From abledo
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
         std::vector<Texture> specularMaps =
-            loadMaterialTextures(material, aiTextureType_SPECULAR,
-                                 "texture_specular");  // From Metallic
-        textures.insert(textures.end(), specularMaps.begin(),
+            loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");  // From Metallic
+        textures.insert(textures.end(), 
+                        specularMaps.begin(),
                         specularMaps.end());
 
-        std::vector<Texture> normalMaps = loadMaterialTextures(
-            material, aiTextureType_HEIGHT, "texture_normal");
+        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-        std::vector<Texture> heightMaps = loadMaterialTextures(
-            material, aiTextureType_NORMALS,
-            "texture_height");  // Should be the roughness map
+        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_height");  // Should be the roughness map
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         aiColor3D ambient, diffuse, specular;
@@ -156,8 +153,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
         mat->GetTexture(type, i, &str);
         bool skip = false;
         for (int j = 0; j < m_texturesLoaded.size(); j++) {
-            if (std::strcmp(m_texturesLoaded[j].path.data(), str.C_Str()) ==
-                0) {
+            if (std::strcmp(m_texturesLoaded[j].path.data(), str.C_Str()) == 0) {
                 textures.push_back(m_texturesLoaded[j]);
                 skip = true;
                 break;
