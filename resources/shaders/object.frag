@@ -99,6 +99,9 @@ void main() {
     }
 
     fragColor =  vec4(result, 1.0);
+    float gamma = 2.2;
+
+    fragColor.rgb = pow(fragColor.rgb, vec3(1.0/gamma));
 }
 
 // No ambience for now

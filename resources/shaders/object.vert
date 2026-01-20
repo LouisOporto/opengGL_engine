@@ -42,7 +42,7 @@ void main() {
     vs_out.TBN = mat3(T, B, N);
 
     if (materialVert.missingNormal) {
-        vs_out.Normal = mat3(transpose(model)) * aNormal;
+        vs_out.Normal = normalMatrix * aNormal;
     }
     else {
         vs_out.Normal = texture(materialVert.texture_normal1, aTexCoord).rgb;
