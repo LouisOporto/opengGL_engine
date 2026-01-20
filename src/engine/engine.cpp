@@ -50,7 +50,7 @@ bool Engine::init(int argc, char* argv[]) {
         float y = displacement * 0.4f;
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0 - offset;
         float z = cos(angle) * radius + displacement;
-        model = glm::translate(model, glm::vec3(x, y, z - 50.f));
+        model = glm::translate(model, glm::vec3(x, y + 30.f, z));
 
         float scale = static_cast<float>((rand() % 20) / 100.0 + 0.05);
         model = glm::scale(model, glm::vec3(scale));
@@ -93,7 +93,7 @@ bool Engine::init(int argc, char* argv[]) {
     };
 
     std::vector<std::string> cubemap{
-        "cubemap.png",
+        "Cubemap_Sky_25-512x512.png"
     };
 
     stbi_set_flip_vertically_on_load(false);
@@ -102,6 +102,8 @@ bool Engine::init(int argc, char* argv[]) {
 
     m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(
         cubemap, "RESOURCES/images/skybox");
+
+    m_floorTexture = ImageLoader::getInstance()->loadImage("box.png", "RESOURCES/images", 1);
 
     // Shader setup
     if (!setupShaders()) {
@@ -367,7 +369,7 @@ void Engine::update() {
                              spotlightColor * DIF, spotlightColor * SPE,
                              cos(glm::radians(12.5f)), cos(glm::radians(17.5f)),
                              CONSTANT, LINEAR, QUADRATIC);
-    m_objShader.setBool("NormalOn", m_NormalMapOn);
+    // m_objShader.setBool("NormalOn", m_NormalMapOn);
 
     // Skybox Shader
     m_skyboxShader.use();
@@ -390,6 +392,24 @@ void Engine::render() {
     glEnable(GL_DEPTH_TEST);
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Use cube VAO to draw the floor plane will use specific texture for plane
+    m_objShader.use();
+
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.f, 0.0f));
+    // m_model = glm::rotate(m_model, glm::radians(90.0f), glm::vec3(-1.0, 0.0, 0.0));
+    m_model = glm::scale(m_model, glm::vec3(100.0f, 0.0f, 100.0f));
+
+    m_objShader.setMat4("model", m_model);
+    m_objShader.setVec3("material.diffuse", glm::vec3(0.5f));
+    m_objShader.setVec3("material.ambient", glm::vec3(0.1f));
+    m_objShader.setInt("material.texture_diffuse1", 0);
+    m_objShader.setBool("material.missingDiffuse", false);
+    m_objShader.setBool("materialVert.missingNormal", true);
+    glBindTexture(GL_TEXTURE_2D, m_floorTexture);
+    glBindVertexArray(m_vegetationVAO);
+    glDrawArrays(GL_TRIANGLES, 24, 6);
 
     // Model
     m_objShader.use();
@@ -427,7 +447,7 @@ void Engine::render() {
     m_objShader.use();
 
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, -50.0f));
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 30.0f, 0.0f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
     // inverseModel = glm::inverse(m_model);
 

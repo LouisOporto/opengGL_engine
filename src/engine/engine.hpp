@@ -332,7 +332,7 @@ class Engine {
 
     unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO,
         m_vegetationVAO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO, m_UBO;
-    unsigned int m_texture0, m_texture1, m_textureColorBuffer, m_cubemapTexture;
+    unsigned int m_texture0, m_texture1, m_textureColorBuffer, m_cubemapTexture, m_floorTexture;
 
     // World perspective
     bool m_firstMouse;
