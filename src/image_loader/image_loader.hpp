@@ -14,7 +14,7 @@ class ImageLoader {
         return m_instance = m_instance != nullptr ? m_instance : new ImageLoader();
     }
 
-    unsigned int loadImage(const char* filepath, const std::string& directory);
+    unsigned int loadImage(const char* filepath, const std::string& directory, int diffuse = 0);
     unsigned int loadCubemap(std::vector<std::string> faces, const std::string& directory);
 
    private:

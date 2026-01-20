@@ -2,7 +2,7 @@
 
 ImageLoader* ImageLoader::m_instance = nullptr;
 
-unsigned int ImageLoader::loadImage(const char* path, const std::string& directory) {
+unsigned int ImageLoader::loadImage(const char* path, const std::string& directory, int diffuse) {
     std::string filepath = std::string(path);
     filepath = directory + '/' + filepath;
 
@@ -16,7 +16,11 @@ unsigned int ImageLoader::loadImage(const char* path, const std::string& directo
         glBindTexture(GL_TEXTURE_2D, texture);
         // Logger::Log("Channels: %d", nrChannels);
         // Logger::Log("Before Binding");
-        glTexImage2D(GL_TEXTURE_2D, 0, (nrChannels == 4   ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), width, height, 0, (nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), GL_UNSIGNED_BYTE, data);
+        if (diffuse) {
+            glTexImage2D(GL_TEXTURE_2D, 0, (nrChannels == 4 ? GL_SRGB_ALPHA : nrChannels == 3 ? GL_SRGB : GL_R), width, height, 0, (nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), GL_UNSIGNED_BYTE, data);
+        } else {
+            glTexImage2D(GL_TEXTURE_2D, 0, (nrChannels == 4  ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), width, height, 0, (nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), GL_UNSIGNED_BYTE, data);
+        }
         glGenerateMipmap(GL_TEXTURE_2D);
         // Logger::Log("After binding");
 
