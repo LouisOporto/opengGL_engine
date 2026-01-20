@@ -154,7 +154,12 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
             Texture texture;
             // Logger::Log("Loading image file: %s", str.C_Str());
 
-            texture.id = ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
+            if (typeName == "texture_diffuse") {
+                texture.id = ImageLoader::getInstance()->loadImage(str.C_Str(), directory, 1);
+            }
+            else {
+                texture.id = ImageLoader::getInstance()->loadImage(str.C_Str(), directory);
+            }
             // printf("texture.id = %d, Typename: %s\n", texture.id,
             // typeName.c_str());
             texture.type = typeName;
