@@ -222,8 +222,49 @@ const float SKYBOXVERTICES[] = {
     1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
 
 const float QUADVERTICES[] = {
-    -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-    -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f};
+    -1.0f,  1.0f, 0.0f, 1.0f, 
+    -1.0f, -1.0f, 0.0f, 0.0f, 
+     1.0f, -1.0f, 1.0f, 0.0f, 
+    -1.0f,  1.0f, 0.0f, 1.0f,
+     1.0f, -1.0f, 1.0f, 0.0f,
+     1.0f,  1.0f, 1.0f, 1.0f
+};
+
+const float DEBUGQUADVERTICES[] = {
+    -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+     1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+};
+
+const float PLANEVERTICES[] = {
+     100.0f, -0.5f,  100.0f,
+    -100.0f, -0.5f, -100.0f,
+    -100.0f, -0.5f,  100.0f,
+     100.0f, -0.5f,  100.0f,
+     100.0f, -0.5f, -100.0f,
+    -100.0f, -0.5f, -100.0f,
+};
+
+const float PLANENORMALS[] = {
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+};
+
+const float PLANETEXCOORDS[] = {
+    100.0f, 0.0f,
+    0.0f, 100.0f,
+    0.0f, 0.0f,
+    100.0f, 0.0f,
+    100.0f, 100.0f,
+    0.0f, 100.0f,
+};
 
 const std::vector<glm::vec3> OBJECTPOSITIONS = {
     glm::vec3(0.0f, 0.0f, 5.0f),
@@ -251,6 +292,8 @@ const float SPE = 1.0f;
 const float CONSTANT = 1.0f;
 const float LINEAR = 0.09f;
 const float QUADRATIC = 0.032f;
+
+const unsigned int SHADOW_LENGTH = 1024, SHADOW_HEIGHT = 1024;
 
 class Engine {
    public:
@@ -319,7 +362,9 @@ class Engine {
     Shader m_skyboxShader;
     Shader m_cubeShader;
     Shader m_normalShader;
+    Shader m_depthShader;
     Shader m_primShader;
+    Shader m_debugDepthShader;
     Timer m_timer;
     bool m_running;
 
@@ -330,9 +375,9 @@ class Engine {
     // unsigned int m_FBO;
     // unsigned int m_RBO;
 
-    unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO,
-        m_vegetationVAO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO, m_UBO;
-    unsigned int m_texture0, m_texture1, m_textureColorBuffer, m_cubemapTexture, m_floorTexture;
+    unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO, m_UBO, m_debugVAO, m_debugVBO;
+    unsigned int m_texture0, m_texture1, m_cubemapTexture, m_floorTexture;
+    unsigned int m_textureColorBuffer, m_depthMapFBO, m_depthMap;
 
     // World perspective
     bool m_firstMouse;
@@ -349,6 +394,7 @@ class Engine {
     glm::mat4 m_projection;
     glm::mat4 m_view;
     glm::mat4 m_model;
+    glm::mat4 m_lightSpaceMatrix;
 
     int m_SCR_W, m_SCR_H;  // Functions that change with screen size needs to
                            // update with this
