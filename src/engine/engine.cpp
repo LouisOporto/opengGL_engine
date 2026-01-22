@@ -39,7 +39,7 @@ bool Engine::init(int argc, char* argv[]) {
     unsigned int amount = 100;
     m_modelMatrices = new glm::mat4[amount];
     srand(static_cast<unsigned int>(glfwGetTime()));
-    float radius = 50.0f;
+    float radius = 10.0f;
     float offset = 2.5f;
     for (int i = 0; i < amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
@@ -50,7 +50,7 @@ bool Engine::init(int argc, char* argv[]) {
         float y = displacement * 0.4f;
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0 - offset;
         float z = cos(angle) * radius + displacement;
-        model = glm::translate(model, glm::vec3(x, y + 30.f, z));
+        model = glm::translate(model, glm::vec3(x + 5, y + 20.f, z));
 
         float scale = static_cast<float>((rand() % 20) / 100.0 + 0.05);
         model = glm::scale(model, glm::vec3(scale));
@@ -117,7 +117,7 @@ bool Engine::init(int argc, char* argv[]) {
     // m_screenShader.setInt("screenTexture", 0);
 
     // Camera setup
-    m_camera = new Camera(m_SCR_W, m_SCR_H);
+    m_camera = new Camera(m_SCR_W, m_SCR_H, glm::vec3(0.0f, 10.0f, 10.0f));
     m_projection = glm::perspective(glm::radians(45.0f), (float)m_SCR_W / m_SCR_H, 0.1f, 100.0f);
     m_view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -356,7 +356,7 @@ void Engine::update() {
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         glm::vec3 color = {iter == 0 ? 1.0f : 0.7f, iter == 1 ? 1.0f : 0.7f,
                            iter == 2 ? 1.0f : 0.7f};
-        color = glm::vec3(1.0f, 1.0f, 1.0f);
+        // glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
         m_objShader.setPointLight(
             "pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter],
             color * AMB, color * DIF, color * SPE, CONSTANT, LINEAR, QUADRATIC);
@@ -369,7 +369,6 @@ void Engine::update() {
                              spotlightColor * DIF, spotlightColor * SPE,
                              cos(glm::radians(12.5f)), cos(glm::radians(17.5f)),
                              CONSTANT, LINEAR, QUADRATIC);
-    // m_objShader.setBool("NormalOn", m_NormalMapOn);
 
     // Skybox Shader
     m_skyboxShader.use();
@@ -499,9 +498,9 @@ void Engine::render() {
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
 
         m_lightShader.setMat4("model", m_model);
-        // m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f :
-        // 0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
-        m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
+        m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f :
+        0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
+        // m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
 
         glBindVertexArray(m_lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -519,7 +518,7 @@ void Engine::render() {
     // Framebuffer render to the simplified triangle faces
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(background.x, background.y, background.z, background.a);
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_screenShader.use();
@@ -545,13 +544,14 @@ void Engine::clean() {
     // Clean up by oject basis or keep this way
     glDeleteVertexArrays(1, &m_objectVAO);
     glDeleteVertexArrays(1, &m_lightVAO);
-    glDeleteVertexArrays(1, &m_vegetationVAO);
+    glDeleteVertexArrays(1, &m_planeVAO);
     glDeleteVertexArrays(1, &m_quadVAO);
     glDeleteBuffers(1, &m_VBO);
     glDeleteBuffers(1, &m_quadVBO);
     glDeleteBuffers(1, &m_UBO);
     glDeleteRenderbuffers(1, &m_RBO);
     glDeleteFramebuffers(1, &m_FBO);
+    glDeleteFramebuffers(1, &m_depthMapFBO);
 
     glfwTerminate();
     AudioEngine::getInstance()->clean();
