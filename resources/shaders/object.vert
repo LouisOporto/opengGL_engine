@@ -29,9 +29,6 @@ out VS_OUT {
     vec4 FragPosLightSpace;
 } vs_out;
 
-// out VS_OUT { // Explosion using geom
-//     vec2 texCoords;
-// } vs_out;
 
 void main() {
     mat3 normalMatrix = mat3(transpose(inverse(model)));
@@ -45,7 +42,6 @@ void main() {
 
     if (materialVert.missingNormal) {
         vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
-        // vs_out.Normal = normalMatrix * aNormal;
     }
     else {
         vs_out.Normal = texture(materialVert.texture_normal1, aTexCoord).rgb;
@@ -56,5 +52,5 @@ void main() {
     vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
     vs_out.TexCoord = aTexCoord;
     vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
-    gl_Position = projection * view * vec4(vs_out.FragPos, 1.0);
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
