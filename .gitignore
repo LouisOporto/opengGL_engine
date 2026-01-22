@@ -8,10 +8,9 @@
 /required_libraries
 /.vscode
 /include
-/images
+resources/images
+resources/audio
 /lib
 /assimp
-/resources
 /imgui
 /FMOD
-**/Dispatch
