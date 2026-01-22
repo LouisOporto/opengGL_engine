@@ -8,6 +8,7 @@ out vec3 FragPos;
 layout(std140) uniform Matrices {
     mat4 projection;
     mat4 view;
+    mat4 lightSpaceMatrix;
 };
 
 // if Version >=4.2 use...
