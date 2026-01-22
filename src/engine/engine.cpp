@@ -386,14 +386,22 @@ void Engine::update() {
     m_projection = getCamera()->getPerspective();
     m_view = getCamera()->getLookAt();
 
+    glm::vec3 directionVector = {5.0f, 60.0f, 30.0f};
+    glm::vec3 lightColor = glm::vec3(1.0f);
+
+    // Light Matrix (model)
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+    glm::mat4 lightView = glm::lookAt(directionVector, glm::vec3(5.0f, 1.0f, -5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_lightSpaceMatrix = lightProjection * lightView;
+    m_depthShader.use();
+    m_depthShader.setMat4("lightSpaceMatrix", m_lightSpaceMatrix);
+
     // Uniform Buffer Values
     glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &m_projection[0][0]);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &m_view[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 2, sizeof(glm::mat4), &m_lightSpaceMatrix[0][0]);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    glm::vec3 directionVector = {0.0f, -20.3f, 4.3f};
-    glm::vec3 lightColor = glm::vec3(1.0f);
 
     // Light shader
     m_lightShader.use();
@@ -439,109 +447,159 @@ void Engine::update() {
 }
 
 void Engine::render() {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
     glEnable(GL_DEPTH_TEST);
+    glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Use cube VAO to draw the floor plane will use specific texture for plane
-    m_objShader.use();
+    // First Pass: Shadow Casting
+    glViewport(0, 0, SHADOW_LENGTH, SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_depthShader.use();
 
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.f, 0.0f));
-    // m_model = glm::rotate(m_model, glm::radians(90.0f), glm::vec3(-1.0, 0.0, 0.0));
-    m_model = glm::scale(m_model, glm::vec3(100.0f, 0.0f, 100.0f));
 
-    m_objShader.setMat4("model", m_model);
-    m_objShader.setVec3("material.diffuse", glm::vec3(0.5f));
-    m_objShader.setVec3("material.ambient", glm::vec3(0.1f));
-    m_objShader.setInt("material.texture_diffuse1", 0);
-    m_objShader.setBool("material.missingDiffuse", false);
-    m_objShader.setBool("materialVert.missingNormal", true);
-    glBindTexture(GL_TEXTURE_2D, m_floorTexture);
-    glBindVertexArray(m_vegetationVAO);
-    glDrawArrays(GL_TRIANGLES, 24, 6);
+    m_depthShader.setMat4("model", m_model);
+    glBindVertexArray(m_planeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Model
-    m_objShader.use();
-
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
-    // glm::mat4 inverseModel = glm::inverse(m_model);
 
-    m_objShader.setMat4("model", m_model);
-    // m_objShader.setMat4("inverseModel", inverseModel);
-
-    m_objModel->draw(m_objShader);
-
-    // m_normalShader.use();
-    // m_normalShader.setMat4("model", m_model);
-    // m_objModel->draw(m_normalShader);
+    m_depthShader.setMat4("model", m_model);
+    m_objModel->draw(m_depthShader);
 
     // Reflecting model
-    m_cubeShader.use();
-
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    // inverseModel = glm::inverse(m_model);
+    
+    m_depthShader.setMat4("model", m_model);
+    m_objModel->draw(m_depthShader);
 
-    m_cubeShader.setMat4("model", m_model);
-    // m_cubeShader.setMat4("inverseModel", inverseModel);
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    m_objModel->draw(m_cubeShader);
+    m_depthShader.setMat4("model", m_model);
 
-    // Planet Model
+    m_planetModel->draw(m_depthShader);
+
+    // Asteroid Belt
+    for (int i = 0; i < 100; i++) {
+        // m_depthShader.setMat4("model", glm::translate(m_modelMatrices[i],
+        // glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
+        // (float)sin(glfwGetTime() * 5.f))));
+        m_depthShader.setMat4("model", m_modelMatrices[i]);
+        m_rockModel->draw(m_depthShader);
+    }
+
+    // Light
+    for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
+        m_model = glm::mat4(1.0f);
+        m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
+        m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
+
+        m_depthShader.setMat4("model", m_model);
+        glBindVertexArray(m_lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
+    // Second Pass: Model Rendering
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    glViewport(0, 0, m_SCR_W, m_SCR_H);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    m_debugDepthShader.use();
+
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 10.0f, 5.0f));
+
+    m_debugDepthShader.setMat4("model", m_model);
+    glBindTexture(GL_TEXTURE_2D, m_depthMap);
+    glBindVertexArray(m_debugVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Use vegetation VAO to draw the floor plane will use specific texture for plane
     m_objShader.use();
 
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(0.0f, 30.0f, 0.0f));
-    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
-    // inverseModel = glm::inverse(m_model);
 
     m_objShader.setMat4("model", m_model);
-    // m_objShader.setMat4("inverseModel", inverseModel);
 
+    m_objShader.setVec3("material.ambient", glm::vec3(0.7f));
+    m_objShader.setVec3("material.diffuse", glm::vec3(0.5f));
+    m_objShader.setVec3("material.specular", glm::vec3(0.1f));
+
+    m_objShader.setInt("material.texture_diffuse1", 0);
+    m_objShader.setInt("depthMap", 1);
+    
+    m_objShader.setBool("material.missingDiffuse", false);
+    m_objShader.setBool("materialVert.missingNormal", true);
+    m_objShader.setBool("usingDepth", true);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_floorTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_depthMap);
+    glBindVertexArray(m_planeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Model
+    m_objShader.use();
+    m_objShader.setBool("usingDepth", true);
+    m_objShader.setInt("depthMap", 4);
+    
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    m_objShader.setMat4("model", m_model);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, m_depthMap);
+    m_objModel->draw(m_objShader);
+    
+    // m_normalShader.use();
+    // m_normalShader.setMat4("model", m_model);
+    // m_objModel->draw(m_normalShader);
+    
+    // Reflecting model
+    m_cubeShader.use();
+    
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    m_cubeShader.setMat4("model", m_model);
+    
+    m_objModel->draw(m_cubeShader);
+    
+    // Planet Model
+    m_objShader.use();
+    m_objShader.setBool("usingDepth", false);
+    
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    m_objShader.setMat4("model", m_model);
     m_planetModel->draw(m_objShader);
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
-        // m_objShader.setMat4("model", glm::translate(m_modelMatrices[i],
-        // glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
-        // (float)sin(glfwGetTime() * 5.f))));
+        m_objShader.setMat4("model", glm::translate(m_modelMatrices[i],
+        glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
+        (float)sin(glfwGetTime() * 5.f))));
         m_objShader.setMat4("model", m_modelMatrices[i]);
         m_rockModel->draw(m_objShader);
     }
-
-    // Primitive cubes // TURNED OFF
-    // m_primShader.use();
-    // for (int iter = 0; iter < OBJECTPOSITIONS.size(); iter++) {
-    //     // Logger::Log("Rendering cube: #%d", iter);
-    //     m_model = glm::mat4(1.0f);
-    //     m_model = glm::translate(m_model, OBJECTPOSITIONS[iter]);
-    //     m_model = glm::rotate(m_model, glm::radians(iter * 15.f),
-    //                           glm::vec3(0.1f, 0.5f, 0.4f));
-    //     glm::mat4 inverseModel = glm::inverse(m_model);
-
-    //     // m_cubeShader.setMat4("model", m_model);
-    //     // m_cubeShader.setMat4("inverseModel", inverseModel);
-    //     // Update this to for multiple instances
-    //     // m_primShader.setMat4("model", m_model);
-    //     // m_primShader.setMat4("inverseModel", inverseModel);
-    //     m_primShader.setMat4("models[" + std::to_string(iter) + ']', m_model);
-    //     m_primShader.setMat4("inverseModels[" + std::to_string(iter) + ']',
-    //                          inverseModel);
-    // }
-
-    glBindVertexArray(m_objectVAO);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-    // glDrawArrays(GL_POINTS, 0, 36);
-    glDrawArraysInstanced(GL_POINTS, 0, 36, OBJECTPOSITIONS.size());
-    // }
 
     // Light
     m_lightShader.use();
