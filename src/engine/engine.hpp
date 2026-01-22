@@ -276,7 +276,7 @@ const std::vector<glm::vec3> OBJECTPOSITIONS = {
 const std::vector<glm::vec3> LIGHTPOSITIONS = {
     glm::vec3(3.0f, 4.0f, 2.5f),
     glm::vec3(-3.0f, 1.0f, 1.3f),
-    glm::vec3(0.0f, -1.2f, 3.2f),
+    glm::vec3(0.0f, 1.2f, -3.2f),
 };
 
 const std::vector<glm::vec3> VEGETATION = {
