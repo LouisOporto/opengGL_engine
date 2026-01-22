@@ -167,10 +167,11 @@ bool Engine::init(int argc, char* argv[]) {
 bool Engine::initOpenGLVariables() {
     glGenVertexArrays(1, &m_objectVAO);
     glGenVertexArrays(1, &m_lightVAO);
-    glGenVertexArrays(1, &m_vegetationVAO);
+    glGenVertexArrays(1, &m_planeVAO);
     glGenVertexArrays(1, &m_skyboxVAO);
     glGenBuffers(1, &m_VBO);
     glGenBuffers(1, &m_skyboxVBO);
+    glGenBuffers(1, &m_planeVBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     int size = sizeof(VERTICESPOS) + sizeof(VERTICESNORM) + sizeof(VERTICESTEX);
@@ -196,16 +197,23 @@ bool Engine::initOpenGLVariables() {
         glEnableVertexAttribArray(0);
     }
 
-    // Vegtation VAO
+    glBindBuffer(GL_ARRAY_BUFFER, m_planeVBO);
+    size = sizeof(PLANEVERTICES) + sizeof(PLANENORMALS) + sizeof(PLANETEXCOORDS);
+    glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(PLANEVERTICES), &PLANEVERTICES);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(PLANEVERTICES), sizeof(PLANENORMALS), &PLANENORMALS);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(PLANEVERTICES) + sizeof(PLANENORMALS), sizeof(PLANETEXCOORDS), &PLANETEXCOORDS);
+
+    // Plane VAO
     {
-        glBindVertexArray(m_vegetationVAO);
+        glBindVertexArray(m_planeVAO);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(VERTICESPOS)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(PLANEVERTICES)));
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)(sizeof(PLANEVERTICES) + sizeof(PLANENORMALS)));
         glEnableVertexAttribArray(2);
     }
 
@@ -234,6 +242,20 @@ bool Engine::initOpenGLVariables() {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
         glEnableVertexAttribArray(1);
     }
+    
+    {
+        glGenVertexArrays(1, &m_debugVAO);
+        glGenBuffers(1, &m_debugVBO);
+        glBindVertexArray(m_debugVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_debugVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(DEBUGQUADVERTICES), DEBUGQUADVERTICES, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)* 5, (void*)0);
+        glEnableVertexAttribArray(0);
+        
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)* 5, (void*)(sizeof(float) * 3));
+        glEnableVertexAttribArray(1);
+    }
 
     // Framebuffer setup
     {
@@ -253,6 +275,28 @@ bool Engine::initOpenGLVariables() {
 
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
 
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            Logger::Error("Framebuffer is not complete, cannot proceed!");
+            return false;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
+        glGenTextures(1, &m_depthMap);
+        glBindTexture(GL_TEXTURE_2D, m_depthMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_LENGTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        float boarderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f};
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, boarderColor);
+        
+        glGenFramebuffers(1, &m_depthMapFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMap, 0);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             Logger::Error("Framebuffer is not complete, cannot proceed!");
             return false;
@@ -292,13 +336,22 @@ bool Engine::setupShaders() {
         return false;
     }
 
+    if (!m_depthShader.initShader("RESOURCES/shaders/simpleDepthShader.vert", "RESOURCES/shaders/simpleDepthShader.frag")) {
+        return false;
+    }
+
+    if (!m_debugDepthShader.initShader("RESOURCES/shaders/debugDepth.vert", "RESOURCES/shaders/debugDepth.frag")) {
+        return false;
+    }
+    m_debugDepthShader.bindUniformBlock("Matrices", 0);
+
     // Uniform Block Object
     {
         glGenBuffers(1, &m_UBO);
         glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
-        glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_UBO, 0, 2 * sizeof(glm::mat4));
+        glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_UBO, 0, 3 * sizeof(glm::mat4));
     }
 
     return true;
