@@ -444,6 +444,18 @@ void Engine::update() {
     // Cube Shader
     m_cubeShader.use();
     m_cubeShader.setVec3("cameraPos", getCamera()->getPos());
+    for (int i = 0; i < 100; i++) {
+        glm::vec4 difference = m_modelMatrices[i][3] - glm::vec4(m_origin, 1.0);
+        difference.w = 1.0f;
+        glm::mat4 rotMat = glm::mat4(1.0f);
+        glm::vec3 rotation(0.0f, 1.0f, 0.0f);
+        rotMat = glm::rotate(rotMat, glm::radians(0.1f), rotation);
+        glm::vec3 transformed = glm::vec3(rotMat * difference);
+        m_modelMatrices[i][3] = glm::vec4(transformed + m_origin, 1.0f);
+        // Logger::Log("Location: %f:%f:%f", currentModel[3].x, currentModel[3].y, currentModel[3].z);
+        // Logger::Log("Difference: %f:%f:%f", difference.x, difference.y, difference.z);
+        // Logger::Log("Rotated: %f:%f:%f:%f", transformed.x, transformed.y, transformed.z);
+    }
 }
 
 void Engine::render() {
@@ -493,9 +505,6 @@ void Engine::render() {
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
-        // m_depthShader.setMat4("model", glm::translate(m_modelMatrices[i],
-        // glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
-        // (float)sin(glfwGetTime() * 5.f))));
         m_depthShader.setMat4("model", m_modelMatrices[i]);
         m_rockModel->draw(m_depthShader);
     }
@@ -594,9 +603,6 @@ void Engine::render() {
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
-        m_objShader.setMat4("model", glm::translate(m_modelMatrices[i],
-        glm::vec3((float)cos(glfwGetTime() * 5.f), 0.0f,
-        (float)sin(glfwGetTime() * 5.f))));
         m_objShader.setMat4("model", m_modelMatrices[i]);
         m_rockModel->draw(m_objShader);
     }

@@ -395,7 +395,8 @@ class Engine {
     glm::mat4 m_view;
     glm::mat4 m_model;
     glm::mat4 m_lightSpaceMatrix;
-
+    glm::vec3 m_origin;
+    
     int m_SCR_W, m_SCR_H;  // Functions that change with screen size needs to
                            // update with this
 
