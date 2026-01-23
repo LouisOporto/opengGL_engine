@@ -41,6 +41,7 @@ bool Engine::init(int argc, char* argv[]) {
     srand(static_cast<unsigned int>(glfwGetTime()));
     float radius = 10.0f;
     float offset = 2.5f;
+    m_origin = glm::vec3{5.f, 20.f, 0.0f};
     for (int i = 0; i < amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
         float angle = (float)i / (float)amount * 360.f;
@@ -50,14 +51,13 @@ bool Engine::init(int argc, char* argv[]) {
         float y = displacement * 0.4f;
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0 - offset;
         float z = cos(angle) * radius + displacement;
-        model = glm::translate(model, glm::vec3(x + 5, y + 20.f, z));
+        model = glm::translate(model, glm::vec3(x, y, z) + m_origin); 
 
         float scale = static_cast<float>((rand() % 20) / 100.0 + 0.05);
         model = glm::scale(model, glm::vec3(scale));
 
         float rotAngle = static_cast<float>((rand() % 360));
         model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
         m_modelMatrices[i] = model;
     }
 
