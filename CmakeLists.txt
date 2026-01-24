@@ -40,7 +40,8 @@ set_target_properties(coreFMOD PROPERTIES
 add_executable(${CMAKE_PROJECT_NAME} 
     src/main.cpp 
     src/engine/engine.cpp 
-    src/shader/shader.cpp 
+    src/shader/shader.cpp
+    src/shader/shaderStorage.cpp
     src/timer/timer.cpp 
     src/image_loader/image_loader.cpp 
     src/camera/camera.cpp
