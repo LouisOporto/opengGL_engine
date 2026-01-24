@@ -37,7 +37,7 @@ void Mesh::setupMesh() {
     glBindVertexArray(0);
 }
 
-void Mesh::draw(Shader& shader) {
+void Mesh::draw(Shader* shader) {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;
@@ -70,26 +70,26 @@ void Mesh::draw(Shader& shader) {
         // Logger::Log("Shader Name: %s, Number: %d\n", ("material." + name +
         // number).c_str(), i);
         if (name == "texture_height" || name == "texture_normal") {
-            shader.setInt(("materialVert." + name + number).c_str(), i);
+            shader->setInt(("materialVert." + name + number).c_str(), i);
             // shader.setInt(("material" + name + number).c_str(), i);
         } else {
-            shader.setInt(("material." + name + number).c_str(), i);
+            shader->setInt(("material." + name + number).c_str(), i);
         }
         // Logger::Log("Setting %s", (name + number).c_str());
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
     }
 
-    shader.setBool("material.missingDiffuse", missingDiffuse);
-    shader.setBool("material.missingSpecular", missingSpecular);
+    shader->setBool("material.missingDiffuse", missingDiffuse);
+    shader->setBool("material.missingSpecular", missingSpecular);
     // shader.setBool("material.missingNormal", missingNormal);
-    shader.setBool("materialVert.missingNormal", missingNormal);
-    shader.setBool("materialVert.missingHeight", missingHeight);
+    shader->setBool("materialVert.missingNormal", missingNormal);
+    shader->setBool("materialVert.missingHeight", missingHeight);
 
-    shader.setVec3("material.ambient", m_meshMaterials.ambient);
-    shader.setVec3("material.diffuse", m_meshMaterials.diffuse);
-    shader.setVec3("material.specular", m_meshMaterials.specular);
-    shader.setFloat("material.shininess", m_meshMaterials.shininess);
+    shader->setVec3("material.ambient", m_meshMaterials.ambient);
+    shader->setVec3("material.diffuse", m_meshMaterials.diffuse);
+    shader->setVec3("material.specular", m_meshMaterials.specular);
+    shader->setFloat("material.shininess", m_meshMaterials.shininess);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);

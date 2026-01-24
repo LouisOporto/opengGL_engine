@@ -43,7 +43,7 @@ class Mesh {
     DefaultMaterials m_meshMaterials;
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, DefaultMaterials defaultMat);
-    void draw(Shader &shader);
+    void draw(Shader* shader);
 
    private:
     // render data
