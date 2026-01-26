@@ -78,15 +78,21 @@ in VS_OUT {
     vec4 FragPosLightSpace;
 } vs_in;
 
+float linearizeDepth(float depth) {
+    float value = depth * 2.0 - 1.0;
+    return (2.0 * 0.1 * 200.0) / (200.0 + 0.1 - value * (200.0 - 0.1));
+}
+
 float calcShadow(vec4 fragPosLightSpace, vec3 norm, vec3 lightDir) {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
-    // return projCoords.y;
+    // return projCoords.x;
     float closetDepth = texture(depthMap, projCoords.xy).r;
-    // return closetDepth;
+    // closetDepth =  linearizeDepth(closetDepth) / 200.0;
     float currentDepth = projCoords.z;
     // return currentDepth;
-    float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
+    float bias = max(0.02 * (1.0 - dot(norm, lightDir)), 0.005);
+    // bias = 0.005;
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(depthMap, 0);
     for (int x = -1; x <= 1; x++) {
