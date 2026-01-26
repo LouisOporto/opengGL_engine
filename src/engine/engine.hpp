@@ -364,7 +364,7 @@ class Engine {
     Shader m_skyboxShader;
     Shader m_cubeShader;
     Shader m_normalShader;
-    Shader m_depthShader;
+    // Shader m_depthShader;
     Shader m_primShader;
     Shader m_debugDepthShader;
     Timer m_timer;
@@ -377,9 +377,9 @@ class Engine {
     // unsigned int m_FBO;
     // unsigned int m_RBO;
 
-    unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_FBO, m_RBO, m_UBO, m_debugVAO, m_debugVBO;
-    unsigned int m_texture0, m_texture1, m_cubemapTexture, m_floorTexture;
-    unsigned int m_textureColorBuffer, m_depthMapFBO, m_depthMap;
+    unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_UBO, m_debugVAO, m_debugVBO;
+    unsigned int m_texture0, m_texture1, m_cubemapTexture, m_floorTexture, m_depthMap;
+    unsigned int m_textureColorBuffer, m_depthMapFBO, m_FBO, m_RBO;
 
     // World perspective
     bool m_firstMouse;
