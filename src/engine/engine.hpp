@@ -337,7 +337,7 @@ class Engine {
     // OpenlGL
     bool initOpenGLVariables();
     bool setupShaders();
-    void handleKeyInput(float deltaTime);
+    void handleKeyInput();
     inline void quit() { m_running = false; }
 
     // ImGUI
@@ -351,35 +351,19 @@ class Engine {
     static Engine* m_instance;
     GLFWwindow* m_window;
 
-    // Streamline Model and Shader information (simplify if possible);
-    std::map<int, Shader> m_shaders;
-    std::map<std::string, int> m_shaderIndex;
-
     Model* m_objModel;
     Model* m_planetModel;
     Model* m_rockModel;
-    Shader m_objShader;
-    Shader m_lightShader;
-    Shader m_screenShader;
-    Shader m_skyboxShader;
-    Shader m_cubeShader;
-    Shader m_normalShader;
-    // Shader m_depthShader;
-    Shader m_primShader;
-    Shader m_debugDepthShader;
+    ShaderStorage m_shaders;
     Timer m_timer;
-    bool m_running;
 
-    // Dynamically create VBO, VAO, (intialize by hard coding and reuse by
-    // caching)
-    // std::map<std::string, unsigned int> m_VAOs;
-    // std::map<std::string, unsigned int> m_VBOs;
-    // unsigned int m_FBO;
-    // unsigned int m_RBO;
+    // Dynamically create VBO, VAO, (initialize by hard coding and reuse by caching)
+    std::map<std::string, unsigned int> m_VAOs;
+    std::map<std::string, unsigned int> m_VBOs;
 
     unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_UBO, m_debugVAO, m_debugVBO;
-    unsigned int m_texture0, m_texture1, m_cubemapTexture, m_floorTexture, m_depthMap;
-    unsigned int m_textureColorBuffer, m_depthMapFBO, m_FBO, m_RBO;
+    unsigned int m_texture0, m_texture1, m_cubemapTexture, m_floorTexture, m_depthMap, m_depthCubemap;
+    unsigned int m_textureColorBuffer, m_depthMapFBO, m_FBO, m_RBO, m_depthCubemapFBO;
 
     // World perspective
     bool m_firstMouse;
@@ -387,7 +371,8 @@ class Engine {
     bool m_NormalMapOn;
     bool m_mouseVisible;
     bool m_screenRotate;
-    float m_lastX, m_lastY;
+    bool m_running;
+    float m_lastX, m_lastY, m_dt;
     int m_volume = 100;
 
     // No need to change universal usage here
@@ -398,9 +383,7 @@ class Engine {
     glm::mat4 m_model;
     glm::mat4 m_lightSpaceMatrix;
     glm::vec3 m_origin;
-    
-    int m_SCR_W, m_SCR_H;  // Functions that change with screen size needs to
-                           // update with this
+    int m_SCR_W, m_SCR_H;
 
     // ImGUI Variables
     char m_loadingBuffer[512];
