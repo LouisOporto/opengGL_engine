@@ -1,7 +1,5 @@
 #include "shaderStorage.hpp"
 
-ShaderStorage* ShaderStorage::m_instance = nullptr;
-
 bool ShaderStorage::addShader(const char* name, const char* vert, const char* frag, const char* geom) {
     if (m_shaders.count(name)) return false;
 
@@ -15,19 +13,13 @@ bool ShaderStorage::addShader(const char* name, const char* vert, const char* fr
     return true;
 }
 
-// void ShaderStorage::removeShader(const char* name) {
-//     // Should only be used by class
-//     if (m_shaders.count(name)) {
-//         delete m_shaders[name];
-//         m_shaders.erase(name);
-//     }
-// }
-
 Shader* ShaderStorage::getShader(const char* name) {
     // Retrieve shader for public use
     if (m_shaders.count(name)) {
         return m_shaders[name];
     }
+    // Better method to catch none errors
+    Logger::Error("Could not find shader name: %s", name);
     return nullptr;
 }
 
