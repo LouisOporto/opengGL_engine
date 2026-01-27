@@ -17,6 +17,7 @@ bool Engine::init(int argc, char* argv[]) {
     m_SCR_W = SCR_W;
     m_SCR_H = SCR_H;
     m_window = glfwCreateWindow(m_SCR_W, m_SCR_H, "Window", NULL, NULL);
+
     if (!m_window) {
         Logger::Error("Failed to create GLFW window");
         return false;
@@ -30,6 +31,7 @@ bool Engine::init(int argc, char* argv[]) {
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = true;
+
     if (glewInit() != GLEW_OK) {
         Logger::Error("Failed to init GLEW");
         return false;
@@ -42,6 +44,7 @@ bool Engine::init(int argc, char* argv[]) {
     float radius = 10.0f;
     float offset = 2.5f;
     m_origin = glm::vec3{5.f, 20.f, 0.0f};
+
     for (int i = 0; i < amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
         float angle = (float)i / (float)amount * 360.f;
@@ -81,9 +84,7 @@ bool Engine::init(int argc, char* argv[]) {
     // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
     // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
     m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
-
     m_planetModel = new Model("RESOURCES/images/planet/planet.obj");
-
     m_rockModel = new Model("RESOURCES/images/rock/rock.obj");
 
     // Textures setup
@@ -97,24 +98,14 @@ bool Engine::init(int argc, char* argv[]) {
     };
 
     stbi_set_flip_vertically_on_load(false);
-    // m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(
-    //     faces, "RESOURCES/images/skybox");
-
-    m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(
-        cubemap, "RESOURCES/images/skybox");
-
+    // m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(faces, "RESOURCES/images/skybox");
+    m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(cubemap, "RESOURCES/images/skybox");
     m_floorTexture = ImageLoader::getInstance()->loadImage("box.png", "RESOURCES/images", 1);
 
     // Shader setup
     if (!setupShaders()) {
         return false;
     }
-
-    m_objShader.use();
-    m_objShader.setFloat("material.shininess", 32.0f);
-
-    // m_screenShader.use();
-    // m_screenShader.setInt("screenTexture", 0);
 
     // Camera setup
     m_camera = new Camera(m_SCR_W, m_SCR_H, glm::vec3(0.0f, 10.0f, 10.0f));
@@ -127,7 +118,7 @@ bool Engine::init(int argc, char* argv[]) {
     m_mouseVisible = false;
     m_screenRotate = false;
     toggleMouse();
-    float temp = m_timer.getElapsed();  // Not used
+    m_dt = m_timer.getElapsed();  // Not used
 
     // Initialize imGUI context
     ImGui::GetVersion();
@@ -160,7 +151,6 @@ bool Engine::init(int argc, char* argv[]) {
     // AudioEngine::getInstance()->loadBank("Ep106Music",
     // "RESOURCES/audio/Dispatch"); Radio by Bershy is Ep106Music index 12
     // AudioEngine::getInstance()->playByIndex("Ep106Music", "Radio", 12);
-
     return m_running = true;
 }
 
@@ -302,51 +292,49 @@ bool Engine::initOpenGLVariables() {
             return false;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glGenTextures(1, &m_depthCubemap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
+        for (unsigned int i = 0; i < 6; i++) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_LENGTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        }
+        
+        glGenBuffers(1, &m_depthCubemapFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_depthCubemapFBO);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthCubemap, 0);
+        glDrawBuffer(GL_NONE); // This causes main map to go black
+        glReadBuffer(GL_NONE);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            Logger::Error("Framebuffer is not complete, cannot proceed!");
+            return false;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glDrawBuffer(GL_BACK);
     }
 
     return true;
 }
 
 bool Engine::setupShaders() {
-    // if(!ShaderStorage::getInstance()->addShader("m_objShader", "RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) return false;
-    // ShaderStorage::getInstance()->getShader("m_objShader")->bindUniformBlock("Matrices", 0);
-    if (!m_objShader.initShader("RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) {
-        // "RESOURCES/shaders/newObject.geom")) {
-        return false;
-    }
-    m_objShader.bindUniformBlock("Matrices", 0);
-
-    if (!m_lightShader.initShader("RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) {
-        return false;
-    }
-    m_lightShader.bindUniformBlock("Matrices", 0);
-
-    if (!m_screenShader.initShader("RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) {
-        return false;
-    }
-
-    if (!m_skyboxShader.initShader("RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) {
-        return false;
-    }
-
-    if (!m_cubeShader.initShader("RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) {
-        return false;
-    }
-    m_cubeShader.bindUniformBlock("Matrices", 0);
-
-    if (!m_normalShader.initShader("RESOURCES/shaders/normalDisplay.vert", "RESOURCES/shaders/normalDisplay.frag", "RESOURCES/shaders/normalDisplay.geom")) {
-        return false;
-    }
-
-    if(!ShaderStorage::getInstance()->addShader("depthShader", "RESOURCES/shaders/simpleDepthShader.vert", "RESOURCES/shaders/simpleDepthShader.frag")) return false;
-    // if (!m_depthShader.initShader("RESOURCES/shaders/simpleDepthShader.vert", "RESOURCES/shaders/simpleDepthShader.frag")) {
-    //     return false;
-    // }
-
-    if (!m_debugDepthShader.initShader("RESOURCES/shaders/debugDepth.vert", "RESOURCES/shaders/debugDepth.frag")) {
-        return false;
-    }
-    m_debugDepthShader.bindUniformBlock("Matrices", 0);
+    if (!m_shaders.addShader("screen", "RESOURCES/shaders/screen.vert", "RESOURCES/shaders/screen.frag")) return false;
+    if (!m_shaders.addShader("skybox", "RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) return false;
+    if (!m_shaders.addShader("normal", "RESOURCES/shaders/normalDisplay.vert", "RESOURCES/shaders/normalDisplay.frag", "RESOURCES/shaders/normalDisplay.geom")) return false;
+    if (!m_shaders.addShader("depth", "RESOURCES/shaders/simpleDepthShader.vert", "RESOURCES/shaders/simpleDepthShader.frag")) return false;
+    if (!m_shaders.addShader("object", "RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) return false;
+    if (!m_shaders.addShader("light", "RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) return false;
+    if (!m_shaders.addShader("cube", "RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) return false;
+    if (!m_shaders.addShader("debugDepth", "RESOURCES/shaders/debugDepth.vert", "RESOURCES/shaders/debugDepth.frag")) return false;
+    m_shaders.getShader("object")->bindUniformBlock("Matrices", 0);
+    m_shaders.getShader("light")->bindUniformBlock("Matrices", 0);
+    m_shaders.getShader("cube")->bindUniformBlock("Matrices", 0);
+    m_shaders.getShader("debugDepth")->bindUniformBlock("Matrices", 0);
 
     // Uniform Block Object
     {
@@ -363,8 +351,8 @@ bool Engine::setupShaders() {
 void Engine::event() {
     glfwPollEvents();
     if (glfwWindowShouldClose(m_window)) quit();
-    float dt = m_timer.getElapsed();
-    handleKeyInput(dt);
+    m_dt = m_timer.getElapsed();
+    handleKeyInput();
 
     // Handle imGui GUI
     ImGui_ImplGlfw_NewFrame();
@@ -374,11 +362,6 @@ void Engine::event() {
 
 void Engine::update() {
     AudioEngine::getInstance()->update();
-    Shader* depthShader = ShaderStorage::getInstance()->getShader("depthShader");
-    // Shader* objShader = ShaderStorage::getInstance()->getShader("objShader");
-    // Shader* skyboxShader = ShaderStorage::getInstance()->getShader("skyboxShader");
-    // Shader* normalShader = ShaderStorage::getInstance()->getShader("normalShader");
-    // Shader* cubeShader = ShaderStorage::getInstance()->getShader("cubeShader");
 
     // General variables used by all shaders
     if (m_screenRotate) {
@@ -403,12 +386,12 @@ void Engine::update() {
     // glm::mat4 lightProjection = glm::perspective(45.0f, m_SCR_W / (float)m_SCR_H, nearPlane, farPlane);
     glm::mat4 lightView = glm::lookAt(directionVector, glm::vec3(5.0f, 1.0f, -5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     m_lightSpaceMatrix = lightProjection * lightView;
-    depthShader->use();
-    depthShader->setMat4("lightSpaceMatrix", m_lightSpaceMatrix);
+    m_shaders.getShader("depth")->use();
+    m_shaders.getShader("depth")->setMat4("lightSpaceMatrix", m_lightSpaceMatrix);
 
-    // m_debugDepthShader.use();
-    // m_debugDepthShader.setFloat("nearPlane", nearPlane);
-    // m_debugDepthShader.setFloat("farPlane", farPlane);
+    // m_shaders.getShader("depth")->use();
+    // m_shaders.getShader("depth")->setFloat("nearPlane", nearPlane);
+    // m_shaders.getShader("depth")->setFloat("farPlane", farPlane);
 
     // Uniform Buffer Values
     glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
@@ -417,47 +400,44 @@ void Engine::update() {
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 2, sizeof(glm::mat4), &m_lightSpaceMatrix[0][0]);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    // Light shader
-    m_lightShader.use();
-
     // Model shader
-    m_objShader.use();
-    m_objShader.setVec3("viewPos", getCamera()->getPos());
+    m_shaders.getShader("object")->use();
+    m_shaders.getShader("object")->setVec3("viewPos", getCamera()->getPos());
     // m_objShader.setFloat("time", 179.9087f);
 
     // Model Lighting (Phong Lighting)
-    m_objShader.setDirLight("dirLight", directionVector, lightColor * AMB, lightColor * DIF, lightColor * SPE);
-    m_objShader.setInt("numPointLights", LIGHTPOSITIONS.size());
+    m_shaders.getShader("object")->setDirLight("dirLight", directionVector, lightColor * AMB, lightColor * DIF, lightColor * SPE);
+    m_shaders.getShader("object")->setInt("numPointLights", LIGHTPOSITIONS.size());
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         glm::vec3 color = {iter == 0 ? 1.0f : 0.7f, iter == 1 ? 1.0f : 0.7f,
                            iter == 2 ? 1.0f : 0.7f};
         // glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-        m_objShader.setPointLight(
+        m_shaders.getShader("object")->setPointLight(
             "pointLights[" + std::to_string(iter) + ']', LIGHTPOSITIONS[iter],
             color * AMB, color * DIF, color * SPE, CONSTANT, LINEAR, QUADRATIC);
     }
 
     glm::vec3 spotlightColor = {1.0f, 1.0f, 0.3f};
-    m_objShader.setBool("spotLightOn", m_lightOn);
-    m_objShader.setSpotLight("spotLight", getCamera()->getPos(),
+    m_shaders.getShader("object")->setBool("spotLightOn", m_lightOn);
+    m_shaders.getShader("object")->setSpotLight("spotLight", getCamera()->getPos(),
                              getCamera()->getFront(), spotlightColor * AMB,
                              spotlightColor * DIF, spotlightColor * SPE,
                              cos(glm::radians(12.5f)), cos(glm::radians(17.5f)),
                              CONSTANT, LINEAR, QUADRATIC);
 
     // Skybox Shader
-    m_skyboxShader.use();
-    m_skyboxShader.setMat4("projection", m_projection);
-    m_skyboxShader.setMat4("view", glm::mat4(glm::mat3(m_view)));
+    m_shaders.getShader("skybox")->use();
+    m_shaders.getShader("skybox")->setMat4("projection", m_projection);
+    m_shaders.getShader("skybox")->setMat4("view", glm::mat4(glm::mat3(m_view)));
 
     // Normal Shader
-    m_normalShader.use();
-    m_normalShader.setMat4("projection", m_projection);
-    m_normalShader.setMat4("view", m_view);
+    m_shaders.getShader("normal")->use();
+    m_shaders.getShader("normal")->setMat4("projection", m_projection);
+    m_shaders.getShader("normal")->setMat4("view", m_view);
 
     // Cube Shader
-    m_cubeShader.use();
-    m_cubeShader.setVec3("cameraPos", getCamera()->getPos());
+    m_shaders.getShader("cube")->use();
+    m_shaders.getShader("cube")->setVec3("cameraPos", getCamera()->getPos());
     for (int i = 0; i < 100; i++) {
         glm::vec4 difference = m_modelMatrices[i][3] - glm::vec4(m_origin, 1.0);
         difference.w = 1.0f;
@@ -474,11 +454,6 @@ void Engine::update() {
 
 void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
-    Shader* depthShader = ShaderStorage::getInstance()->getShader("depthShader");
-    // Shader* objShader = ShaderStorage::getInstance()->getShader("objShader");
-    // Shader* skyboxShader = ShaderStorage::getInstance()->getShader("skyboxShader");
-    // Shader* normalShader = ShaderStorage::getInstance()->getShader("normalShader");
-    // Shader* cubeShader = ShaderStorage::getInstance()->getShader("cubeShader");
     glClearColor(background.x, background.y, background.z, background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -488,11 +463,11 @@ void Engine::render() {
     glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    depthShader->use();
+    m_shaders.getShader("depth")->use();
 
     m_model = glm::mat4(1.0f);
 
-    depthShader->setMat4("model", m_model);
+    m_shaders.getShader("depth")->setMat4("model", m_model);
     glBindVertexArray(m_planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -502,8 +477,8 @@ void Engine::render() {
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    depthShader->setMat4("model", m_model);
-    m_objModel->draw(depthShader);
+    m_shaders.getShader("depth")->setMat4("model", m_model);
+    m_objModel->draw(m_shaders.getShader("depth"));
 
     // Reflecting model
     m_model = glm::mat4(1.0f);
@@ -511,21 +486,21 @@ void Engine::render() {
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
-    depthShader->setMat4("model", m_model);
-    m_objModel->draw(depthShader);
+    m_shaders.getShader("depth")->setMat4("model", m_model);
+    m_objModel->draw(m_shaders.getShader("depth"));
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    depthShader->setMat4("model", m_model);
+    m_shaders.getShader("depth")->setMat4("model", m_model);
 
-    m_planetModel->draw(depthShader);
+    m_planetModel->draw(m_shaders.getShader("depth"));
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
-        depthShader->setMat4("model", m_modelMatrices[i]);
-        m_rockModel->draw(depthShader);
+        m_shaders.getShader("depth")->setMat4("model", m_modelMatrices[i]);
+        m_rockModel->draw(m_shaders.getShader("depth"));
     }
 
     // Light
@@ -534,7 +509,7 @@ void Engine::render() {
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
 
-        depthShader->setMat4("model", m_model);
+        m_shaders.getShader("depth")->setMat4("model", m_model);
         glBindVertexArray(m_lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
@@ -544,33 +519,33 @@ void Engine::render() {
     glViewport(0, 0, m_SCR_W, m_SCR_H);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    m_debugDepthShader.use();
+    m_shaders.getShader("debugDepth")->use();
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 10.0f, 5.0f));
 
-    m_debugDepthShader.setMat4("model", m_model);
+    m_shaders.getShader("debugDepth")->setMat4("model", m_model);
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
     glBindVertexArray(m_debugVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Use vegetation VAO to draw the floor plane will use specific texture for plane
-    m_objShader.use();
+    m_shaders.getShader("object")->use();
 
     m_model = glm::mat4(1.0f);
 
-    m_objShader.setMat4("model", m_model);
+    m_shaders.getShader("object")->setMat4("model", m_model);
 
-    m_objShader.setVec3("material.ambient", glm::vec3(0.7f));
-    m_objShader.setVec3("material.diffuse", glm::vec3(0.5f));
-    m_objShader.setVec3("material.specular", glm::vec3(0.1f));
+    m_shaders.getShader("object")->setVec3("material.ambient", glm::vec3(0.7f));
+    m_shaders.getShader("object")->setVec3("material.diffuse", glm::vec3(0.5f));
+    m_shaders.getShader("object")->setVec3("material.specular", glm::vec3(0.1f));
 
-    m_objShader.setInt("material.texture_diffuse1", 0);
-    m_objShader.setInt("depthMap", 1);
+    m_shaders.getShader("object")->setInt("material.texture_diffuse1", 0);
+    m_shaders.getShader("object")->setInt("depthMap", 1);
     
-    m_objShader.setBool("material.missingDiffuse", false);
-    m_objShader.setBool("materialVert.missingNormal", true);
-    m_objShader.setBool("usingDepth", true);
+    m_shaders.getShader("object")->setBool("material.missingDiffuse", false);
+    m_shaders.getShader("object")->setBool("materialVert.missingNormal", true);
+    m_shaders.getShader("object")->setBool("usingDepth", true);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_floorTexture);
     glActiveTexture(GL_TEXTURE1);
@@ -579,62 +554,62 @@ void Engine::render() {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Model
-    m_objShader.use();
-    m_objShader.setBool("usingDepth", true);
-    m_objShader.setInt("depthMap", 4);
+    m_shaders.getShader("object")->use();
+    m_shaders.getShader("object")->setBool("usingDepth", true);
+    m_shaders.getShader("object")->setInt("depthMap", 4);
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
     
-    m_objShader.setMat4("model", m_model);
+    m_shaders.getShader("object")->setMat4("model", m_model);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
-    m_objModel->draw(&m_objShader);
+    m_objModel->draw(m_shaders.getShader("object"));
     
-    // m_normalShader.use();
-    // m_normalShader.setMat4("model", m_model);
-    // m_objModel->draw(m_normalShader);
-    
+
+    // m_shaders.getShader("normal")->use();
+    // m_shaders.getShader("normal")->setMat4("model", m_model);
+    // m_objModel->draw(m_shaders.getShader("normal"));
     // Reflecting model
-    m_cubeShader.use();
+    m_shaders.getShader("cube")->use();
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
-    m_cubeShader.setMat4("model", m_model);
+    m_shaders.getShader("cube")->setMat4("model", m_model);
     
-    m_objModel->draw(&m_cubeShader);
+    m_objModel->draw(m_shaders.getShader("cube"));
     
     // Planet Model
-    m_objShader.use();
-    m_objShader.setBool("usingDepth", false);
+    m_shaders.getShader("object")->use();
+    m_shaders.getShader("object")->setBool("usingDepth", false);
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    m_objShader.setMat4("model", m_model);
-    m_planetModel->draw(&m_objShader);
+    m_shaders.getShader("object")->setMat4("model", m_model);
+    m_planetModel->draw(m_shaders.getShader("object"));
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
-        m_objShader.setMat4("model", m_modelMatrices[i]);
-        m_rockModel->draw(&m_objShader);
+        m_shaders.getShader("object")->setMat4("model", m_modelMatrices[i]);
+        m_rockModel->draw(m_shaders.getShader("object"));
     }
 
     // Light
-    m_lightShader.use();
+    m_shaders.getShader("light")->use();
     for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
         m_model = glm::mat4(1.0f);
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
 
-        m_lightShader.setMat4("model", m_model);
-        m_lightShader.setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f :
+        m_shaders.getShader("light")->setMat4("model", m_model);
+        m_shaders.getShader("light")->setVec3("lightColor", glm::vec3(iter == 0 ? 1.0f :
         0.0f, iter == 1 ? 1.0f : 0.0f, iter == 2 ? 1.0f : 0.0f));
         // m_lightShader.setVec3("lightColor", glm::vec3(1.f, 1.0f, 1.f));
 
@@ -644,7 +619,7 @@ void Engine::render() {
 
     // Skybox
     glDepthFunc(GL_LEQUAL);
-    m_skyboxShader.use();
+    m_shaders.getShader("skybox")->use();
     glBindVertexArray(m_skyboxVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -657,7 +632,7 @@ void Engine::render() {
     glClearColor(background.x, background.y, background.z, background.a);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    m_screenShader.use();
+    m_shaders.getShader("screen")->use();
     glBindVertexArray(m_quadVAO);
     glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -692,24 +667,24 @@ void Engine::clean() {
 
     glfwTerminate();
     AudioEngine::getInstance()->clean();
-    ShaderStorage::getInstance()->clean();
+    m_shaders.clean();
 }
 
-void Engine::handleKeyInput(float deltaTime) {
+void Engine::handleKeyInput() {
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) return;
     if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
-        getCamera()->handleKeyInput(FORWARD, deltaTime);
+        getCamera()->handleKeyInput(FORWARD, m_dt);
     if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
-        getCamera()->handleKeyInput(BACKWARD, deltaTime);
+        getCamera()->handleKeyInput(BACKWARD, m_dt);
     if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
-        getCamera()->handleKeyInput(LEFT, deltaTime);
+        getCamera()->handleKeyInput(LEFT, m_dt);
     if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
-        getCamera()->handleKeyInput(RIGHT, deltaTime);
+        getCamera()->handleKeyInput(RIGHT, m_dt);
     if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        getCamera()->handleKeyInput(UP, deltaTime);
+        getCamera()->handleKeyInput(UP, m_dt);
     if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
         glfwGetKey(m_window, GLFW_KEY_C) != GLFW_PRESS)
-        getCamera()->handleKeyInput(DOWN, deltaTime);
+        getCamera()->handleKeyInput(DOWN, m_dt);
 }
 
 // Callback functions
