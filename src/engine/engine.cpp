@@ -83,9 +83,9 @@ bool Engine::init(int argc, char* argv[]) {
     // m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
     // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
     // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
-    m_objModel = new Model("RESOURCES/images/bunny/bunnygirl.obj");
-    m_planetModel = new Model("RESOURCES/images/planet/planet.obj");
-    m_rockModel = new Model("RESOURCES/images/rock/rock.obj");
+    m_models["bunny"] = new Model("RESOURCES/images/bunny/bunnygirl.obj");
+    m_models["planet"] = new Model("RESOURCES/images/planet/planet.obj");
+    m_models["rock"] = new Model("RESOURCES/images/rock/rock.obj");
 
     // Textures setup
     std::vector<std::string> faces{
@@ -478,7 +478,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_objModel->draw(m_shaders.getShader("depth"));
+    m_models["bunny"]->draw(m_shaders.getShader("depth"));
 
     // Reflecting model
     m_model = glm::mat4(1.0f);
@@ -487,7 +487,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
     m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_objModel->draw(m_shaders.getShader("depth"));
+    m_models["bunny"]->draw(m_shaders.getShader("depth"));
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
@@ -495,12 +495,12 @@ void Engine::render() {
 
     m_shaders.getShader("depth")->setMat4("model", m_model);
 
-    m_planetModel->draw(m_shaders.getShader("depth"));
+    m_models["planet"]->draw(m_shaders.getShader("depth"));
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
         m_shaders.getShader("depth")->setMat4("model", m_modelMatrices[i]);
-        m_rockModel->draw(m_shaders.getShader("depth"));
+        m_models["rock"]->draw(m_shaders.getShader("depth"));
     }
 
     // Light
@@ -566,7 +566,7 @@ void Engine::render() {
     m_shaders.getShader("object")->setMat4("model", m_model);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
-    m_objModel->draw(m_shaders.getShader("object"));
+    m_models["bunny"]->draw(m_shaders.getShader("object"));
     
 
     // m_shaders.getShader("normal")->use();
@@ -582,7 +582,7 @@ void Engine::render() {
     
     m_shaders.getShader("cube")->setMat4("model", m_model);
     
-    m_objModel->draw(m_shaders.getShader("cube"));
+    m_models["bunny"]->draw(m_shaders.getShader("cube"));
     
     // Planet Model
     m_shaders.getShader("object")->use();
@@ -593,12 +593,12 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_shaders.getShader("object")->setMat4("model", m_model);
-    m_planetModel->draw(m_shaders.getShader("object"));
+    m_models["planet"]->draw(m_shaders.getShader("object"));
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
         m_shaders.getShader("object")->setMat4("model", m_modelMatrices[i]);
-        m_rockModel->draw(m_shaders.getShader("object"));
+        m_models["rock"]->draw(m_shaders.getShader("object"));
     }
 
     // Light
@@ -664,6 +664,11 @@ void Engine::clean() {
     glDeleteRenderbuffers(1, &m_RBO);
     glDeleteFramebuffers(1, &m_FBO);
     glDeleteFramebuffers(1, &m_depthMapFBO);
+
+    for (auto iter = m_models.begin(); iter != m_models.end(); iter++) {
+        delete iter->second;
+    }
+    m_models.clear();
 
     glfwTerminate();
     AudioEngine::getInstance()->clean();
@@ -776,7 +781,7 @@ void Engine::showappMenuBar() {
             ImGui::MenuItem("Main menu", NULL, false,
                             false);  // No "Shortcut key provided"
             ImGui::Separator();
-            ImGui::MenuItem("Setttings");
+            ImGui::MenuItem("Settings");
             if (ImGui::MenuItem("Quit")) {
                 quit();
             }

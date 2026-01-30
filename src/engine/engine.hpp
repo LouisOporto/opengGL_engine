@@ -351,15 +351,16 @@ class Engine {
     static Engine* m_instance;
     GLFWwindow* m_window;
 
-    Model* m_objModel;
-    Model* m_planetModel;
-    Model* m_rockModel;
+    // Model* m_objModel;
+    // Model* m_planetModel;
+    // Model* m_rockModel;
     ShaderStorage m_shaders;
     Timer m_timer;
 
     // Dynamically create VBO, VAO, (initialize by hard coding and reuse by caching)
-    std::map<std::string, unsigned int> m_VAOs;
-    std::map<std::string, unsigned int> m_VBOs;
+    std::map<std::string, Model*> m_models;
+    // std::map<std::string, unsigned int> m_VAOs;
+    // std::map<std::string, unsigned int> m_VBOs;
 
     unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_UBO, m_debugVAO, m_debugVBO;
     unsigned int m_texture0, m_texture1, m_cubemapTexture, m_floorTexture, m_depthMap, m_depthCubemap;
