@@ -83,6 +83,8 @@ bool Engine::init(int argc, char* argv[]) {
     // m_objModel = new Model("RESOURCES/images/backpack/backpack.obj");
     // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
     // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
+
+    // m_models["porsche"] = new Model("RESOURCES/images/porsche/911_scene.obj");
     m_models["bunny"] = new Model("RESOURCES/images/bunny/bunnygirl.obj");
     m_models["planet"] = new Model("RESOURCES/images/planet/planet.obj");
     m_models["rock"] = new Model("RESOURCES/images/rock/rock.obj");
@@ -106,6 +108,9 @@ bool Engine::init(int argc, char* argv[]) {
     if (!setupShaders()) {
         return false;
     }
+
+    m_shaders.getShader("box")->use();
+    m_shaders.getShader("box")->setInt("diffuseTexture", 0);
 
     // Camera setup
     m_camera = new Camera(m_SCR_W, m_SCR_H, glm::vec3(0.0f, 10.0f, 10.0f));
@@ -178,6 +183,9 @@ bool Engine::initOpenGLVariables() {
 
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(VERTICESPOS)));
         glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
+        glEnableVertexAttribArray(2);
     }
 
     // Light VAO (Phyiscal light objects)
@@ -304,10 +312,10 @@ bool Engine::initOpenGLVariables() {
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
         }
         
-        glGenBuffers(1, &m_depthCubemapFBO);
+        glGenFramebuffers(1, &m_depthCubemapFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthCubemapFBO);
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthCubemap, 0);
-        glDrawBuffer(GL_NONE); // This causes main map to go black
+        glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -315,8 +323,6 @@ bool Engine::initOpenGLVariables() {
             return false;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glDrawBuffer(GL_BACK);
     }
 
     return true;
@@ -327,14 +333,17 @@ bool Engine::setupShaders() {
     if (!m_shaders.addShader("skybox", "RESOURCES/shaders/skybox.vert", "RESOURCES/shaders/skybox.frag")) return false;
     if (!m_shaders.addShader("normal", "RESOURCES/shaders/normalDisplay.vert", "RESOURCES/shaders/normalDisplay.frag", "RESOURCES/shaders/normalDisplay.geom")) return false;
     if (!m_shaders.addShader("depth", "RESOURCES/shaders/simpleDepthShader.vert", "RESOURCES/shaders/simpleDepthShader.frag")) return false;
+    if (!m_shaders.addShader("depthCube", "RESOURCES/shaders/depthCube.vert", "RESOURCES/shaders/depthCube.frag", "RESOURCES/shaders/depthCube.geom")) return false;
     if (!m_shaders.addShader("object", "RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) return false;
     if (!m_shaders.addShader("light", "RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) return false;
     if (!m_shaders.addShader("cube", "RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) return false;
     if (!m_shaders.addShader("debugDepth", "RESOURCES/shaders/debugDepth.vert", "RESOURCES/shaders/debugDepth.frag")) return false;
+    if (!m_shaders.addShader("box", "RESOURCES/shaders/box.vert", "RESOURCES/shaders/box.frag")) return false;
     m_shaders.getShader("object")->bindUniformBlock("Matrices", 0);
     m_shaders.getShader("light")->bindUniformBlock("Matrices", 0);
     m_shaders.getShader("cube")->bindUniformBlock("Matrices", 0);
     m_shaders.getShader("debugDepth")->bindUniformBlock("Matrices", 0);
+    m_shaders.getShader("box")->bindUniformBlock("Matrices", 0);
 
     // Uniform Block Object
     {
