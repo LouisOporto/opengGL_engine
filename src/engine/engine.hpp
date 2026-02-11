@@ -351,9 +351,6 @@ class Engine {
     static Engine* m_instance;
     GLFWwindow* m_window;
 
-    // Model* m_objModel;
-    // Model* m_planetModel;
-    // Model* m_rockModel;
     ShaderStorage m_shaders;
     Timer m_timer;
 
@@ -363,26 +360,18 @@ class Engine {
     // std::map<std::string, unsigned int> m_VBOs;
 
     unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_UBO, m_debugVAO, m_debugVBO;
-    unsigned int m_texture0, m_texture1, m_cubemapTexture, m_floorTexture, m_depthMap, m_depthCubemap;
-    unsigned int m_textureColorBuffer, m_depthMapFBO, m_FBO, m_RBO, m_depthCubemapFBO;
+    unsigned int m_cubemapTexture, m_floorTexture, m_cubemapWood, m_depthMap, m_depthCubemap, m_textureColorBuffer;
+    unsigned int m_depthMapFBO, m_FBO, m_RBO, m_depthCubemapFBO;
 
     // World perspective
-    bool m_firstMouse;
-    bool m_lightOn;
-    bool m_NormalMapOn;
-    bool m_mouseVisible;
-    bool m_screenRotate;
-    bool m_running;
+    bool m_firstMouse, m_lightOn, m_NormalMapOn, m_mouseVisible, m_screenRotate, m_running;
     float m_lastX, m_lastY, m_dt;
     int m_volume = 100;
 
     // No need to change universal usage here
     Camera* m_camera;
     glm::mat4* m_modelMatrices;
-    glm::mat4 m_projection;
-    glm::mat4 m_view;
-    glm::mat4 m_model;
-    glm::mat4 m_lightSpaceMatrix;
+    glm::mat4 m_projection, m_view, m_model, m_lightSpaceMatrix;
     glm::vec3 m_origin;
     int m_SCR_W, m_SCR_H;
 
