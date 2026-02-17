@@ -538,22 +538,96 @@ void Engine::render() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
+    // Logger::Warn("depthFBO: %d\ndepthCubeFBO: %d", m_depthMapFBO, m_depthCubemapFBO);
+    // Lets do a first desgin with point light and directrion light off.
+    // Next step is to combine a directional and point light in the shadow map (Double drawing and combine when doing shader coloring)
+    glViewport(0, 0, SHADOW_LENGTH, SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_depthCubemapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_shaders.getShader("depthCube")->use();
+
+    m_model = glm::mat4(1.0f);
+
+    m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    glBindVertexArray(m_planeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Model
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    m_models["bunny"]->draw(m_shaders.getShader("depthCube"));
+
+    // Reflecting model
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    m_models["bunny"]->draw(m_shaders.getShader("depthCube"));
+
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    m_shaders.getShader("depthCube")->setMat4("model", m_model);
+
+    m_models["planet"]->draw(m_shaders.getShader("depthCube"));
+
+    // Asteroid Belt
+    for (int i = 0; i < 100; i++) {
+        m_shaders.getShader("depthCube")->setMat4("model", m_modelMatrices[i]);
+        m_models["rock"]->draw(m_shaders.getShader("depthCube"));
+    }
+
+    // Light
+    for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
+        m_model = glm::mat4(1.0f);
+        m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
+        m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
+
+        m_shaders.getShader("depthCube")->setMat4("model", m_model);
+        glBindVertexArray(m_lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+    
     // Second Pass: Model Rendering
     glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
     glViewport(0, 0, m_SCR_W, m_SCR_H);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    m_shaders.getShader("debugDepth")->use();
+    // Testing depth map
+    // m_shaders.getShader("debugDepth")->use();
 
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(0.0f, 10.0f, 5.0f));
+
+    // m_shaders.getShader("debugDepth")->setMat4("model", m_model);
+    // glBindTexture(GL_TEXTURE_2D, m_depthMap);
+    // glBindVertexArray(m_debugVAO);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    
+    glDisable(GL_CULL_FACE);
+    m_shaders.getShader("box")->use();
+    
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(0.0f, 10.0f, 5.0f));
+    m_model = glm::translate(m_model, glm::vec3(0.0f, 10.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(10.0f));
+    
+    m_shaders.getShader("box")->setMat4("model", m_model);
+    m_shaders.getShader("box")->setBool("reverseNormals", true);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_floorTexture);
+    glBindVertexArray(m_objectVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glEnable(GL_CULL_FACE);
 
-    m_shaders.getShader("debugDepth")->setMat4("model", m_model);
-    glBindTexture(GL_TEXTURE_2D, m_depthMap);
-    glBindVertexArray(m_debugVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // Use vegetation VAO to draw the floor plane will use specific texture for plane
+    // Plane Texture (Should be disabled for this version of shadow cascade)
     m_shaders.getShader("object")->use();
 
     m_model = glm::mat4(1.0f);
@@ -605,7 +679,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
     m_shaders.getShader("cube")->setMat4("model", m_model);
-    
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
     m_models["bunny"]->draw(m_shaders.getShader("cube"));
     
     // Planet Model
@@ -645,7 +719,8 @@ void Engine::render() {
     glDepthFunc(GL_LEQUAL);
     m_shaders.getShader("skybox")->use();
     glBindVertexArray(m_skyboxVAO);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS);
