@@ -385,9 +385,19 @@ void Engine::update() {
 
     m_projection = getCamera()->getPerspective();
     m_view = getCamera()->getLookAt();
+    // glm::vec3 pos = getCamera()->getPos();
 
     glm::vec3 directionVector = {5.0f, 60.0f, 30.0f};
     glm::vec3 lightColor = glm::vec3(1.0f);
+    glm::vec3 pos = glm::vec3(5.0, 10.0f, 0.0f);
+
+    std::vector<glm::mat4> shadowTransforms;
+    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 
     // Light Matrix (model)
     float nearPlane = 0.1f, farPlane = 200.0f;
@@ -401,6 +411,12 @@ void Engine::update() {
     // m_shaders.getShader("depth")->use();
     // m_shaders.getShader("depth")->setFloat("nearPlane", nearPlane);
     // m_shaders.getShader("depth")->setFloat("farPlane", farPlane);
+    m_shaders.getShader("depthCube")->use();
+    for (int i = 0; i < 6; i++) {
+        m_shaders.getShader("depthCube")->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+    }
+    m_shaders.getShader("depthCube")->setVec3("lightPos", m_camera->getPos());
+    m_shaders.getShader("depthCube")->setFloat("farPlane", 100.0f);
 
     // Uniform Buffer Values
     glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
@@ -464,8 +480,7 @@ void Engine::update() {
 void Engine::render() {
     glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
     glClearColor(background.x, background.y, background.z, background.w);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // First Pass: Shadow Casting
     glViewport(0, 0, SHADOW_LENGTH, SHADOW_HEIGHT);
