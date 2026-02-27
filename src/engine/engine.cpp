@@ -637,12 +637,14 @@ void Engine::render() {
     m_shaders.getShader("object")->setVec3("material.ambient", glm::vec3(0.7f));
     m_shaders.getShader("object")->setVec3("material.diffuse", glm::vec3(0.5f));
     m_shaders.getShader("object")->setVec3("material.specular", glm::vec3(0.1f));
+    m_shaders.getShader("object")->setFloat("material.shininess", 0.0f);
 
     m_shaders.getShader("object")->setInt("material.texture_diffuse1", 0);
     m_shaders.getShader("object")->setInt("depthMap", 1);
     
     m_shaders.getShader("object")->setBool("material.missingDiffuse", false);
     m_shaders.getShader("object")->setBool("materialVert.missingNormal", true);
+    m_shaders.getShader("object")->setBool("material.missingSpecular", true);
     m_shaders.getShader("object")->setBool("usingDepth", true);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_floorTexture);
@@ -719,8 +721,8 @@ void Engine::render() {
     glDepthFunc(GL_LEQUAL);
     m_shaders.getShader("skybox")->use();
     glBindVertexArray(m_skyboxVAO);
-    // glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS);
