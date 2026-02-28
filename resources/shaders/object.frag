@@ -80,7 +80,7 @@ in VS_OUT {
 
 float linearizeDepth(float depth) {
     float value = depth * 2.0 - 1.0;
-    return (2.0 * 0.1 * 200.0) / (200.0 + 0.1 - value * (200.0 - 0.1));
+    return (2.0 * 0.1 * 200.0) / (200.0 + 0.1 - value * (200.0 - 0.1)); // Formula : (2 * nearZ * farZ) / (farZ + nearZ - 2 * (farZ - nearZ))
 }
 
 float calcShadow(vec4 fragPosLightSpace, vec3 norm, vec3 lightDir) {
