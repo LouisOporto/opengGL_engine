@@ -3,6 +3,11 @@
 Engine* Engine::m_instance = nullptr;
 
 bool Engine::init(int argc, char* argv[]) {
+    if (!Logger::init()) {
+        Logger::Error("Failed to setup logger session logging");
+        return false;
+    }
+
     if (!glfwInit()) {
         Logger::Error("Failed to start GLFW");
         return false;
