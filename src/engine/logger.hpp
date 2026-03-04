@@ -18,18 +18,18 @@ class Logger {
         std::time_t t = std::time(nullptr);
         std::tm now;
         localtime_s(&now, &t);
-        printf(LOG_COLOR_LOG "[%d:%d:%d] LOG: ", now.tm_hour, now.tm_min,
-               now.tm_sec);
+
+        char message[1024];
+        char timezone[1024];
+        snprintf(message, sizeof(message), msg, args...);
+        snprintf(timezone, sizeof(timezone), "[%02d:%02d:%02d]", now.tm_hour, now.tm_min, now.tm_sec);
+
+        printf(LOG_COLOR_LOG "%s LOG: ", timezone);
         printf(msg, args...);
         printf(LOG_COLOR_RESET "\n");
 
-        char message[1024];
-        snprintf(message, sizeof(message), msg, args...);
         std::fstream file("log.txt", std::ios::out | std::ios::app);
-        file << "[" << std::setfill('0') << std::setw(2) << now.tm_hour << ":"
-             << std::setfill('0') << std::setw(2) << now.tm_min << ":"
-             << std::setfill('0') << std::setw(2) << now.tm_sec
-             << "] LOG: " << message << std::endl;
+        file << timezone << " LOG: " << message << std::endl;
         file.close();
     }
 
@@ -38,18 +38,18 @@ class Logger {
         std::time_t t = std::time(nullptr);
         std::tm now;
         localtime_s(&now, &t);
-        printf(LOG_COLOR_WARN "[%d:%d:%d] WARN: ", now.tm_hour, now.tm_min,
-               now.tm_sec);
+
+        char message[1024];
+        char timezone[1024];
+        snprintf(message, sizeof(message), msg, args...);
+        snprintf(timezone, sizeof(timezone), "[%02d:%02d:%02d]", now.tm_hour, now.tm_min, now.tm_sec);
+        
+        printf(LOG_COLOR_WARN "%s WARN: ", timezone);
         printf(msg, args...);
         printf(LOG_COLOR_RESET "\n");
 
-        char message[1024];
-        snprintf(message, sizeof(message), msg, args...);
         std::fstream file("log.txt", std::ios::out | std::ios::app);
-        file << "[" << std::setfill('0') << std::setw(2) << now.tm_hour << ":"
-             << std::setfill('0') << std::setw(2) << now.tm_min << ":"
-             << std::setfill('0') << std::setw(2) << now.tm_sec
-             << "] WARN: " << message << std::endl;
+        file << timezone <<" WARN: " << message << std::endl;
         file.close();
     }
 
@@ -58,18 +58,18 @@ class Logger {
         std::time_t t = std::time(nullptr);
         std::tm now;
         localtime_s(&now, &t);
-        printf(LOG_COLOR_ERROR "[%d:%d:%d] ERROR: ", now.tm_hour, now.tm_min,
-               now.tm_sec);
+
+        char message[1024];
+        char timezone[1024];
+        snprintf(message, sizeof(message), msg, args...);
+        snprintf(timezone, sizeof(timezone), "[%02d:%02d:%02d]", now.tm_hour, now.tm_min, now.tm_sec);
+        
+        printf(LOG_COLOR_ERROR "%s ERROR: ", timezone);
         printf(msg, args...);
         printf(LOG_COLOR_RESET "\n");
 
-        char message[1024];
-        snprintf(message, sizeof(message), msg, args...);
         std::fstream file("log.txt", std::ios::out | std::ios::app);
-        file << "[" << std::setfill('0') << std::setw(2) << now.tm_hour << ":"
-             << std::setfill('0') << std::setw(2) << now.tm_min << ":"
-             << std::setfill('0') << std::setw(2) << now.tm_sec
-             << "] ERROR: " << message << std::endl;
+        file << timezone << " ERROR: " << message << std::endl;
         file.close();
     }
 };
