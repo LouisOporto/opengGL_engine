@@ -75,6 +75,12 @@ class Logger {
         std::fstream file("log.txt", std::ios::out | std::ios::app);
         file << timezone <<" WARN: " << message << std::endl;
         file.close();
+
+        if (usingSession) {
+            std::fstream session(currentSessionTime, std::ios::out | std::ios::app);
+            session << timezone <<" WARN: " << message << std::endl;
+            session.close();
+        }
     }
 
     template <typename... Args>
@@ -95,6 +101,12 @@ class Logger {
         std::fstream file("log.txt", std::ios::out | std::ios::app);
         file << timezone << " ERROR: " << message << std::endl;
         file.close();
+
+        if (usingSession) {
+            std::fstream session(currentSessionTime, std::ios::out | std::ios::app);
+            session << timezone <<" ERROR: " << message << std::endl;
+            session.close();
+        }
     }
 };
 
