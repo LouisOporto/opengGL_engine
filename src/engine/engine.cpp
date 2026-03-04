@@ -397,15 +397,16 @@ void Engine::update() {
     glm::vec3 pos = glm::vec3(5.0, 10.0f, 0.0f);
 
     std::vector<glm::mat4> shadowTransforms;
-    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-    shadowTransforms.push_back(m_projection * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    float nearPlane = 0.1f, farPlane = 300.0f;
+    glm::mat4 proj = glm::perspective(glm::radians(90.0f), m_SCR_W / (float)m_SCR_H, nearPlane, farPlane);
+    shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+    shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 
     // Light Matrix (model)
-    float nearPlane = 0.1f, farPlane = 200.0f;
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
     // glm::mat4 lightProjection = glm::perspective(45.0f, m_SCR_W / (float)m_SCR_H, nearPlane, farPlane);
     glm::mat4 lightView = glm::lookAt(directionVector, glm::vec3(5.0f, 1.0f, -5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -420,8 +421,8 @@ void Engine::update() {
     for (int i = 0; i < 6; i++) {
         m_shaders.getShader("depthCube")->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
     }
-    m_shaders.getShader("depthCube")->setVec3("lightPos", m_camera->getPos());
-    m_shaders.getShader("depthCube")->setFloat("farPlane", 200.0f);
+    m_shaders.getShader("depthCube")->setVec3("lightPos", pos);
+    m_shaders.getShader("depthCube")->setFloat("farPlane", farPlane);
 
     // Uniform Buffer Values
     glBindBuffer(GL_UNIFORM_BUFFER, m_UBO);
@@ -434,7 +435,7 @@ void Engine::update() {
     m_shaders.getShader("box")->use();
     m_shaders.getShader("box")->setVec3("lightPos", pos);
     m_shaders.getShader("box")->setVec3("viewPos", getCamera()->getPos());
-    m_shaders.getShader("box")->setFloat("farPlane", 200.0f);
+    m_shaders.getShader("box")->setFloat("farPlane", farPlane);
 
     // Model shader
     m_shaders.getShader("object")->use();
@@ -750,7 +751,7 @@ void Engine::render() {
     m_shaders.getShader("skybox")->use();
     glBindVertexArray(m_skyboxVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS);
