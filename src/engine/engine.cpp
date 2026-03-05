@@ -104,10 +104,10 @@ bool Engine::init(int argc, char* argv[]) {
         "Cubemap_Sky_25-512x512.png"
     };
 
-    stbi_set_flip_vertically_on_load(false);
     // m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(faces, "RESOURCES/images/skybox");
     m_cubemapTexture = ImageLoader::getInstance()->loadCubemap(cubemap, "RESOURCES/images/skybox");
-    m_floorTexture = ImageLoader::getInstance()->loadImage("box.png", "RESOURCES/images", 1);
+    stbi_set_flip_vertically_on_load(true);
+    m_floorTexture = ImageLoader::getInstance()->loadImage("greybox_grey_grid.png", "RESOURCES/images", 1);
 
     // Shader setup
     if (!setupShaders()) {
@@ -416,8 +416,8 @@ void Engine::update() {
     glm::vec3 pos = glm::vec3(5.0, 10.0f, 0.0f);
 
     std::vector<glm::mat4> shadowTransforms;
-    float nearPlane = 0.1f, farPlane = 300.0f;
-    glm::mat4 proj = glm::perspective(glm::radians(90.0f), m_SCR_W / (float)m_SCR_H, nearPlane, farPlane);
+    float nearPlane = 0.1f, farPlane = 100.0f;
+    glm::mat4 proj = glm::perspective(glm::radians(90.0f), (float)SHADOW_LENGTH / (float)SHADOW_HEIGHT, nearPlane, farPlane);
     shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
     shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
     shadowTransforms.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -453,6 +453,7 @@ void Engine::update() {
     // Box shader
     m_shaders.getShader("box")->use();
     m_shaders.getShader("box")->setVec3("lightPos", pos);
+    m_shaders.getShader("box")->setBool("reverseNormals", true);
     m_shaders.getShader("box")->setVec3("viewPos", getCamera()->getPos());
     m_shaders.getShader("box")->setFloat("farPlane", farPlane);
 
@@ -579,14 +580,12 @@ void Engine::render() {
     m_shaders.getShader("depthCube")->use();
 
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(5.0f, 10.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(30.0f));
+    m_model = glm::translate(m_model, glm::vec3(5.0f, 25.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(50.0f));
     m_shaders.getShader("depthCube")->setMat4("model", m_model);
 
-    glDisable(GL_CULL_FACE);
     glBindVertexArray(m_objectVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glEnable(GL_CULL_FACE);
 
     m_model = glm::mat4(1.0f);
 
@@ -653,15 +652,14 @@ void Engine::render() {
     // glBindVertexArray(m_debugVAO);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     
-    glDisable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
     m_shaders.getShader("box")->use();
     
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(5.0f, 10.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(30.0f));
+    m_model = glm::translate(m_model, glm::vec3(5.0f, 25.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(50.0f));
     
     m_shaders.getShader("box")->setMat4("model", m_model);
-    m_shaders.getShader("box")->setBool("reverseNormals", true);
     m_shaders.getShader("box")->setInt("diffuseTexture", 0);
     m_shaders.getShader("box")->setInt("depthMap", 1);
     m_shaders.getShader("box")->setInt("depthCubeMap", 2);
