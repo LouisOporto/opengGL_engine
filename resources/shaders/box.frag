@@ -18,28 +18,50 @@ uniform float farPlane;
 
 // uniform bool shadows;
 
-// vec3 gridSamplingDisk[20] = vec3[] (
-//     vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), 
-// );
-
-vec3 calcDirLight();
-vec3 calcPointLight();
-vec3 calcSpotLight();
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);   
 
 float calcShadow(vec3 fragPos) {
     vec3 fragToLight = fragPos - lightPos;
-    float closetDepth = texture(depthCubeMap, fragToLight).r;
-    closetDepth *= farPlane;
+    // float closetDepth = texture(depthCubeMap, fragToLight).r;
+    // closetDepth *= farPlane;
     float currentDepth = length(fragToLight);
 
+    float shadow = 0.0;
     float bias = 0.05;
-    float shadow = currentDepth - bias > closetDepth ? 1.0 : 0.0;
+    // float samples = 4.0;
+    // float offset = 0.1;
+    // for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
+    //     for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
+    //         for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
+    //             float closetDepth = texture(depthCubeMap, fragToLight + vec3(x, y, z)).r;
+    //             closetDepth *= farPlane;
+    //             if (currentDepth - bias > closetDepth) shadow += 1.0;
+    //         }
+    //     }
+    // }
+    // shadow /= (samples * samples * samples);
+
+    int samples = 20;
+    float viewDistance = length(viewPos - fragPos);
+    float diskRadius = (1.0 + (viewDistance / farPlane)) / 25.0;
+    for (int i = 0; i < samples; i++) {
+        float closetDepth = texture(depthCubeMap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;
+        closetDepth *= farPlane;
+        if (currentDepth - bias > closetDepth) shadow += 1.0;
+    }
+    shadow /= float(samples);
+
+    // float bias = 0.05;
+    // float shadow = currentDepth - bias > closetDepth ? 1.0 : 0.0;
     return shadow;
 }
-
-#define ambientLight 0.3
-#define diffuseLight = 0.5
-#define specularLight = 0.1
 
 void main() {
     vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
@@ -70,20 +92,9 @@ void main() {
     fragColor = vec4(lighting, 1.0);
     fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / gamma));
 
-    vec3 fragToLight = fs_in.FragPos - lightPos;
-    float closetDepth = texture(depthCubeMap, fragToLight).r;
-    closetDepth;
-    fragColor = vec4(vec3(closetDepth), 1.0);
-}
 
-vec3 calcDirLight() {
-    return vec3(0.0);
-}
-
-vec3 calcPointLight() {
-    return vec3(0.0);
-}
-
-vec3 calcSpotLight() {
-    return vec3(0.0);
+    // Visualize depth cubemap
+    // vec3 fragToLight = fs_in.FragPos - lightPos;
+    // float closetDepth = texture(depthCubeMap, fragToLight).r;
+    // fragColor = vec4(vec3(closetDepth), 1.0);
 }
