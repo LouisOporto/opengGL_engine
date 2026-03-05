@@ -166,9 +166,11 @@ bool Engine::init(int argc, char* argv[]) {
 
 bool Engine::initOpenGLVariables() {
     glGenVertexArrays(1, &m_objectVAO);
+    glGenVertexArrays(1, &m_boxVAO);
     glGenVertexArrays(1, &m_lightVAO);
     glGenVertexArrays(1, &m_planeVAO);
     glGenVertexArrays(1, &m_skyboxVAO);
+    glGenBuffers(1, &m_boxVBO);
     glGenBuffers(1, &m_VBO);
     glGenBuffers(1, &m_skyboxVBO);
     glGenBuffers(1, &m_planeVBO);
@@ -198,6 +200,23 @@ bool Engine::initOpenGLVariables() {
         glBindVertexArray(m_lightVAO);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
         glEnableVertexAttribArray(0);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_boxVBO);
+    glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VERTICESPOS), &VERTICESPOS);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS), sizeof(VERTICESNORM), &VERTICESNORM);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(VERTICESPOS) + sizeof(VERTICESNORM), sizeof(BOXTEX), &BOXTEX);
+
+    // Box VAO
+    {
+        glBindVertexArray(m_boxVAO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(VERTICESPOS)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)(sizeof(VERTICESPOS) + sizeof(VERTICESNORM)));
+        glEnableVertexAttribArray(2);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_planeVBO);
@@ -652,9 +671,9 @@ void Engine::render() {
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
-    glBindVertexArray(m_objectVAO);
+    glBindVertexArray(m_boxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // Plane Texture (Should be disabled for this version of shadow cascade)
     m_shaders.getShader("object")->use();

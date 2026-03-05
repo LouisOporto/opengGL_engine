@@ -50,12 +50,12 @@ const float VERTICESPOS[] = {
     -0.5, -0.5, -0.5,
     -0.5, -0.5, 0.5,
 
-    -0.5, -0.5, -0.5,
-    -0.5, 0.5,  -0.5,
-    0.5,  0.5,  -0.5,
-    -0.5, -0.5, -0.5,
-    0.5,  0.5,  -0.5,
-    0.5,  -0.5, -0.5,
+    0.5, 0.5, -0.5,
+    0.5, -0.5,  -0.5,
+    -0.5,  0.5,  -0.5,
+    -0.5, 0.5, -0.5,
+    0.5,  -0.5,  -0.5,
+    -0.5,  -0.5, -0.5,
 
     -0.5, 0.5,  -0.5,
     -0.5, 0.5,  0.5,
@@ -138,11 +138,11 @@ const float VERTICESTEX[] = {
     0.0,  0.0,
     1.0,  0.0,
 
-    0.0,  0.0,
     0.0,  1.0,
-    1.0,  1.0,
     0.0,  0.0,
     1.0,  1.0,
+    1.0,  1.0,
+    0.0,  0.0,
     1.0,  0.0,
 
     0.0,  1.0,
@@ -159,6 +159,7 @@ const float VERTICESTEX[] = {
     0.0,  1.0,
     0.0,  0.0,
 };
+
 const float VERTICES[] = {
     -0.5, 0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  1.0,
     -0.5, -0.5, 0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
@@ -268,6 +269,50 @@ const float PLANETEXCOORDS[] = {
     0.0f, 100.0f,
 };
 
+const float BOXTEX[] {
+    1.0,  1.0,
+    1.0,  0.0,
+    0.0,  1.0,
+    0.0,  1.0,
+    1.0,  0.0,
+    0.0,  0.0,
+
+    1.0,  1.0,
+    1.0,  0.0,
+    0.0,  1.0,
+    0.0,  1.0,
+    1.0,  0.0,
+    0.0,  0.0,
+
+    1.0,  1.0,
+    1.0,  0.0,
+    0.0,  1.0,
+    0.0,  1.0,
+    1.0,  0.0,
+    0.0,  0.0,
+
+    1.0,  1.0,
+    1.0,  0.0,
+    0.0,  1.0,
+    0.0,  1.0,
+    1.0,  0.0,
+    0.0,  0.0,
+
+    1.0,  1.0,
+    1.0,  0.0,
+    0.0,  1.0,
+    0.0,  1.0,
+    1.0,  0.0,
+    0.0,  0.0,
+
+    1.0,  0.0,
+    0.0,  0.0,
+    0.0,  1.0,
+    0.0,  1.0,
+    1.0,  1.0,
+    1.0,  0.0,
+};
+
 const std::vector<glm::vec3> OBJECTPOSITIONS = {
     glm::vec3(0.0f, 0.0f, 5.0f),
     glm::vec3(3.2f, 0.3f, -5.0f),
@@ -359,7 +404,7 @@ class Engine {
     // std::map<std::string, unsigned int> m_VAOs;
     // std::map<std::string, unsigned int> m_VBOs;
 
-    unsigned int m_VBO, m_objectVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_UBO, m_debugVAO, m_debugVBO;
+    unsigned int m_VBO, m_objectVAO, m_boxVAO, m_lightVAO, m_quadVAO, m_quadVBO, m_planeVAO, m_planeVBO, m_skyboxVAO, m_skyboxVBO, m_UBO, m_boxVBO, m_debugVAO, m_debugVBO;
     unsigned int m_cubemapTexture, m_floorTexture, m_cubemapWood, m_depthMap, m_depthCubemap, m_textureColorBuffer;
     unsigned int m_depthMapFBO, m_FBO, m_RBO, m_depthCubemapFBO;
 
