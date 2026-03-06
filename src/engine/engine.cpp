@@ -360,12 +360,12 @@ bool Engine::setupShaders() {
     if (!m_shaders.addShader("depthCube", "RESOURCES/shaders/depthCube.vert", "RESOURCES/shaders/depthCube.frag", "RESOURCES/shaders/depthCube.geom")) return false;
     if (!m_shaders.addShader("object", "RESOURCES/shaders/object.vert", "RESOURCES/shaders/object.frag")) return false;
     if (!m_shaders.addShader("light", "RESOURCES/shaders/light.vert", "RESOURCES/shaders/light.frag")) return false;
-    if (!m_shaders.addShader("cube", "RESOURCES/shaders/cube.vert", "RESOURCES/shaders/cube.frag")) return false;
+    if (!m_shaders.addShader("reflect", "RESOURCES/shaders/reflect.vert", "RESOURCES/shaders/reflect.frag")) return false;
     if (!m_shaders.addShader("debugDepth", "RESOURCES/shaders/debugDepth.vert", "RESOURCES/shaders/debugDepth.frag")) return false;
     if (!m_shaders.addShader("box", "RESOURCES/shaders/box.vert", "RESOURCES/shaders/box.frag")) return false;
     m_shaders.getShader("object")->bindUniformBlock("Matrices", 0);
     m_shaders.getShader("light")->bindUniformBlock("Matrices", 0);
-    m_shaders.getShader("cube")->bindUniformBlock("Matrices", 0);
+    m_shaders.getShader("reflect")->bindUniformBlock("Matrices", 0);
     m_shaders.getShader("debugDepth")->bindUniformBlock("Matrices", 0);
     m_shaders.getShader("box")->bindUniformBlock("Matrices", 0);
 
@@ -493,8 +493,8 @@ void Engine::update() {
     m_shaders.getShader("normal")->setMat4("view", m_view);
 
     // Cube Shader
-    m_shaders.getShader("cube")->use();
-    m_shaders.getShader("cube")->setVec3("cameraPos", getCamera()->getPos());
+    m_shaders.getShader("reflect")->use();
+    m_shaders.getShader("reflect")->setVec3("cameraPos", getCamera()->getPos());
     for (int i = 0; i < 100; i++) {
         glm::vec4 difference = m_modelMatrices[i][3] - glm::vec4(m_origin, 1.0);
         difference.w = 1.0f;
@@ -719,16 +719,16 @@ void Engine::render() {
     // m_shaders.getShader("normal")->setMat4("model", m_model);
     // m_objModel->draw(m_shaders.getShader("normal"));
     // Reflecting model
-    m_shaders.getShader("cube")->use();
+    m_shaders.getShader("reflect")->use();
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
-    m_shaders.getShader("cube")->setMat4("model", m_model);
+    m_shaders.getShader("reflect")->setMat4("model", m_model);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-    m_models["bunny"]->draw(m_shaders.getShader("cube"));
+    m_models["bunny"]->draw(m_shaders.getShader("reflect"));
     
     // Planet Model
     m_shaders.getShader("object")->use();
