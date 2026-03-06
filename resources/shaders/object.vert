@@ -31,7 +31,7 @@ out VS_OUT {
 
 
 void main() {
-    mat3 normalMatrix = mat3(transpose(inverse(model)));
+    // mat3 normalMatrix = mat3(transpose(inverse(model)));
 
     // vec3 T = normalize(normalMatrix * aTangent);
     // vec3 N = normalize(normalMatrix * aNormal);
@@ -43,7 +43,7 @@ void main() {
     vs_out.TBN = mat3(T, B, N);
 
     if (materialVert.missingNormal) {
-        vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
+        vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
     }
     else {
         vs_out.Normal = texture(materialVert.texture_normal1, aTexCoord).rgb;
