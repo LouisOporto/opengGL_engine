@@ -16,8 +16,11 @@ class Logger {
  private:
     inline static char currentSessionTime[1024];
     inline static bool usingSession = false;
+    inline static bool m_hideLogs = false;
+    inline static bool m_hideWarnings = false;
+    inline static bool m_hideErrors = false;
  public:
-    static bool init() {
+    static bool init(bool hideLogs = false, bool hideWarnings = false, bool hideErrors = false ) {
         if (!std::filesystem::is_directory("./logs")) {
             if (!std::filesystem::create_directory("./logs")) {
                 return false;
@@ -28,6 +31,10 @@ class Logger {
         localtime_s(&now, &t);
 
         snprintf(currentSessionTime, sizeof(currentSessionTime), "./logs/%02d-%02d %02d.%02d.%02d-session.txt", now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec);
+
+        m_hideLogs = hideLogs;
+        m_hideWarnings = hideWarnings;
+        m_hideErrors = hideErrors;
         return usingSession = true;
     }
 
@@ -42,9 +49,11 @@ class Logger {
         snprintf(message, sizeof(message), msg, args...);
         snprintf(timezone, sizeof(timezone), "[%02d:%02d:%02d]", now.tm_hour, now.tm_min, now.tm_sec);
 
-        printf(LOG_COLOR_LOG "%s LOG: ", timezone);
-        printf(msg, args...);
-        printf(LOG_COLOR_RESET "\n");
+        if (!m_hideLogs) {
+            printf(LOG_COLOR_LOG "%s LOG: ", timezone);
+            printf(msg, args...);
+            printf(LOG_COLOR_RESET "\n");
+        }
 
         std::fstream file("./logs/log.txt", std::ios::out | std::ios::app);
         file << timezone << " LOG: " << message << std::endl;
@@ -68,9 +77,11 @@ class Logger {
         snprintf(message, sizeof(message), msg, args...);
         snprintf(timezone, sizeof(timezone), "[%02d:%02d:%02d]", now.tm_hour, now.tm_min, now.tm_sec);
         
-        printf(LOG_COLOR_WARN "%s WARN: ", timezone);
-        printf(msg, args...);
-        printf(LOG_COLOR_RESET "\n");
+        if (!m_hideWarnings) {
+            printf(LOG_COLOR_WARN "%s WARN: ", timezone);
+            printf(msg, args...);
+            printf(LOG_COLOR_RESET "\n");
+        }
 
         std::fstream file("log.txt", std::ios::out | std::ios::app);
         file << timezone <<" WARN: " << message << std::endl;
@@ -94,9 +105,11 @@ class Logger {
         snprintf(message, sizeof(message), msg, args...);
         snprintf(timezone, sizeof(timezone), "[%02d:%02d:%02d]", now.tm_hour, now.tm_min, now.tm_sec);
         
-        printf(LOG_COLOR_ERROR "%s ERROR: ", timezone);
-        printf(msg, args...);
-        printf(LOG_COLOR_RESET "\n");
+        if (!m_hideErrors) {
+            printf(LOG_COLOR_ERROR "%s ERROR: ", timezone);
+            printf(msg, args...);
+            printf(LOG_COLOR_RESET "\n");
+        }
 
         std::fstream file("log.txt", std::ios::out | std::ios::app);
         file << timezone << " ERROR: " << message << std::endl;

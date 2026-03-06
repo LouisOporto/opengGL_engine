@@ -3,7 +3,7 @@
 Engine* Engine::m_instance = nullptr;
 
 bool Engine::init(int argc, char* argv[]) {
-    if (!Logger::init()) {
+    if (!Logger::init(DISABLELOGS, DISABLEWARNINGS, DISABLEERRORS)) {
         Logger::Error("Failed to setup logger session logging");
         return false;
     }
