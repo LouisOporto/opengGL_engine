@@ -25,8 +25,8 @@
 #include "../timer/timer.hpp"
 #include "logger.hpp"
 
-#define DISABLELOGS false
-#define DISABLEWARNINGS false
+#define DISABLELOGS true
+#define DISABLEWARNINGS false 
 #define DISABLEERRORS false
 
 const int SCR_W = 1920;
