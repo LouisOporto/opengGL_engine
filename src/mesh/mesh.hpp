@@ -19,12 +19,6 @@ struct Texture {
     unsigned int id;
     std::string type;
     std::string path;
-
-    // Use the provided textures instead of the
-    // glm::vec3 ambient;
-    // glm::vec3 diffuse;
-    // glm::vec3 specular;
-    // float shininess;
 };
 
 struct DefaultMaterials {
@@ -46,7 +40,7 @@ class Mesh {
     void draw(Shader* shader);
 
    private:
-    // render data
+    // Render data
     unsigned int VAO, VBO, EBO;
     void setupMesh();
 };
