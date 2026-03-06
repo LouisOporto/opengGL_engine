@@ -39,7 +39,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     DefaultMaterials materialColor;
 
     Vertex vertex;
-    // Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
+    Logger::Log("Processing mesh: %s", mesh->mName.C_Str());
 
     // process vertex
     for (int i = 0; i < mesh->mNumVertices; i++) {

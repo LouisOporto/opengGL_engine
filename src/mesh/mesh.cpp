@@ -49,7 +49,7 @@ void Mesh::draw(Shader* shader) {
     bool missingNormal = true;
 
     for (int i = 0; i < m_textures.size(); i++) {
-        // printf("Texture Number: %d\n", i);
+        // Logger::Log("Texture Number: %d\n", i);
         glActiveTexture(GL_TEXTURE0 + i);
 
         std::string number;

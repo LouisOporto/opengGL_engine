@@ -11,18 +11,15 @@ unsigned int ImageLoader::loadImage(const char* path, const std::string& directo
 
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
-    // Logger::Log("After loading");
     if (data) {
         glBindTexture(GL_TEXTURE_2D, texture);
-        // Logger::Log("Channels: %d", nrChannels);
-        // Logger::Log("Before Binding");
+        Logger::Log("Channels: %d", nrChannels);
         if (diffuse) {
             glTexImage2D(GL_TEXTURE_2D, 0, (nrChannels == 4 ? GL_SRGB_ALPHA : nrChannels == 3 ? GL_SRGB : GL_R), width, height, 0, (nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), GL_UNSIGNED_BYTE, data);
         } else {
             glTexImage2D(GL_TEXTURE_2D, 0, (nrChannels == 4  ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), width, height, 0, (nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_R), GL_UNSIGNED_BYTE, data);
         }
         glGenerateMipmap(GL_TEXTURE_2D);
-        // Logger::Log("After binding");
 
         glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -52,8 +49,7 @@ unsigned int ImageLoader::loadCubemap(std::vector<std::string> faces, const std:
             int offsetW, offsetH;
             int newWidth = width / 4;
             int newHeight = height / 3;
-            // Logger::Log("Width: %d and Height: %d (SubWidth %d : SubHeight
-            // %d)", width, height, newWidth, newHeight);
+            Logger::Log("Width: %d and Height: %d (SubWidth %d : SubHeight %d)", width, height, newWidth, newHeight);
             for (int i = 0; i < 6; i++) {
                 switch (i) {
                     case 0:
@@ -81,17 +77,15 @@ unsigned int ImageLoader::loadCubemap(std::vector<std::string> faces, const std:
                         offsetH = newHeight;
                         break;  // bottom
                 }
-                // Logger::Log("Offset for position: X=%d Y=%d", offsetW,
-                // offsetH); Logger::Log("Format: %d", nrChannels);
+                Logger::Log("Offset for position: X=%d Y=%d", offsetW, offsetH); 
+                Logger::Log("Format: %d", nrChannels);
                 unsigned char* sideData = subImageGet(data, width, height, nrChannels, offsetW, offsetH, newWidth, newHeight);
                 if (sideData != NULL) {
                     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, (nrChannels == 4 ? GL_RGBA : GL_RGB), newWidth, newHeight, 0, (nrChannels == 4 ? GL_RGBA : GL_RGB), GL_UNSIGNED_BYTE, sideData);
                 } else {
                     Logger::Error("Failed to retrieve sub image");
                 }
-                // Logger::Warn("Cleaning sideData");
                 free(sideData);
-                // Logger::Warn("Error Number:%d", glGetError());
             }
             stbi_image_free(data);
         } else {
