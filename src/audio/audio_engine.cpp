@@ -125,6 +125,7 @@ void AudioEngine::playByPath(std::string name, std::string path, bool release) {
 
     if (FMOD_Studio_System_GetEvent(m_system, path.c_str(), &descript) != FMOD_OK) {
         Logger::Error("Failed to retrieve event named: %s", path.c_str());
+        return;
     }
 
     int length = 0;
