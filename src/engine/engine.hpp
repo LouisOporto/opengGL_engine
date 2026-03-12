@@ -20,6 +20,7 @@
 #include "../image_loader/image_loader.hpp"
 #include "../mesh/mesh.hpp"
 #include "../model/model.hpp"
+#include "../model/modelLoader.hpp"
 #include "../shader/shader.hpp"
 #include "../shader/shaderStorage.hpp"
 #include "../timer/timer.hpp"
@@ -404,7 +405,7 @@ class Engine {
     Timer m_timer;
 
     // Dynamically create VBO, VAO, (initialize by hard coding and reuse by caching)
-    std::map<std::string, Model*> m_models;
+    ModelLoader m_modelLoader;
     // std::map<std::string, unsigned int> m_VAOs;
     // std::map<std::string, unsigned int> m_VBOs;
 

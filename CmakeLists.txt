@@ -47,6 +47,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/camera/camera.cpp
     src/mesh/mesh.cpp
     src/model/model.cpp
+    src/model/modelLoader.cpp
     src/audio/audio_engine.cpp
 
     imgui/imgui.cpp

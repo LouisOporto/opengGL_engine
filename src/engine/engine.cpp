@@ -89,10 +89,11 @@ bool Engine::init(int argc, char* argv[]) {
     // m_objModel = new Model("RESOURCES/images/JustAGirl/JustAGirl.obj");
     // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
 
-    // m_models["porsche"] = new Model("RESOURCES/images/porsche/911_scene.obj");
-    m_models["bunny"] = new Model("RESOURCES/images/bunny/bunnygirl.obj");
-    m_models["planet"] = new Model("RESOURCES/images/planet/planet.obj");
-    m_models["rock"] = new Model("RESOURCES/images/rock/rock.obj");
+    // Need a class that does this automatically and naming convention
+    m_modelLoader.addModel("porsche", "RESOURCES/images/porsche/911_scene.obj");
+    // m_modelLoader.addModel("bunny", "RESOURCES/images/bunny/bunnygirl.obj");
+    m_modelLoader.addModel("planet", "RESOURCES/images/planet/planet.obj");
+    m_modelLoader.addModel("rock", "RESOURCES/images/rock/rock.obj");
 
     // Textures setup
     std::vector<std::string> faces{
@@ -534,7 +535,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_models["bunny"]->draw(m_shaders.getShader("depth"));
+    m_modelLoader["porsche"]->draw(m_shaders.getShader("depth"));
 
     // Reflecting model
     m_model = glm::mat4(1.0f);
@@ -543,7 +544,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
     m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_models["bunny"]->draw(m_shaders.getShader("depth"));
+    m_modelLoader["porsche"]->draw(m_shaders.getShader("depth"));
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
@@ -551,12 +552,12 @@ void Engine::render() {
 
     m_shaders.getShader("depth")->setMat4("model", m_model);
 
-    m_models["planet"]->draw(m_shaders.getShader("depth"));
+    m_modelLoader["planet"]->draw(m_shaders.getShader("depth"));
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
         m_shaders.getShader("depth")->setMat4("model", m_modelMatrices[i]);
-        m_models["rock"]->draw(m_shaders.getShader("depth"));
+        m_modelLoader["rock"]->draw(m_shaders.getShader("depth"));
     }
 
     // Light
@@ -600,7 +601,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_shaders.getShader("depthCube")->setMat4("model", m_model);
-    m_models["bunny"]->draw(m_shaders.getShader("depthCube"));
+    m_modelLoader["porsche"]->draw(m_shaders.getShader("depthCube"));
 
     // Reflecting model
     m_model = glm::mat4(1.0f);
@@ -609,7 +610,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
     m_shaders.getShader("depthCube")->setMat4("model", m_model);
-    m_models["bunny"]->draw(m_shaders.getShader("depthCube"));
+    m_modelLoader["porsche"]->draw(m_shaders.getShader("depthCube"));
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
@@ -617,12 +618,12 @@ void Engine::render() {
 
     m_shaders.getShader("depthCube")->setMat4("model", m_model);
 
-    m_models["planet"]->draw(m_shaders.getShader("depthCube"));
+    m_modelLoader["planet"]->draw(m_shaders.getShader("depthCube"));
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
         m_shaders.getShader("depthCube")->setMat4("model", m_modelMatrices[i]);
-        m_models["rock"]->draw(m_shaders.getShader("depthCube"));
+        m_modelLoader["rock"]->draw(m_shaders.getShader("depthCube"));
     }
 
     // Light
@@ -712,7 +713,7 @@ void Engine::render() {
     m_shaders.getShader("object")->setMat4("model", m_model);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
-    m_models["bunny"]->draw(m_shaders.getShader("object"));
+    m_modelLoader["porsche"]->draw(m_shaders.getShader("object"));
     
 
     // m_shaders.getShader("normal")->use();
@@ -728,7 +729,7 @@ void Engine::render() {
     
     m_shaders.getShader("reflect")->setMat4("model", m_model);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-    m_models["bunny"]->draw(m_shaders.getShader("reflect"));
+    m_modelLoader["porsche"]->draw(m_shaders.getShader("reflect"));
     
     // Planet Model
     m_shaders.getShader("object")->use();
@@ -739,12 +740,12 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_shaders.getShader("object")->setMat4("model", m_model);
-    m_models["planet"]->draw(m_shaders.getShader("object"));
+    m_modelLoader["planet"]->draw(m_shaders.getShader("object"));
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
         m_shaders.getShader("object")->setMat4("model", m_modelMatrices[i]);
-        m_models["rock"]->draw(m_shaders.getShader("object"));
+        m_modelLoader["rock"]->draw(m_shaders.getShader("object"));
     }
 
     // Light
@@ -812,10 +813,7 @@ void Engine::clean() {
     glDeleteFramebuffers(1, &m_FBO);
     glDeleteFramebuffers(1, &m_depthMapFBO);
 
-    for (auto iter = m_models.begin(); iter != m_models.end(); iter++) {
-        delete iter->second;
-    }
-    m_models.clear();
+    m_modelLoader.clean();
 
     glfwTerminate();
     AudioEngine::getInstance()->clean();
