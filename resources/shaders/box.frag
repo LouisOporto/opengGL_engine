@@ -16,8 +16,6 @@ uniform vec3 viewPos;
 
 uniform float farPlane;
 
-// uniform bool shadows;
-
 vec3 sampleOffsetDirections[20] = vec3[]
 (
    vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
@@ -35,19 +33,6 @@ float calcShadow(vec3 fragPos) {
 
     float shadow = 0.0;
     float bias = 0.05;
-    // float samples = 4.0;
-    // float offset = 0.1;
-    // for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
-    //     for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
-    //         for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-    //             float closetDepth = texture(depthCubeMap, fragToLight + vec3(x, y, z)).r;
-    //             closetDepth *= farPlane;
-    //             if (currentDepth - bias > closetDepth) shadow += 1.0;
-    //         }
-    //     }
-    // }
-    // shadow /= (samples * samples * samples);
-
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);
     float diskRadius = (1.0 + (viewDistance / farPlane)) / 25.0;
@@ -58,8 +43,6 @@ float calcShadow(vec3 fragPos) {
     }
     shadow /= float(samples);
 
-    // float bias = 0.05;
-    // float shadow = currentDepth - bias > closetDepth ? 1.0 : 0.0;
     return shadow;
 }
 
