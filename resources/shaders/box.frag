@@ -18,17 +18,15 @@ uniform float farPlane;
 
 vec3 sampleOffsetDirections[20] = vec3[]
 (
-   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
-   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
-   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
-   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
-   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
-);   
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), // RTF, RBF, LBF, LTF
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1), // RTB, RBB, LBB, LTB
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0), // RT , RB , LB , LT
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1), // RF , LF , RB , LB
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)  // TF , BF , BB , TB
+);
 
 float calcShadow(vec3 fragPos) {
     vec3 fragToLight = fragPos - lightPos;
-    // float closetDepth = texture(depthCubeMap, fragToLight).r;
-    // closetDepth *= farPlane;
     float currentDepth = length(fragToLight);
 
     float shadow = 0.0;
