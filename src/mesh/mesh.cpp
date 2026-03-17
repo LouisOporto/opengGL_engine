@@ -40,11 +40,13 @@ void Mesh::setupMesh() {
 void Mesh::draw(Shader* shader) {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
+    unsigned int shininessNr = 1;
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
 
     bool missingDiffuse = true;
     bool missingSpecular = true;
+    bool missingShininess = true;
     bool missingHeight = true;
     bool missingNormal = true;
 
@@ -60,12 +62,16 @@ void Mesh::draw(Shader* shader) {
         } else if (name == "texture_specular") {
             number = std::to_string(specularNr++);
             missingSpecular = false;
+        } else if (name == "texture_shininess") {
+            number = std::to_string(shininessNr++);
+            missingShininess = false;
         } else if (name == "texture_normal") {
             number = std::to_string(normalNr++);
             missingNormal = false;
-        } else if (name == "texture_height")
+        } else if (name == "texture_height") {
             number = std::to_string(heightNr++);
-        missingHeight = false;
+            missingHeight = false;
+        }
 
         // Logger::Log("Shader Name: %s, Number: %d\n", ("material." + name +
         // number).c_str(), i);
@@ -82,6 +88,7 @@ void Mesh::draw(Shader* shader) {
 
     shader->setBool("material.missingDiffuse", missingDiffuse);
     shader->setBool("material.missingSpecular", missingSpecular);
+    shader->setBool("mateiral.missingShininess", missingShininess);
     // shader.setBool("material.missingNormal", missingNormal);
     shader->setBool("materialVert.missingNormal", missingNormal);
     shader->setBool("materialVert.missingHeight", missingHeight);

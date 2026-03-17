@@ -94,16 +94,19 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         // Logger::Log("After material retrieval");
         bool noMaterials = true;
 
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");  // From abledo
+        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");  // From Kd (Diffusion)
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");  // From Metallic
+        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");  // From Ks (but majority dont provide this value)
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+        std::vector<Texture> shininessMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_shininess"); // From Ns (Exponent of shininess)
+        textures.insert(textures.end(), shininessMaps.begin(), shininessMaps.end());
+
+        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal"); // Picks up Normal maps as height maps
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_height");  // Should be the roughness map
+        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_height");  // Should be height maps, but cant assign from assimp
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         aiColor3D ambient, diffuse, specular;
@@ -136,8 +139,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
     std::vector<Texture> textures;
     int count = mat->GetTextureCount(type);
 
-    // Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(),
-    // count);
+    Logger::Log("Texture count for type: %s, Count: %d", typeName.c_str(), count);
 
     for (int i = 0; i < count; i++) {
         aiString str;
