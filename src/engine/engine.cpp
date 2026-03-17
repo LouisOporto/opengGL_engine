@@ -90,10 +90,11 @@ bool Engine::init(int argc, char* argv[]) {
     // m_objModel = new Model ("RESOURCES/images/porsche/911_scene.obj");
 
     // Need a class that does this automatically and naming convention
-    m_modelLoader.addModel("porsche", "RESOURCES/images/porsche/911_scene.obj");
-    // m_modelLoader.addModel("bunny", "RESOURCES/images/bunny/bunnygirl.obj");
+    // m_modelLoader.addModel("porsche", "RESOURCES/images/porsche/911_scene.obj");
+    m_modelLoader.addModel("bunny", "RESOURCES/images/bunnyGirl/bunnyGirl.obj");
     m_modelLoader.addModel("planet", "RESOURCES/images/planet/planet.obj");
     m_modelLoader.addModel("rock", "RESOURCES/images/rock/rock.obj");
+    // return false;
 
     // Textures setup
     std::vector<std::string> faces{
@@ -535,7 +536,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_modelLoader["porsche"]->draw(m_shaders.getShader("depth"));
+    m_modelLoader["bunny"]->draw(m_shaders.getShader("depth"));
 
     // Reflecting model
     m_model = glm::mat4(1.0f);
@@ -544,7 +545,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
     m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_modelLoader["porsche"]->draw(m_shaders.getShader("depth"));
+    m_modelLoader["bunny"]->draw(m_shaders.getShader("depth"));
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
@@ -601,7 +602,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_shaders.getShader("depthCube")->setMat4("model", m_model);
-    m_modelLoader["porsche"]->draw(m_shaders.getShader("depthCube"));
+    m_modelLoader["bunny"]->draw(m_shaders.getShader("depthCube"));
 
     // Reflecting model
     m_model = glm::mat4(1.0f);
@@ -610,7 +611,7 @@ void Engine::render() {
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
     m_shaders.getShader("depthCube")->setMat4("model", m_model);
-    m_modelLoader["porsche"]->draw(m_shaders.getShader("depthCube"));
+    m_modelLoader["bunny"]->draw(m_shaders.getShader("depthCube"));
 
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
@@ -713,7 +714,7 @@ void Engine::render() {
     m_shaders.getShader("object")->setMat4("model", m_model);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
-    m_modelLoader["porsche"]->draw(m_shaders.getShader("object"));
+    m_modelLoader["bunny"]->draw(m_shaders.getShader("object"));
     
 
     // m_shaders.getShader("normal")->use();
@@ -729,7 +730,7 @@ void Engine::render() {
     
     m_shaders.getShader("reflect")->setMat4("model", m_model);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
-    m_modelLoader["porsche"]->draw(m_shaders.getShader("reflect"));
+    m_modelLoader["bunny"]->draw(m_shaders.getShader("reflect"));
     
     // Planet Model
     m_shaders.getShader("object")->use();
