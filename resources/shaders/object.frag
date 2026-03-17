@@ -240,6 +240,5 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec3
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
-    
     return (ambient + diffuse + specular);
 }

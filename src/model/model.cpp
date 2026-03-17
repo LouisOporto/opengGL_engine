@@ -103,10 +103,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         std::vector<Texture> shininessMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_shininess"); // From Ns (Exponent of shininess)
         textures.insert(textures.end(), shininessMaps.begin(), shininessMaps.end());
 
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal"); // Picks up Normal maps as height maps
+        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal"); // Issue with assimp picking up map_bump as height maps
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_height");  // Should be height maps, but cant assign from assimp
+        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_DISPLACEMENT, "texture_height");  // Should be height maps, but cant assign from assimp
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         aiColor3D ambient, diffuse, specular;
@@ -115,6 +115,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
         material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+        // Logger::Warn("Specular Color: %f, %f, %f", specular.r, specular.g, specular.b);
 
         material->Get(AI_MATKEY_SHININESS, shininess);
         shininess = glm::max(glm::min(512.f, shininess), 0.f);

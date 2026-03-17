@@ -75,7 +75,7 @@ void Mesh::draw(Shader* shader) {
 
         // Logger::Log("Shader Name: %s, Number: %d\n", ("material." + name +
         // number).c_str(), i);
-        if (name == "texture_height" || name == "texture_normal") {
+        if (name == "texture_normal") {
             shader->setInt(("materialVert." + name + number).c_str(), i);
             // shader.setInt(("material" + name + number).c_str(), i);
         } else {

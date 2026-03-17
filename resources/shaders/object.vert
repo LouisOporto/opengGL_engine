@@ -11,10 +11,8 @@ layout (std140) uniform Matrices {
 };
 
 struct MaterialVert {
-    sampler2D texture_height1;
     sampler2D texture_normal1;
 
-    bool missingHeight;
     bool missingNormal;
 };
 
