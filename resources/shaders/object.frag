@@ -119,6 +119,28 @@ float calcShadow(vec4 fragPosLightSpace, vec3 norm, vec3 lightDir) {
     return shadow;
 }
 
+vec2 calcParllax(vec2 texCoords, vec3 viewDir) {
+    // float height = texture(material.texture_height1, texCoords).r;
+    // return texCoords - viewDir.xy * (height * heightScale);
+
+    const float numLayers = 10;
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+    vec2 P = viewDir.xy * heightScale;
+    vec2 deltaTexCoords = P / numLayers;
+
+    vec2 currentTexCoords = texCoords;
+    float currentDepthMapValue = texture(material.texture_height1, currentTexCoords).r;
+
+    while (currentLayerDepth < currentDepthMapValue) {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = texture(material.texture_height1, currentTexCoords).r;
+        currentLayerDepth += layerDepth;
+    }
+
+    return currentTexCoords;
+}
+
 void main() {
     vec4 texColor;
     vec3 normal = normalize(fs_in.Normal);
