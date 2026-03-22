@@ -94,6 +94,9 @@ bool Engine::init(int argc, char* argv[]) {
     m_modelLoader.addModel("bunny", "RESOURCES/images/bunnyGirl/bunnyGirl.obj");
     m_modelLoader.addModel("planet", "RESOURCES/images/planet/planet.obj");
     m_modelLoader.addModel("rock", "RESOURCES/images/rock/rock.obj");
+    stbi_set_flip_vertically_on_load(true);
+    m_modelLoader.addModel("brick", "RESOURCES/images/brickwall/brickwall.obj");
+    stbi_set_flip_vertically_on_load(false);
     // return false;
 
     // Textures setup
@@ -685,7 +688,7 @@ void Engine::render() {
     m_shaders.getShader("object")->setVec3("material.ambient", glm::vec3(0.7f));
     m_shaders.getShader("object")->setVec3("material.diffuse", glm::vec3(0.5f));
     m_shaders.getShader("object")->setVec3("material.specular", glm::vec3(0.1f));
-    m_shaders.getShader("object")->setFloat("material.shininess", 0.0f);
+    m_shaders.getShader("object")->setFloat("material.shininess", 32.0f);
 
     m_shaders.getShader("object")->setInt("material.texture_diffuse1", 0);
     m_shaders.getShader("object")->setInt("depthMap", 1);
@@ -693,6 +696,7 @@ void Engine::render() {
     m_shaders.getShader("object")->setBool("material.missingDiffuse", false);
     m_shaders.getShader("object")->setBool("materialVert.missingNormal", true);
     m_shaders.getShader("object")->setBool("material.missingSpecular", true);
+    m_shaders.getShader("object")->setBool("material.missingShininess", false);
     m_shaders.getShader("object")->setBool("usingDepth", true);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_floorTexture);
@@ -701,18 +705,30 @@ void Engine::render() {
     glBindVertexArray(m_planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
+    // Parallax Brick Wall    
+    m_shaders.getShader("object")->use();
+
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(5.0f, 15.0f, -12.0f));
+    m_model = glm::rotate(m_model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.0f, 10.0f, 10.0f));
+    m_shaders.getShader("object")->setMat4("model", m_model);
+    m_shaders.getShader("object")->setBool("usingDepth", false);
+
+    m_modelLoader["brick"]->draw(m_shaders.getShader("object"));
+
     // Model
     m_shaders.getShader("object")->use();
     m_shaders.getShader("object")->setBool("usingDepth", true);
-    m_shaders.getShader("object")->setInt("depthMap", 4);
+    m_shaders.getShader("object")->setInt("depthMap", 7);
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     
     m_shaders.getShader("object")->setMat4("model", m_model);
-    glActiveTexture(GL_TEXTURE4);
+    glActiveTexture(GL_TEXTURE7);
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
     m_modelLoader["bunny"]->draw(m_shaders.getShader("object"));
     
@@ -725,8 +741,8 @@ void Engine::render() {
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
     
     m_shaders.getShader("reflect")->setMat4("model", m_model);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);

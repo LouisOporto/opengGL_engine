@@ -75,12 +75,7 @@ void Mesh::draw(Shader* shader) {
 
         // Logger::Log("Shader Name: %s, Number: %d\n", ("material." + name +
         // number).c_str(), i);
-        if (name == "texture_normal") {
-            shader->setInt(("materialVert." + name + number).c_str(), i);
-            // shader.setInt(("material" + name + number).c_str(), i);
-        } else {
-            shader->setInt(("material." + name + number).c_str(), i);
-        }
+        shader->setInt(("material." + name + number).c_str(), i);
         // Logger::Log("Setting %s", (name + number).c_str());
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
@@ -89,9 +84,8 @@ void Mesh::draw(Shader* shader) {
     shader->setBool("material.missingDiffuse", missingDiffuse);
     shader->setBool("material.missingSpecular", missingSpecular);
     shader->setBool("mateiral.missingShininess", missingShininess);
-    // shader.setBool("material.missingNormal", missingNormal);
-    shader->setBool("materialVert.missingNormal", missingNormal);
-    shader->setBool("materialVert.missingHeight", missingHeight);
+    shader->setBool("material.missingHeight", missingHeight);
+    shader->setBool("material.missingNormal", missingNormal);
 
     shader->setVec3("material.ambient", m_meshMaterials.ambient);
     shader->setVec3("material.diffuse", m_meshMaterials.diffuse);
