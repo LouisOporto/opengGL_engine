@@ -42,11 +42,13 @@ struct Material {
     sampler2D texture_specular1;
     sampler2D texture_shininess1;
     sampler2D texture_normal1;
+    sampler2D texture_height1;
 
     bool missingDiffuse;
     bool missingSpecular;
     bool missingShininess;
     bool missingNormal;
+    bool missingHeight;
 
     vec3 ambient;
     vec3 diffuse;
@@ -54,21 +56,22 @@ struct Material {
     float shininess;
 };
 
-vec3 calcDirLight(DirectionLight light, vec3 norm, vec3 viewDir, vec4 texColor);
-vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec3 fragPos);
-vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec3 fragPos);
+vec3 calcDirLight(DirectionLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord);
+vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord, vec3 fragPos);
+vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord, vec3 fragPos);
 float calcShadow(vec4 FragPosLightSpace);
+vec2 calcParllax(vec2 texCoords, vec3 viewDir);
 
 uniform Material material;
 uniform sampler2D depthMap;
 uniform bool usingDepth;
+uniform float heightScale;
 
 uniform SpotLight spotLight;
 uniform DirectionLight dirLight;
 
 #define NUM_OF_POINTS 4
 uniform PointLight pointLights[NUM_OF_POINTS];
-uniform vec3 viewPos;
 uniform bool spotLightOn;
 uniform int numPointLights;
 
@@ -78,6 +81,8 @@ in VS_OUT {
     vec2 TexCoord;
     mat3 TBN;
     vec4 FragPosLightSpace;
+    vec3 TangentFragPos;
+    vec3 TangentViewPos;
 } fs_in;
 
 float linearizeDepth(float depth) {
@@ -142,7 +147,7 @@ void main() {
 }
 
 // No ambience for now
-vec3 calcDirLight(DirectionLight light, vec3 norm, vec3 viewDir, vec4 texColor) {
+vec3 calcDirLight(DirectionLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord) {
     vec3 lightDir = normalize(light.direction);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 

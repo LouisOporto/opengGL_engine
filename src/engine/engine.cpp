@@ -714,6 +714,7 @@ void Engine::render() {
     m_model = glm::scale(m_model, glm::vec3(1.0f, 10.0f, 10.0f));
     m_shaders.getShader("object")->setMat4("model", m_model);
     m_shaders.getShader("object")->setBool("usingDepth", false);
+    m_shaders.getShader("object")->setFloat("heightScale", 0.1f);
 
     m_modelLoader["brick"]->draw(m_shaders.getShader("object"));
 
