@@ -144,23 +144,35 @@ vec2 calcParllax(vec2 texCoords, vec3 viewDir) {
 void main() {
     vec4 texColor;
     vec3 normal = normalize(fs_in.Normal);
-    vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    vec3 result = vec3(0.0);
+    vec3 viewDir = normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
+    vec2 texCoord = fs_in.TexCoord;
+
+    texCoord.y = 1.0 - texCoord.y; // Flip because flipUVs disabled in assimp
 
     if (material.missingDiffuse) {
         texColor = vec4(material.diffuse, 1.0);
     } else {
-        texColor = texture(material.texture_diffuse1, fs_in.TexCoord);
+        if (!material.missingHeight) {
+            texCoord = calcParllax(texCoord, viewDir);
+            if (texCoord.x > 1.0 || texCoord.y > 1.0 || texCoord.x < 0.0 || texCoord.y < 0.0) discard;
+        }
+        texColor = texture(material.texture_diffuse1, texCoord);
     }
 
-    result += calcDirLight(dirLight, normal, viewDir, texColor);
+    if (!material.missingNormal) {
+        normal = texture(material.texture_normal1, texCoord).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+    }
 
+    vec3 result = vec3(0.0);
+
+    result += calcDirLight(dirLight, normal, viewDir, texColor, texCoord);
     for (int iter = 0; iter < numPointLights; iter++) {
-        result += calcPointLight(pointLights[iter], normal, viewDir, texColor, fs_in.FragPos);
+        result += calcPointLight(pointLights[iter], normal, viewDir, texColor, texCoord, fs_in.TangentFragPos);
     }
 
     if (spotLightOn) {
-        result += calcSpotLight(spotLight, normal, viewDir, texColor, fs_in.FragPos);
+        result += calcSpotLight(spotLight, normal, viewDir, texColor, texCoord, fs_in.TangentFragPos);
     }
 
     float gamma = 2.2;
@@ -179,12 +191,12 @@ vec3 calcDirLight(DirectionLight light, vec3 norm, vec3 viewDir, vec4 texColor, 
     vec3 diffuse = light.diffuse * material.diffuse * diff * vec3(texColor);
 
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(reflectDir, halfwayDir), 0.0), float(texture(material.texture_shininess1, fs_in.TexCoord)) * 256.f);
+    float spec = pow(max(dot(reflectDir, halfwayDir), 0.0), float(texture(material.texture_shininess1, texCoord)) * 256.f);
     if (material.missingShininess) {
         spec = pow(max(dot(reflectDir, halfwayDir), 0.0), material.shininess);
     }
 
-    vec3 specular = light.specular * material.specular * spec * vec3(texture(material.texture_specular1, fs_in.TexCoord));
+    vec3 specular = light.specular * material.specular * spec * vec3(texture(material.texture_specular1, texCoord));
     if (material.missingSpecular) {
         specular = light.specular * material.specular * spec;
         if (material.shininess == 0.0) {
@@ -201,8 +213,8 @@ vec3 calcDirLight(DirectionLight light, vec3 norm, vec3 viewDir, vec4 texColor, 
     return (ambient + diffuse + specular);
 }
 
-vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec3 fragPos) {
-    vec3 lightDir = normalize(light.position - fragPos);
+vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord, vec3 fragPos) {
+    vec3 lightDir = normalize(fs_in.TBN * light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     vec3 ambient = light.ambient * material.ambient * vec3(texColor);
@@ -211,12 +223,12 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, ve
     vec3 diffuse = light.diffuse * material.diffuse * diff * vec3(texColor);
 
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(reflectDir, halfwayDir), 0.0), float(texture(material.texture_shininess1, fs_in.TexCoord)) * 256.f);
+    float spec = pow(max(dot(reflectDir, halfwayDir), 0.0), float(texture(material.texture_shininess1, texCoord)) * 256.f);
     if (material.missingShininess) {
         spec = pow(max(dot(reflectDir, halfwayDir), 0.0), material.shininess);
     }
 
-    vec3 specular = light.specular * material.specular * spec * vec3(texture(material.texture_specular1, fs_in.TexCoord));
+    vec3 specular = light.specular * material.specular * spec * vec3(texture(material.texture_specular1, texCoord));
     if (material.missingSpecular) {
         specular = light.specular * material.specular * spec;
         if (material.shininess == 0.0) {
@@ -233,8 +245,8 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, ve
     return (ambient + diffuse + specular);
 }
 
-vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec3 fragPos) {
-    vec3 lightDir = normalize(light.position - fragPos);
+vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord, vec3 fragPos) {
+    vec3 lightDir = normalize(fs_in.TBN * light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     vec3 ambient = light.ambient * material.ambient * vec3(texColor);
@@ -243,12 +255,12 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec3
     vec3 diffuse = light.diffuse * material.diffuse * diff * vec3(texColor);
 
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(reflectDir, halfwayDir), 0.0), float(texture(material.texture_shininess1, fs_in.TexCoord)) * 256.f);
+    float spec = pow(max(dot(reflectDir, halfwayDir), 0.0), float(texture(material.texture_shininess1, texCoord)) * 256.f);
     if (material.missingShininess) {
         spec = pow(max(dot(reflectDir, halfwayDir), 0.0), material.shininess);
     }
 
-    vec3 specular = light.specular * material.specular * spec * vec3(texture(material.texture_specular1, fs_in.TexCoord));
+    vec3 specular = light.specular * material.specular * spec * vec3(texture(material.texture_specular1, texCoord));
     if (material.missingSpecular) {
         specular = light.specular * material.specular * spec;
         if (material.shininess == 0.0) {
