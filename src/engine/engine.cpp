@@ -662,7 +662,7 @@ void Engine::render() {
     
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 25.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(50.0f));
+    m_model = glm::scale(m_model, glm::vec3(100.0f));
     
     m_shaders.getShader("box")->setMat4("model", m_model);
     m_shaders.getShader("box")->setInt("diffuseTexture", 0);
@@ -685,18 +685,22 @@ void Engine::render() {
 
     m_shaders.getShader("object")->setMat4("model", m_model);
 
+    
+    m_shaders.getShader("object")->setInt("material.texture_diffuse1", 0);
+    m_shaders.getShader("object")->setInt("depthMap", 1);
+    
+    m_shaders.getShader("object")->setBool("material.missingDiffuse", false);
+    m_shaders.getShader("object")->setBool("material.missingSpecular", true);
+    m_shaders.getShader("object")->setBool("material.missingShininess", false);
+    m_shaders.getShader("object")->setBool("material.missingNormal", true);
+    m_shaders.getShader("object")->setBool("material.missingHeight", true);
+
     m_shaders.getShader("object")->setVec3("material.ambient", glm::vec3(0.7f));
     m_shaders.getShader("object")->setVec3("material.diffuse", glm::vec3(0.5f));
     m_shaders.getShader("object")->setVec3("material.specular", glm::vec3(0.1f));
     m_shaders.getShader("object")->setFloat("material.shininess", 32.0f);
 
-    m_shaders.getShader("object")->setInt("material.texture_diffuse1", 0);
-    m_shaders.getShader("object")->setInt("depthMap", 1);
-    
-    m_shaders.getShader("object")->setBool("material.missingDiffuse", false);
-    m_shaders.getShader("object")->setBool("materialVert.missingNormal", true);
-    m_shaders.getShader("object")->setBool("material.missingSpecular", true);
-    m_shaders.getShader("object")->setBool("material.missingShininess", false);
+    m_shaders.getShader("object")->setBool("disableTBN", true);
     m_shaders.getShader("object")->setBool("usingDepth", true);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_floorTexture);
@@ -704,6 +708,7 @@ void Engine::render() {
     glBindTexture(GL_TEXTURE_2D, m_depthMap);
     glBindVertexArray(m_planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    m_shaders.getShader("object")->setBool("disableTBN", false);
 
     // Parallax Brick Wall    
     m_shaders.getShader("object")->use();
