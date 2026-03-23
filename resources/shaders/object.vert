@@ -14,6 +14,7 @@ uniform mat4 model;
 
 out VS_OUT {
     vec3 FragPos;
+    vec3 ViewPos;
     vec3 Normal;
     vec2 TexCoord;
     mat3 TBN;
@@ -34,6 +35,7 @@ void main() {
     vs_out.TBN = transpose(mat3(T, B, N));
     vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
     vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.ViewPos = viewPos;
     vs_out.TexCoord = aTexCoord;
     vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
     gl_Position = projection * view * model * vec4(aPos, 1.0);

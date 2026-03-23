@@ -74,9 +74,11 @@ uniform DirectionLight dirLight;
 uniform PointLight pointLights[NUM_OF_POINTS];
 uniform bool spotLightOn;
 uniform int numPointLights;
+uniform bool disableTBN;
 
 in VS_OUT {
     vec3 FragPos;
+    vec3 ViewPos;
     vec3 Normal;
     vec2 TexCoord;
     mat3 TBN;
@@ -145,6 +147,11 @@ void main() {
     vec4 texColor;
     vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
+    vec3 fragPos = fs_in.TangentFragPos;
+    if (disableTBN) {
+        viewDir = normalize(fs_in.ViewPos - fs_in.FragPos);
+        fragPos = fs_in.FragPos;
+    }
     vec2 texCoord = fs_in.TexCoord;
 
     texCoord.y = 1.0 - texCoord.y; // Flip because flipUVs disabled in assimp
@@ -168,11 +175,11 @@ void main() {
 
     result += calcDirLight(dirLight, normal, viewDir, texColor, texCoord);
     for (int iter = 0; iter < numPointLights; iter++) {
-        result += calcPointLight(pointLights[iter], normal, viewDir, texColor, texCoord, fs_in.TangentFragPos);
+        result += calcPointLight(pointLights[iter], normal, viewDir, texColor, texCoord, fragPos);
     }
 
     if (spotLightOn) {
-        result += calcSpotLight(spotLight, normal, viewDir, texColor, texCoord, fs_in.TangentFragPos);
+        result += calcSpotLight(spotLight, normal, viewDir, texColor, texCoord, fragPos);
     }
 
     float gamma = 2.2;
@@ -215,6 +222,7 @@ vec3 calcDirLight(DirectionLight light, vec3 norm, vec3 viewDir, vec4 texColor, 
 
 vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord, vec3 fragPos) {
     vec3 lightDir = normalize(fs_in.TBN * light.position - fragPos);
+    if (disableTBN) lightDir = normalize(light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     vec3 ambient = light.ambient * material.ambient * vec3(texColor);
@@ -247,6 +255,7 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir, vec4 texColor, ve
 
 vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir, vec4 texColor, vec2 texCoord, vec3 fragPos) {
     vec3 lightDir = normalize(fs_in.TBN * light.position - fragPos);
+    if (disableTBN) lightDir = normalize(light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     vec3 ambient = light.ambient * material.ambient * vec3(texColor);
