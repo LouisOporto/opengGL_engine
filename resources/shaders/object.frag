@@ -122,25 +122,34 @@ float calcShadow(vec4 fragPosLightSpace, vec3 norm, vec3 lightDir) {
 }
 
 vec2 calcParllax(vec2 texCoords, vec3 viewDir) {
-    // float height = texture(material.texture_height1, texCoords).r;
-    // return texCoords - viewDir.xy * (height * heightScale);
+    const float minLayers = 8.0f;
+    const float maxLayers = 32.0f;
+    float layers = mix(maxLayers, minLayers, max(dot(vec3(0.0, 0.0, 1.0), viewDir), 0.0));
 
-    const float numLayers = 10;
-    float layerDepth = 1.0 / numLayers;
+    float deltaLayerDepth = 1.0 / layers;
     float currentLayerDepth = 0.0;
+
     vec2 P = viewDir.xy * heightScale;
-    vec2 deltaTexCoords = P / numLayers;
-
+    vec2 deltaTexCoords = P / layers;
     vec2 currentTexCoords = texCoords;
-    float currentDepthMapValue = texture(material.texture_height1, currentTexCoords).r;
+    float currentMapDepthValue = texture(material.texture_height1, currentTexCoords).r;
 
-    while (currentLayerDepth < currentDepthMapValue) {
+    while (currentLayerDepth < currentMapDepthValue) {
         currentTexCoords -= deltaTexCoords;
-        currentDepthMapValue = texture(material.texture_height1, currentTexCoords).r;
-        currentLayerDepth += layerDepth;
+        currentMapDepthValue = texture(material.texture_height1, currentTexCoords).r;
+        currentLayerDepth += deltaLayerDepth;
     }
 
-    return currentTexCoords;
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    float afterDepth = currentMapDepthValue - currentLayerDepth;
+    float beforeDepth = texture(material.texture_height1, prevTexCoords).r - currentLayerDepth + deltaLayerDepth;
+
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+
 }
 
 void main() {
