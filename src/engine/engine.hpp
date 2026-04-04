@@ -326,15 +326,9 @@ const std::vector<glm::vec3> OBJECTPOSITIONS = {
 };
 
 const std::vector<glm::vec3> LIGHTPOSITIONS = {
-    glm::vec3(3.0f, 4.0f, 2.5f),
-    glm::vec3(-3.0f, 1.0f, 1.3f),
-    glm::vec3(0.0f, 1.2f, -3.2f),
-};
-
-const std::vector<glm::vec3> VEGETATION = {
-    glm::vec3(-1.5f, 0.0f, -0.48f), glm::vec3(1.5f, 0.0f, 0.51f),
-    glm::vec3(0.0f, 0.0f, 0.7f),    glm::vec3(-0.3f, 0.0f, -2.3f),
-    glm::vec3(0.5f, 0.0f, -0.6f),
+    glm::vec3(3.0f, 3.0f, 3.0f),
+    glm::vec3(-2.0f, 3.0f, 2.0f),
+    glm::vec3(4.0f, 3.0f, -4.0f),
 };
 
 const float AMB = 0.1f;
@@ -356,6 +350,7 @@ class Engine {
     bool init(int argc, char* argv[]);
 
     void update();
+    void drawScene(Shader* shader);
     void render();
     void event();
 

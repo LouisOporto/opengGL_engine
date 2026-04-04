@@ -514,54 +514,51 @@ void Engine::update() {
     }
 }
 
-void Engine::render() {
-    glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
-    glClearColor(background.x, background.y, background.z, background.w);
-    glClear(GL_COLOR_BUFFER_BIT);
+void Engine::drawScene(Shader* shader) {
+    shader->use();
 
-    // First Pass: Shadow Casting
-    glViewport(0, 0, SHADOW_LENGTH, SHADOW_HEIGHT);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    m_shaders.getShader("depth")->use();
-
+    // Box
     m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, glm::vec3(5.0f, 25.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(100.0f));
+    shader->setMat4("model", m_model);
 
-    m_shaders.getShader("depth")->setMat4("model", m_model);
+    glBindVertexArray(m_boxVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Floor
+    m_model = glm::mat4(1.0f);
+    shader->setMat4("model", m_model);
     glBindVertexArray(m_planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Model
     m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    m_model = glm::translate(m_model, glm::vec3(0.0f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    shader->setMat4("model", m_model);
+    m_modelLoader["bunny"]->draw(shader);
 
-    m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_modelLoader["bunny"]->draw(m_shaders.getShader("depth"));
-
-    // Reflecting model
+    // Reflecting
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
+    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0, 1.0f, 0.0f));
     m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
-    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    
-    m_shaders.getShader("depth")->setMat4("model", m_model);
-    m_modelLoader["bunny"]->draw(m_shaders.getShader("depth"));
+    shader->setMat4("model", m_model);
+    m_modelLoader["bunny"]->draw(shader);
 
+    // Planet Model
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
     m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    m_shaders.getShader("depth")->setMat4("model", m_model);
-
-    m_modelLoader["planet"]->draw(m_shaders.getShader("depth"));
+    shader->setMat4("model", m_model);
+    m_modelLoader["planet"]->draw(shader);
 
     // Asteroid Belt
     for (int i = 0; i < 100; i++) {
-        m_shaders.getShader("depth")->setMat4("model", m_modelMatrices[i]);
-        m_modelLoader["rock"]->draw(m_shaders.getShader("depth"));
+        shader->setMat4("model", m_modelMatrices[i]);
+        m_modelLoader["rock"]->draw(shader);
     }
 
     // Light
@@ -570,10 +567,79 @@ void Engine::render() {
         m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
         m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
 
-        m_shaders.getShader("depth")->setMat4("model", m_model);
+        shader->setMat4("model", m_model);
         glBindVertexArray(m_lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+
+}
+
+void Engine::render() {
+    glm::vec4 background = {0.1f, 0.1f, 0.1f, 1.0f};
+    glClearColor(background.x, background.y, background.z, background.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Function that draw scene and provides an overriding for shader use if use default not enabled
+
+    // First Pass: Shadow Casting
+    glViewport(0, 0, SHADOW_LENGTH, SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    drawScene(m_shaders.getShader("depth"));
+    // m_shaders.getShader("depth")->use();
+
+    // m_model = glm::mat4(1.0f);
+
+    // m_shaders.getShader("depth")->setMat4("model", m_model);
+    // glBindVertexArray(m_planeVAO);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // // Model
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    // m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    // m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // m_shaders.getShader("depth")->setMat4("model", m_model);
+    // m_modelLoader["bunny"]->draw(m_shaders.getShader("depth"));
+
+    // // Reflecting model
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
+    // m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    // m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    // m_shaders.getShader("depth")->setMat4("model", m_model);
+    // m_modelLoader["bunny"]->draw(m_shaders.getShader("depth"));
+
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
+    // m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // m_shaders.getShader("depth")->setMat4("model", m_model);
+
+    // m_modelLoader["planet"]->draw(m_shaders.getShader("depth"));
+
+    // // Asteroid Belt
+    // for (int i = 0; i < 100; i++) {
+    //     m_shaders.getShader("depth")->setMat4("model", m_modelMatrices[i]);
+    //     m_modelLoader["rock"]->draw(m_shaders.getShader("depth"));
+    // }
+
+    // // Light
+    // for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
+    //     m_model = glm::mat4(1.0f);
+    //     m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
+    //     m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
+
+    //     m_shaders.getShader("depth")->setMat4("model", m_model);
+    //     glBindVertexArray(m_lightVAO);
+    //     glDrawArrays(GL_TRIANGLES, 0, 36);
+    // }
+
+    // END DEPTH MASK //
+
 
     // Logger::Warn("depthFBO: %d\ndepthCubeFBO: %d", m_depthMapFBO, m_depthCubemapFBO);
     // Lets do a first desgin with point light and directrion light off.
@@ -582,64 +648,67 @@ void Engine::render() {
     glBindFramebuffer(GL_FRAMEBUFFER, m_depthCubemapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    m_shaders.getShader("depthCube")->use();
+    drawScene(m_shaders.getShader("depthCube"));
 
-    m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(5.0f, 25.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(50.0f));
-    m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    // m_shaders.getShader("depthCube")->use();
 
-    glBindVertexArray(m_objectVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(5.0f, 25.0f, 0.0f));
+    // m_model = glm::scale(m_model, glm::vec3(100.0f));
+    // m_shaders.getShader("depthCube")->setMat4("model", m_model);
 
-    m_model = glm::mat4(1.0f);
+    // glBindVertexArray(m_boxVAO);
+    // glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    m_shaders.getShader("depthCube")->setMat4("model", m_model);
-    glBindVertexArray(m_planeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // m_model = glm::mat4(1.0f);
 
-    // Model
-    m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
-    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
+    // m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    // glBindVertexArray(m_planeVAO);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    m_shaders.getShader("depthCube")->setMat4("model", m_model);
-    m_modelLoader["bunny"]->draw(m_shaders.getShader("depthCube"));
+    // // Model
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+    // m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    // m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 15), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    // Reflecting model
-    m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
-    m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
-    m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    // m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    // m_modelLoader["bunny"]->draw(m_shaders.getShader("depthCube"));
+
+    // // Reflecting model
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(10.0f, 0.0f, 0.0f));
+    // m_model = glm::scale(m_model, glm::vec3(1.5f, 1.5f, 1.5f));
+    // m_model = glm::rotate(m_model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
-    m_shaders.getShader("depthCube")->setMat4("model", m_model);
-    m_modelLoader["bunny"]->draw(m_shaders.getShader("depthCube"));
+    // m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    // m_modelLoader["bunny"]->draw(m_shaders.getShader("depthCube"));
 
-    m_model = glm::mat4(1.0f);
-    m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
-    m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
+    // // Planet Model
+    // m_model = glm::mat4(1.0f);
+    // m_model = glm::translate(m_model, glm::vec3(5.0f, 20.0f, 0.0f));
+    // m_model = glm::rotate(m_model, glm::radians((float)glfwGetTime() * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    // m_shaders.getShader("depthCube")->setMat4("model", m_model);
 
-    m_modelLoader["planet"]->draw(m_shaders.getShader("depthCube"));
+    // m_modelLoader["planet"]->draw(m_shaders.getShader("depthCube"));
 
-    // Asteroid Belt
-    for (int i = 0; i < 100; i++) {
-        m_shaders.getShader("depthCube")->setMat4("model", m_modelMatrices[i]);
-        m_modelLoader["rock"]->draw(m_shaders.getShader("depthCube"));
-    }
+    // // Asteroid Belt
+    // for (int i = 0; i < 100; i++) {
+    //     m_shaders.getShader("depthCube")->setMat4("model", m_modelMatrices[i]);
+    //     m_modelLoader["rock"]->draw(m_shaders.getShader("depthCube"));
+    // }
 
-    // Light
-    for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
-        m_model = glm::mat4(1.0f);
-        m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
-        m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
+    // // Light
+    // for (int iter = 0; iter < LIGHTPOSITIONS.size(); iter++) {
+    //     m_model = glm::mat4(1.0f);
+    //     m_model = glm::translate(m_model, LIGHTPOSITIONS[iter]);
+    //     m_model = glm::scale(m_model, glm::vec3(0.6f, 0.6f, 0.6f));
 
-        m_shaders.getShader("depthCube")->setMat4("model", m_model);
-        glBindVertexArray(m_lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    //     m_shaders.getShader("depthCube")->setMat4("model", m_model);
+    //     glBindVertexArray(m_lightVAO);
+    //     glDrawArrays(GL_TRIANGLES, 0, 36);
+    // }
     
     // Second Pass: Model Rendering
     glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
@@ -684,7 +753,6 @@ void Engine::render() {
     m_model = glm::mat4(1.0f);
 
     m_shaders.getShader("object")->setMat4("model", m_model);
-
     
     m_shaders.getShader("object")->setInt("material.texture_diffuse1", 0);
     m_shaders.getShader("object")->setInt("depthMap", 1);
